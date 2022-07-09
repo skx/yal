@@ -1,15 +1,13 @@
-;
-; This is a sample input file for our minimal lisp interpreter.
-;
-; We use it to demonstrates and test our the basic features.
-;
-
-
 ;;
-;; Start of demo code
+;; This is a sample input file for our minimal lisp interpreter.
 ;;
+;; We use it to demonstrates and test our the basic features.
+;;
+;; NOTE: A lot of the things called here are defined in the standard
+;; library, which is pre-pended to all loaded-scripts.
 
 
+;; Instead of just (+ 1 2) we allow multiple args
 (print "Our mathematical functions allow 2+ arguments, e.g: %s"
   (+ 1 2 3 4 5 6))
 
@@ -19,8 +17,11 @@
     1
       (* n (fact (- n 1))))))
 
-;; Invoke the factorial function, inside a `print` call
-(print "8! => %s" (fact 8))
+;; Invoke the factorial function, using apply
+(apply (list 1 2 3 4 5 6 7 8 9 10)
+  (lambda (x)
+    (print "%s! => %s" x (fact x))))
+
 
 ;; Define a variable "foo => 0"
 ;; but then change it, and show that result
@@ -44,9 +45,9 @@
 ;; Now create a utility function to square a number
 (define sq (lambda (x) (* x x)))
 
-;; For each item in the list, print it, and the associated square.
+;; For each item in the range 1-10, print it, and the associated square.
 ;; Awesome!  Much Wow!
-(apply '(1 2 3 4 5 6 7 8 9 10)
+(apply (nat 11)
       (lambda (x)
         (print "%s\tsquared is %s" x (sq x))))
 
@@ -73,6 +74,14 @@
 (if (= (nth (list 10 20 30 40 50) 1) 20)
  (print "Got the second item of the list"))
 
+;;
+;; Show even numbers via the filter-function.
+;;
+(print "Even numbers from 0-10: %s"
+       (filter (nat 11) (lambda (x) (even? x))))
+
+(print "Squared numbers from 0-10: %s"
+       (map (nat 11) (lambda (x) (sq x))))
 
 ;
 ; all done

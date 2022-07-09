@@ -57,3 +57,29 @@
 (define neg? (lambda (n) (< n 0)))
 (define abs  (lambda (n) (if (neg? n) (neg n) n)))
 (define sign (lambda (n) (if (neg? n) (neg 1) 1)))
+
+
+;; Create ranges of numbers in a list
+(define range (lambda (start end step)
+  (if (< start end)
+     (cons start (range (+ start step) end step))
+        ())))
+
+;; Create sequences from 0/1 to N
+(define seq (lambda (n) (range 0 n 1)))
+(define nat (lambda (n) (range 1 n 1)))
+
+
+
+(define filter (lambda (xs f)
+  (if (nil? xs)
+     ()
+     (if (f (car xs))
+        (cons (car xs)(filter (cdr xs) f))
+           (filter (cdr xs) f)))))
+
+
+(define map (lambda (xs f)
+  (if (nil? xs)
+     ()
+       (cons (f (car xs)) (map (cdr xs) f)))))

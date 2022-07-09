@@ -36,7 +36,7 @@ A reasonable amount of sample code can be found in [test.lisp](test.lisp), but a
 
 ```
 
-We have a small core of built-in functions, including those you'd expect:
+We have a small core of functions which probably include things you'd expect:
 
 * List operations `list`, `car`, `cdr`, etc.
 * Mathematical operations which work with a variable number of arguments `+`, `-`, `*`, `/`
@@ -44,6 +44,7 @@ We have a small core of built-in functions, including those you'd expect:
 * Conditionals via `if`, functions via `define`/`lambda`.
 * Tail recursion optimization.
 * Output via `print`, with support for format-strings.
+* Decent range of standard functions `apply`, `map`, `filter`, etc.
 
 Many of our primitives are implemented in pure Lisp, and can be found in our standard-library:
 
