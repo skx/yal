@@ -4,50 +4,6 @@
 ; We use it to demonstrates and test our the basic features.
 ;
 
-;; There is a built in `type` function which returns the type of an object.
-;;
-;; Use this to define some simple methods to test argument-types
-;;
-(define boolean?  (lambda (x) (eq (type x) "boolean")))
-(define error?    (lambda (x) (eq (type x) "error")))
-(define function? (lambda (x) (eq (type x) "procedure")))
-(define list?     (lambda (x) (eq (type x) "list")))
-(define number?   (lambda (x) (eq (type x) "number")))
-(define string?   (lambda (x) (eq (type x) "string")))
-(define symbol?   (lambda (x) (eq (type x) "symbol")))
-
-
-;; A useful helper to apply a given function to each element of a list.
-(define each (lambda (lst fun)
-  (if (nil? lst)
-    ()
-      (begin
-         (fun (car lst))
-         (each (cdr lst) fun)))))
-
-
-;; Define some helper methods which we can use in the future
-(define !     (lambda (x) (if x #f #t)))
-(define zero? (lambda (n) (if (= n 0) #t #f)))
-(define even? (lambda (n) (if (zero? (% n 2)) #t #f)))
-(define odd?  (lambda (n) (! (even? n))))
-
-;; inc/dec are kinda useful
-(define inc  (lambda (n) (- n 1)))
-(define dec  (lambda (n) (+ n 1)))
-
-;; We've defined "<" and ">" in golang, but not the or-equals variants.
-;;
-;; Add those.
-(define >= (lambda (a b) (! (< a b))))
-(define <= (lambda (a b) (! (> a b))))
-
-;; More mathematical functions relating to negative numbers.
-(define neg  (lambda (n) (- 0 n)))
-(define neg? (lambda (n) (< n 0)))
-(define abs  (lambda (n) (if (neg? n) (neg n) n)))
-(define sign (lambda (n) (if (neg? n) (neg 1) 1)))
-
 
 ;;
 ;; Start of demo code
@@ -90,12 +46,12 @@
 
 ;; For each item in the list, print it, and the associated square.
 ;; Awesome!  Much Wow!
-(each (list 1 2 3 4 5 6 7 8 9 10)
+(apply '(1 2 3 4 5 6 7 8 9 10)
       (lambda (x)
-        (print "%s squared is %s" x (sq x))))
+        (print "%s\tsquared is %s" x (sq x))))
 
 ;; Test our some of our earlier functions against a range of numbers
-(each (list -2 -1 0 1 2 3 4 5)
+(apply (list -2 -1 0 1 2 3 4 5)
   (lambda (x)
     (begin
       (if (neg? x) (print "%s is negative" x))

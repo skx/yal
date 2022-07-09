@@ -2,6 +2,16 @@
 
 Another trivial/toy Lisp implementation in Go.
 
+
+## Usage
+
+Build the application and then execute a file from the commandlike
+
+```sh
+go build .
+./yal test.lisp
+```
+
 ## Examples
 
 A reasonable amount of sample code can be found in [test.lisp](test.lisp), but as a quick example:
@@ -35,6 +45,10 @@ We have a small core of built-in functions, including those you'd expect:
 * Tail recursion optimization.
 * Output via `print`, with support for format-strings.
 
+Many of our primitives are implemented in pure Lisp, and can be found in our standard-library:
+
+* [stdlib/stdlib.lisp](stdlib/stdlib.lisp)
+  * This is **prepended** to any script that is supplied upon the command-line.
 
 ## References
 
