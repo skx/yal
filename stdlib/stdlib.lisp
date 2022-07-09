@@ -70,7 +70,7 @@
 (define nat (lambda (n) (range 1 n 1)))
 
 
-
+;; Remove items from a list where the predicate function is not T
 (define filter (lambda (xs f)
   (if (nil? xs)
      ()
@@ -78,8 +78,33 @@
         (cons (car xs)(filter (cdr xs) f))
            (filter (cdr xs) f)))))
 
-
+;; Replace a list with the contents of evaluating the given function on
+;; every itme of the list
 (define map (lambda (xs f)
   (if (nil? xs)
      ()
        (cons (f (car xs)) (map (cdr xs) f)))))
+
+
+;; reduce function
+(define reduce (lambda (xs f acc)
+  (if (nil? xs)
+    acc
+      (reduce (cdr xs) f (f acc (car xs))))))
+
+;; Now define min/max using reduce
+(define min (lambda (xs)
+  (if (nil? xs)
+    ()
+      (reduce xs
+        (lambda (a b)
+           (if (< a b) a b))
+              (car xs)))))
+
+(define max (lambda (xs)
+  (if (nil? xs)
+    ()
+      (reduce xs
+        (lambda (a b)
+           (if (< a b) b a))
+              (car xs)))))

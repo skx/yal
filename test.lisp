@@ -83,6 +83,15 @@
 (print "Squared numbers from 0-10: %s"
        (map (nat 11) (lambda (x) (sq x))))
 
+;;
+;; Show the biggest and smallest list values
+;;
+(let ((vals '(32 92 109 903 31 3 -93 -31 -17 -3)))
+  (begin
+     (print "Biggest item in our list %s is %s" vals (max vals))
+     (print "Smallest item in our list %s is %s" vals (min vals))
+   )))
+
 ;
 ; all done
 ;
