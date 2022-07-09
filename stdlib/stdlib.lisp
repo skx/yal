@@ -16,6 +16,26 @@
 (define string?   (lambda (x) (eq (type x) "string")))
 (define symbol?   (lambda (x) (eq (type x) "symbol")))
 
+;; inc/dec are kinda useful
+(define inc  (lambda (n) (- n 1)))
+(define dec  (lambda (n) (+ n 1)))
+
+;; Not is useful
+(define !     (lambda (x) (if x #f #t)))
+
+;; Some simple tests of numbers
+(define zero? (lambda (n) (if (= n 0) #t #f)))
+(define one?  (lambda (n) (if (= n 1) #t #f)))
+(define even? (lambda (n) (if (zero? (% n 2)) #t #f)))
+(define odd?  (lambda (n) (! (even? n))))
+
+
+;; We've defined "<" and ">" in golang, but not the or-equals variants.
+;;
+;; Add those.
+(define >= (lambda (a b) (! (< a b))))
+(define <= (lambda (a b) (! (> a b))))
+
 
 ;; A useful helper to apply a given function to each element of a list.
 (define apply (lambda (lst fun)
@@ -26,20 +46,11 @@
          (apply (cdr lst) fun)))))
 
 
-(define !     (lambda (x) (if x #f #t)))
-(define zero? (lambda (n) (if (= n 0) #t #f)))
-(define even? (lambda (n) (if (zero? (% n 2)) #t #f)))
-(define odd?  (lambda (n) (! (even? n))))
-
-;; inc/dec are kinda useful
-(define inc  (lambda (n) (- n 1)))
-(define dec  (lambda (n) (+ n 1)))
-
-;; We've defined "<" and ">" in golang, but not the or-equals variants.
-;;
-;; Add those.
-(define >= (lambda (a b) (! (< a b))))
-(define <= (lambda (a b) (! (> a b))))
+;; Find the Nth item of a list
+(define nth (lambda (lst i)
+  (if (= 0 i)
+    (car lst)
+      (nth (cdr lst) (- i 1)))))
 
 ;; More mathematical functions relating to negative numbers.
 (define neg  (lambda (n) (- 0 n)))

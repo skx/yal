@@ -60,9 +60,19 @@
       (if (odd? x)  (print "%s is ODD" x)))))
 
 ;; Test that we can get the correct type of each of our primitives
-(each (list 1 "steve" (list 1 2 3) #t #f nil boolean? print)
+(apply (list 1 "steve" (list 1 2 3) #t #f nil boolean? print)
   (lambda (x)
     (print "'%s' has type '%s'" x (type x))))
+
+;; Test the nth function
+;;
+;; nth starts counting at zero which is perhaps surprising.
+(if (= (nth (list 10 20 30 40 50) 0) 10)
+    (print "Got the first item of the list"))
+
+(if (= (nth (list 10 20 30 40 50) 1) 20)
+ (print "Got the second item of the list"))
+
 
 ;
 ; all done
