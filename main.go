@@ -14,7 +14,7 @@ import (
 func main() {
 
 	// Ensure we have an argument
-	if len(os.Args) < 1 {
+	if len(os.Args) < 2 {
 		fmt.Printf("Usage: yal file.lisp\n")
 		return
 	}
