@@ -115,27 +115,31 @@ func PopulateEnvironment(env *env.Environment) {
 		// Cast
 		l := args[0].(primitive.List)
 
-		// Sort it
-		sort.Slice(l, func(i, j int) bool {
+		// Copy
+		var c primitive.List
+		c = append(c, l...)
+
+		// Sort the copy of the list
+		sort.Slice(c, func(i, j int) bool {
 
 			// If we have numbers we can sort
-			if _, ok := l[i].(primitive.Number); ok {
-				if _, ok := l[j].(primitive.Number); ok {
+			if _, ok := c[i].(primitive.Number); ok {
+				if _, ok := c[j].(primitive.Number); ok {
 
-					a, _ := strconv.ParseFloat(l[i].ToString(), 64)
-					b, _ := strconv.ParseFloat(l[j].ToString(), 64)
+					a, _ := strconv.ParseFloat(c[i].ToString(), 64)
+					b, _ := strconv.ParseFloat(c[j].ToString(), 64)
 
 					return a < b
 				}
 			}
 
 			// Otherwise we sort as strings
-			a := l[i].ToString()
-			b := l[j].ToString()
+			a := c[i].ToString()
+			b := c[j].ToString()
 			return a < b
 		})
 
-		return l
+		return c
 	}})
 
 	// nil

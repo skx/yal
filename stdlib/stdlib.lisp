@@ -16,7 +16,12 @@
 (define string?   (lambda (x) (eq (type x) "string")))
 (define symbol?   (lambda (x) (eq (type x) "symbol")))
 
-;; inc/dec are kinda useful
+;; Traditionally we use `car` and `cdr` for accessing the first and rest
+;; elements of a list.  For readability it might be nice to vary that
+(define first (lambda (x) (car x)))
+(define rest  (lambda (x) (cdr x)))
+
+;; inc/dec are useful primitives to have
 (define inc  (lambda (n) (- n 1)))
 (define dec  (lambda (n) (+ n 1)))
 
@@ -79,7 +84,7 @@
            (filter (cdr xs) f)))))
 
 ;; Replace a list with the contents of evaluating the given function on
-;; every itme of the list
+;; every item of the list
 (define map (lambda (xs f)
   (if (nil? xs)
      ()
