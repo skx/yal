@@ -236,10 +236,12 @@ func PopulateEnvironment(env *env.Environment) {
 
 		// one arg
 		if len(args) == 1 {
+			// expand
 			str := expandStr(args[0].ToString())
 
+			// show & return
 			fmt.Println(str)
-			return primitive.Nil{}
+			return primitive.String(str)
 		}
 
 		// OK format-string
