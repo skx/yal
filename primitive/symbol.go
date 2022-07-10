@@ -4,7 +4,9 @@ package primitive
 type Symbol string
 
 // ToString converts this object to a string.
-func (s Symbol) ToString() string { return string(s) }
+func (s Symbol) ToString() string {
+	return string(s)
+}
 
 // Type returns the type of this primitive object.
 func (s Symbol) Type() string {

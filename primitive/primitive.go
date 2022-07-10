@@ -5,10 +5,10 @@ package primitive
 // Primitive is the interface of all our types
 type Primitive interface {
 
-	// Convert this primitive to a string
+	// ToString converts this primitive to a string representation.
 	ToString() string
 
-	// Return the type of this object
+	// Type returns the type of this object.
 	Type() string
 }
 
