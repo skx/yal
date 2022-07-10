@@ -3,14 +3,30 @@
 Another trivial/toy Lisp implementation in Go.
 
 
-## Usage
 
-Build the application and then execute a file from the commandlike
+## Building / Installing
+
+If you have [this repository](https://github.com/skx/yal) cloned locally then
+you should be able to build and install in the standard way:
 
 ```sh
-go build .
-./yal test.lisp
+$ go build .
+$ go install .
 ```
+
+If you don't have the repository installed, but you have a working golang environment then installation should be as simple as:
+
+```sh
+$ go install github.com/skx/yal@latest
+```
+
+Once installed you can execute a file containing your lisp like so:
+
+```sh
+$ yal test.lisp
+```
+
+
 
 ## Examples
 
@@ -36,7 +52,11 @@ A reasonable amount of sample code can be found in [test.lisp](test.lisp), but a
 
 ```
 
-We have a small core of functions which probably include things you'd expect:
+
+
+# Features
+
+We have a decent core of functions:
 
 * List operations `list`, `car`, `cdr`, etc.
 * Mathematical operations which work with a variable number of arguments `+`, `-`, `*`, `/`
@@ -44,12 +64,29 @@ We have a small core of functions which probably include things you'd expect:
 * Conditionals via `if`, functions via `define`/`lambda`.
 * Tail recursion optimization.
 * Output via `print`, with support for format-strings.
-* Decent range of standard functions `apply`, `map`, `filter`, etc.
+* Decent range of standard functions `apply`, `filter`, `map`, `min`, `max`, `reduce`, etc.
 
-Many of our primitives are implemented in pure Lisp, and can be found in our standard-library:
+Our primitives are implemented in either golang, or 100% pure lisp, and
+you can inspect both sets of code:
 
-* [stdlib/stdlib.lisp](stdlib/stdlib.lisp)
-  * This is **prepended** to any script that is supplied upon the command-line.
+* Primitives implemented in go:
+  * [builtins/builtins.go](builtins/builtins.go)
+* Primitives implemented in 100% pure lisp:
+  * [stdlib/stdlib.lisp](stdlib/stdlib.lisp)
+  * This code is essentially **prepended** to any script that is supplied upon the command-line.
+
+
+
+## Omissions
+
+Notable omissions here:
+
+* No vectors.
+* No eval.
+* No macros.
+
+
+
 
 ## References
 
