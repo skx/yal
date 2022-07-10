@@ -96,7 +96,7 @@
      (print "\tSorted list is %s "(sort vals))
      (print "\tFirst item is %s "(first vals))
      (print "\tRemaining items %s "(rest vals))
-   )))
+   ))
 
 ;
 ; all done
