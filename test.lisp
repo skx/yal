@@ -23,7 +23,7 @@
     (print "%s! => %s" x (fact x))))
 
 
-                                        ; Split a string into a list, reverse it, and join it
+; Split a string into a list, reverse it, and join it
 (let ((input "Steve Kemp"))
   (begin
    (print "Starting string: %s" input)
@@ -71,14 +71,6 @@
   (lambda (x)
     (print "'%s' has type '%s'" x (type x))))
 
-;; Test the nth function
-;;
-;; nth starts counting at zero which is perhaps surprising.
-(if (= (nth (list 10 20 30 40 50) 0) 10)
-    (print "Got the first item of the list."))
-
-(if (= (nth (list 10 20 30 40 50) 1) 20)
- (print "Got the second item of the list."))
 
 ;;
 ;; Show even numbers via the filter-function.
@@ -106,6 +98,43 @@
      (print "\tFirst item is %s "        (first vals))
      (print "\tRemaining items %s "      (rest vals))
    ))
+
+
+;;
+;; A simple assertion function
+;;
+(define assert (lambda (result msg)
+  (if result ()
+    (print "ASSERT failed - %s" msg))))
+
+;;
+;; Make some basic tests using our assert function.
+;;
+(assert (function? print) "(function? print) failed")
+(assert (function? assert) "(function? assert) failed")
+(assert (eq 6 (+ 1 2 3)) "1+2+3 != 6")
+(assert (eq 6 (+ 1 2 3)) "1+2+3 != 6")
+(assert (eq 6 (+ 1 2 3)) "1+2+3 != 6")
+(assert (eq (type type) "procedure(golang)")  "(type type)")
+(assert (eq (type print) "procedure(golang)") "(type print)")
+(assert (eq (type 1)    "number")             "(type number)")
+(assert (eq (type "me") "string")             "(type string)")
+(assert (eq (type (list 1 2)) "list")         "(type list)")
+(assert (neg? -3)  "negative number detected")
+(assert (! (neg? 0) ) "zero is not negative")
+(assert (! (neg? 30) ) "a positive number is not negative")
+(assert (= (abs -3) 3) "abs(-3) == 3")
+(assert (= (fact 1) 1) "1! = 1")
+(assert (= (fact 2) 2) "2! = 2")
+(assert (= (fact 3) 6) "3! = 6")
+(assert (< 3 30)       "3 < 30")
+(assert (! (< 30 30))  "30 < 30")
+(assert (<= 30 30)     "30 < 30")
+(assert (>  30 20)     "30 > 20")
+
+;; nth starts counting at zero which is perhaps surprising.
+(assert (= (nth (list 10 20 30) 0) 10) "Got the first item of the list.")
+(assert (= (nth (list 10 20 30) 1) 20) "Got the second item of the list.")
 
 ;
 ; all done
