@@ -160,6 +160,7 @@ func (ev *Eval) readExpression() (primitive.Primitive, error) {
 // The return value of this function is that of the last expression which
 // was executed.
 func (ev *Eval) Evaluate(e *env.Environment) primitive.Primitive {
+
 	// Out value
 	var out primitive.Primitive
 
