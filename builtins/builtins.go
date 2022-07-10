@@ -4,6 +4,8 @@ package builtins
 
 import (
 	"fmt"
+	"sort"
+	"strconv"
 
 	"github.com/skx/yal/env"
 	"github.com/skx/yal/primitive"
@@ -88,7 +90,7 @@ func PopulateEnvironment(env *env.Environment) {
 		return primitive.Number(int(args[0].(primitive.Number)) % int(args[1].(primitive.Number)))
 	}})
 
-	// primitive.List
+	// List
 	env.Set("list", &primitive.Procedure{F: func(args []primitive.Primitive) primitive.Primitive {
 		return primitive.List(args)
 	}})
@@ -97,6 +99,43 @@ func PopulateEnvironment(env *env.Environment) {
 	}})
 	env.Set("cdr", &primitive.Procedure{F: func(args []primitive.Primitive) primitive.Primitive {
 		return args[0].(primitive.List)[1:]
+	}})
+	env.Set("sort", &primitive.Procedure{F: func(args []primitive.Primitive) primitive.Primitive {
+
+		// If we have only a single argument
+		if len(args) != 1 {
+			return primitive.Error("invalid argument count")
+		}
+
+		// Which is a list
+		if _, ok := args[0].(primitive.List); !ok {
+			return primitive.Error("argument not a list")
+		}
+
+		// Cast
+		l := args[0].(primitive.List)
+
+		// Sort it
+		sort.Slice(l, func(i, j int) bool {
+
+			// If we have numbers we can sort
+			if _, ok := l[i].(primitive.Number); ok {
+				if _, ok := l[j].(primitive.Number); ok {
+
+					a, _ := strconv.ParseFloat(l[i].ToString(), 64)
+					b, _ := strconv.ParseFloat(l[j].ToString(), 64)
+
+					return a < b
+				}
+			}
+
+			// Otherwise we sort as strings
+			a := l[i].ToString()
+			b := l[j].ToString()
+			return a < b
+		})
+
+		return l
 	}})
 
 	// nil

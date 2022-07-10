@@ -83,8 +83,9 @@
 (print "Squared numbers from 0-10: %s"
        (map (nat 11) (lambda (x) (sq x))))
 
+
 ;;
-;; Show the biggest and smallest list values
+;; Setup a list and do a few things with it.
 ;;
 (let ((vals '(32 92 109 903 31 3 -93 -31 -17 -3)))
   (begin
@@ -92,6 +93,7 @@
      (print "\tBiggest item is %s" (max vals))
      (print "\tSmallest item is %s" (min vals))
      (print "\tReversed list is %s "(reverse vals))
+     (print "\tSorted list is %s "(sort vals))
    )))
 
 ;
