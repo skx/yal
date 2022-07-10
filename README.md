@@ -60,25 +60,35 @@ A reasonable amount of sample code can be found in [test.lisp](test.lisp), but a
 
 # Features
 
-We have a decent core of functions:
+We have a reasonable number of functions implemented in our golang core:
 
-* List operations `list`, `car`, `cdr`, etc.
-* Mathematical operations which work with a variable number of arguments `+`, `-`, `*`, `/`
-* String operations `split` and `join`.
-* Comparison functions `<`, `>`, etc.
-* Conditionals via `if`, functions via `define`/`lambda`.
+* List operations:
+  * `car`, `cdr`, `list`, & `sort`.
+* Logical operations
+  * `and`, & `or`.
+* Mathematical operations:
+  * `+`, `-`, `*`, `/`, & `%`
+* String operations:
+  * `split` and `join`.
+* Comparison functions:
+  * `<`, `<=`, `>`, `>=`, `=`, & `eq`.
+* Misc features
+  * `str`, `print`, & `type`
+* Special forms
+  * `begin`, `define`, `if`, `lambda`, `let`,  `set!`, `quote`,
 * Tail recursion optimization.
-* Output via `print`, with support for format-strings.
-* Decent range of standard functions `apply`, `filter`, `map`, `min`, `max`, `reduce`, etc.
 
-Our primitives are implemented in either golang, or 100% pure lisp, and
-you can inspect both sets of code:
+Building upon those primitives we have a larger standard-library of functions written in Lisp such as:
+
+* `abs`, `apply`, `append`, `filter`, `map`, `min`, `max`, `nat`, `neg`, `nth`, `reduce`, `reverse`, `seq`, etc.
+
+Although the lists above should be up to date you can check the definitions to see what is currently available:
 
 * Primitives implemented in go:
   * [builtins/builtins.go](builtins/builtins.go)
 * Primitives implemented in 100% pure lisp:
   * [stdlib/stdlib.lisp](stdlib/stdlib.lisp)
-  * This code is essentially **prepended** to any script that is supplied upon the command-line.
+  * The code in this file is essentially **prepended** to any script that is supplied upon the command-line.
 
 
 
@@ -86,15 +96,13 @@ you can inspect both sets of code:
 
 Notable omissions here:
 
-* No vectors.
-* No eval.
 * No macros.
-
+* No vectors/hashes/records.
 
 
 
 ## References
 
 * https://github.com/thesephist/klisp/blob/main/lib/klisp.klisp
+  * Very helpful "inspiration" for writing primitives in Lisp.
 * [mal - Make a Lisp](https://github.com/kanaka/mal/)
-* [(How to Write a (Lisp) Interpreter (in Python))](http://norvig.com/lispy.html)
