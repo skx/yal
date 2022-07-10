@@ -88,8 +88,10 @@
 ;;
 (let ((vals '(32 92 109 903 31 3 -93 -31 -17 -3)))
   (begin
-     (print "Biggest item in our list %s is %s" vals (max vals))
-     (print "Smallest item in our list %s is %s" vals (min vals))
+     (print "Working with the list: %s " vals)
+     (print "\tBiggest item is %s" (max vals))
+     (print "\tSmallest item is %s" (min vals))
+     (print "\tReversed list is %s "(reverse vals))
    )))
 
 ;

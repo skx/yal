@@ -108,3 +108,16 @@
         (lambda (a b)
            (if (< a b) b a))
               (car xs)))))
+
+
+; O(n^2) behavior with linked lists
+(define append (lambda (xs el)
+  (if (nil? xs)
+    (list el)
+      (cons (car xs) (append (cdr xs) el)))))
+
+
+(define reverse (lambda (x)
+  (if (nil? x)
+    x
+      (append (reverse (cdr x)) (car x)))))
