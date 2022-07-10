@@ -22,44 +22,42 @@ var ErrEOF = errors.New("unexpected EOF")
 // Eval holds our program/state
 type Eval struct {
 
-	// toks contains the tokenized input
-	toks *[]string
+	// toks contains the tokenized input, which we'll interpret.
+	toks []string
+
+	// offset records where in our list of tokens we're going to
+	// read from next.
+	offset int
 }
 
 // New constructs a new evaluator.
 func New(src string) *Eval {
 	e := &Eval{}
-	e.toks = e.tokenize(src)
+
+	// tokenize our input program into a series of terms
+	e.tokenize(src)
+
 	return e
 }
 
-// Remove a token from the string-list
-//
-// TODO: Remove me.
-func (ev *Eval) pop(a *[]string) string {
-	v := (*a)[0]
-	*a = (*a)[1:]
-	return v
-}
-
-// tokenize splits the input string into tokens
-func (ev *Eval) tokenize(str string) *[]string {
-	tokens := []string{}
+// tokenize splits the input string into tokens, via a horrific regular
+// expression which I don't understand!
+func (ev *Eval) tokenize(str string) {
 	re := regexp.MustCompile(`[\s,]*(~@|[\[\]{}()'` + "`" +
 		`~^@]|"(?:\\.|[^\\"])*"|;.*|[^\s\[\]{}('"` + "`" +
 		`,;)]*)`)
+
 	for _, match := range re.FindAllStringSubmatch(str, -1) {
-		if (match[1] == "") ||
-			// comment
-			(match[1][0] == ';') {
+
+		// skip empty terms, or comments (which begin with ";").
+		if (match[1] == "") || (match[1][0] == ';') {
 			continue
 		}
-		tokens = append(tokens, match[1])
+		ev.toks = append(ev.toks, match[1])
 	}
-	return &tokens
 }
 
-// atom converts strings into symbols, booleans, as appropriate.
+// atom converts strings into symbols, booleans, etc, as appropriate.
 func (ev *Eval) atom(token string) primitive.Primitive {
 	switch token {
 	case "#t":
@@ -79,36 +77,60 @@ func (ev *Eval) atom(token string) primitive.Primitive {
 	return primitive.Symbol(token)
 }
 
-func (ev *Eval) readFromTokens(tokens *[]string) (primitive.Primitive, error) {
-	if len(*tokens) == 0 {
+// readExpression uses recursion to read a complete expression from
+// our internal array of tokens - as produced by `tokenize`.
+func (ev *Eval) readExpression() (primitive.Primitive, error) {
+
+	// Have we walked off the end of the program?
+	if ev.offset >= len(ev.toks) {
 		return nil, ErrEOF
 	}
-	token := ev.pop(tokens)
+
+	// Get the next token, and increase our read-position
+	token := ev.toks[ev.offset]
+	ev.offset++
+
+	// We'll have different behaviour depending on what we're
+	// looking at right now.
 	switch token {
 	case "'":
 		// '... => (quote ...)
-		quoted, err := ev.readFromTokens(tokens)
+		quoted, err := ev.readExpression()
 		if err != nil {
 			return nil, err
 		}
 		return primitive.List{ev.atom("quote"), quoted}, nil
 	case "(":
-		if len(*tokens) == 0 {
+		// Are we at the end of our program?
+		if ev.offset >= len(ev.toks) {
 			return nil, ErrEOF
 		}
+
+		// Create a list, which we'll populate with items
+		// until we reach the matching ")" statement
 		list := primitive.List{}
-		for (*tokens)[0] != ")" {
-			expr, err := ev.readFromTokens(tokens)
+
+		// Loop until we hit the closing bracket
+		for ev.toks[ev.offset] != ")" {
+
+			// Read the sub-expressions, recursively.
+			expr, err := ev.readExpression()
 			if err != nil {
 				return nil, err
 			}
 			list = append(list, expr)
-			if len(*tokens) == 0 {
+
+			// Check again we've not hit the end of the program
+			if ev.offset >= len(ev.toks) {
 				return nil, ErrEOF
 			}
 		}
-		ev.pop(tokens)
 
+		// We bump the current read-position one more here,
+		// which means we skip over the closing ")" character.
+		ev.offset++
+
+		// Now rewrite our input a little if it is a (define ..) list
 		if len(list) > 0 && list[0] == primitive.Symbol("define") {
 			// (define (f ...) (...)) => (define f (lambda (...) (...)))
 			if argsList, ok := list[1].(primitive.List); ok {
@@ -118,8 +140,16 @@ func (ev *Eval) readFromTokens(tokens *[]string) (primitive.Primitive, error) {
 
 		return list, nil
 	case ")":
+		// We shouldn't ever hit this, because we skip over
+		// the closing ")" when we handle "(".
+		//
+		// If a program is malformed we'll see it though
 		return nil, errors.New("unexpected ')'")
 	default:
+
+		// Return just a single atom/primitive.
+		//
+		// (i.e. A non-list, non-quote, and non-string).
 		return ev.atom(token), nil
 	}
 }
@@ -136,7 +166,8 @@ func (ev *Eval) Evaluate(e *env.Environment) primitive.Primitive {
 	// loop over all input
 	for {
 		// Get the next expression
-		expr, err := ev.readFromTokens(ev.toks)
+		expr, err := ev.readExpression()
+
 		if err != nil {
 			// End of list?
 			if err == ErrEOF {
