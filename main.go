@@ -5,9 +5,9 @@ import (
 	"io/ioutil"
 	"os"
 
+	"github.com/skx/yal/builtins"
 	"github.com/skx/yal/env"
 	"github.com/skx/yal/eval"
-	"github.com/skx/yal/primitive"
 	"github.com/skx/yal/stdlib"
 )
 
@@ -30,7 +30,7 @@ func main() {
 	environment := env.New()
 
 	// Populate the default primitives
-	primitive.PopulateEnvironment(environment)
+	builtins.PopulateEnvironment(environment)
 
 	// Read the standard library
 	pre := stdlib.Contents()
@@ -42,8 +42,6 @@ func main() {
 	interpreter := eval.New(src)
 
 	// Now evaluate the input using the specified environment
-	out := interpreter.Evaluate(environment)
+	interpreter.Evaluate(environment)
 
-	// Show the result
-	fmt.Printf("%v\n", out)
 }
