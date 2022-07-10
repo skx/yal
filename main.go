@@ -13,14 +13,16 @@ import (
 
 func main() {
 
+	// Ensure we have an argument
 	if len(os.Args) < 1 {
-		fmt.Printf("Usage: ml file.lisp\n")
+		fmt.Printf("Usage: yal file.lisp\n")
 		return
 	}
 
+	// Read the specified file.
 	content, err := ioutil.ReadFile(os.Args[1])
 	if err != nil {
-		fmt.Printf("error reading %s:%s\n", os.Args[1], err)
+		fmt.Printf("Error reading %s:%s\n", os.Args[1], err)
 		return
 	}
 
