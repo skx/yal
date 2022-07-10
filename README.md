@@ -64,6 +64,7 @@ We have a decent core of functions:
 
 * List operations `list`, `car`, `cdr`, etc.
 * Mathematical operations which work with a variable number of arguments `+`, `-`, `*`, `/`
+* String operations `split` and `join`.
 * Comparison functions `<`, `>`, etc.
 * Conditionals via `if`, functions via `define`/`lambda`.
 * Tail recursion optimization.

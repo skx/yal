@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"sort"
 	"strconv"
+	"strings"
 
 	"github.com/skx/yal/env"
 	"github.com/skx/yal/primitive"
@@ -206,6 +207,56 @@ func PopulateEnvironment(env *env.Environment) {
 			return append(primitive.List{args[0]}, args[1].(primitive.List)...)
 		}
 		return primitive.List{args[0], args[1]}
+	}})
+
+	// string functions
+	env.Set("split", &primitive.Procedure{F: func(args []primitive.Primitive) primitive.Primitive {
+
+		// We require two arguments
+		if len(args) != 2 {
+			return primitive.Error("invalid argument count")
+		}
+
+		// Both arguments must be strings
+		if _, ok := args[0].(primitive.String); !ok {
+			return primitive.Error("argument not a string")
+		}
+		if _, ok := args[1].(primitive.String); !ok {
+			return primitive.Error("argument not a string")
+		}
+
+		// split
+		out := strings.Split(args[0].ToString(), args[1].ToString())
+
+		var c primitive.List
+
+		for _, x := range out {
+			c = append(c, primitive.String(x))
+		}
+
+		return c
+	}})
+
+	// string functions
+	env.Set("join", &primitive.Procedure{F: func(args []primitive.Primitive) primitive.Primitive {
+
+		// We require on argument
+		if len(args) != 1 {
+			return primitive.Error("invalid argument count")
+		}
+
+		// The argument must be a list
+		if _, ok := args[0].(primitive.List); !ok {
+			return primitive.Error("argument not a list")
+		}
+
+		tmp := ""
+
+		for _, t := range args[0].(primitive.List) {
+			tmp += t.ToString()
+		}
+
+		return primitive.String(tmp)
 	}})
 
 	// type

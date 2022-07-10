@@ -23,6 +23,13 @@
     (print "%s! => %s" x (fact x))))
 
 
+                                        ; Split a string into a list, reverse it, and join it
+(let ((input "Steve Kemp"))
+  (begin
+   (print "Starting string: %s" input)
+   (print "Reversed string: %s" (join (reverse (split "Steve Kemp" ""))))))
+
+
 ;; Define a variable "foo => 0"
 ;; but then change it, and show that result
 (let ((foo 0))
