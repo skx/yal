@@ -17,7 +17,14 @@ func PopulateEnvironment(env *env.Environment) {
 	env.Set("+", &primitive.Procedure{F: func(args []primitive.Primitive) primitive.Primitive {
 		v := args[0].(primitive.Number)
 		for _, i := range args[1:] {
-			v += i.(primitive.Number)
+
+			// check we have a number
+			n, ok := i.(primitive.Number)
+			if ok {
+				v += n
+			} else {
+				return primitive.Error(fmt.Sprintf("argument %s was not a number", i.ToString()))
+			}
 		}
 		return primitive.Number(v)
 	}})
@@ -25,7 +32,14 @@ func PopulateEnvironment(env *env.Environment) {
 	env.Set("-", &primitive.Procedure{F: func(args []primitive.Primitive) primitive.Primitive {
 		v := args[0].(primitive.Number)
 		for _, i := range args[1:] {
-			v -= i.(primitive.Number)
+
+			// check we have a number
+			n, ok := i.(primitive.Number)
+			if ok {
+				v -= n
+			} else {
+				return primitive.Error(fmt.Sprintf("argument %s was not a number", i.ToString()))
+			}
 		}
 		return primitive.Number(v)
 	}})
@@ -33,7 +47,14 @@ func PopulateEnvironment(env *env.Environment) {
 	env.Set("*", &primitive.Procedure{F: func(args []primitive.Primitive) primitive.Primitive {
 		v := args[0].(primitive.Number)
 		for _, i := range args[1:] {
-			v *= i.(primitive.Number)
+
+			// check we have a number
+			n, ok := i.(primitive.Number)
+			if ok {
+				v *= n
+			} else {
+				return primitive.Error(fmt.Sprintf("argument %s was not a number", i.ToString()))
+			}
 		}
 		return primitive.Number(v)
 	}})
@@ -41,7 +62,14 @@ func PopulateEnvironment(env *env.Environment) {
 	env.Set("/", &primitive.Procedure{F: func(args []primitive.Primitive) primitive.Primitive {
 		v := args[0].(primitive.Number)
 		for _, i := range args[1:] {
-			v /= i.(primitive.Number)
+
+			// check we have a number
+			n, ok := i.(primitive.Number)
+			if ok {
+				v /= n
+			} else {
+				return primitive.Error(fmt.Sprintf("argument %s was not a number", i.ToString()))
+			}
 		}
 		return primitive.Number(v)
 	}})
@@ -95,9 +123,20 @@ func PopulateEnvironment(env *env.Environment) {
 		return primitive.List(args)
 	}})
 	env.Set("car", &primitive.Procedure{F: func(args []primitive.Primitive) primitive.Primitive {
+
+		// ensure we received a list
+		if _, ok := args[0].(primitive.List); !ok {
+			return primitive.Error("argument not a list")
+		}
+
 		return args[0].(primitive.List)[0]
 	}})
 	env.Set("cdr", &primitive.Procedure{F: func(args []primitive.Primitive) primitive.Primitive {
+		// ensure we received a list
+		if _, ok := args[0].(primitive.List); !ok {
+			return primitive.Error("argument not a list")
+		}
+
 		return args[0].(primitive.List)[1:]
 	}})
 	env.Set("sort", &primitive.Procedure{F: func(args []primitive.Primitive) primitive.Primitive {
@@ -213,8 +252,10 @@ func PopulateEnvironment(env *env.Environment) {
 			}
 			parm = append(parm, a.ToString())
 		}
-		fmt.Println(fmt.Sprintf(frmt, parm...))
-		return primitive.Nil{}
+
+		out := fmt.Sprintf(frmt, parm...)
+		fmt.Println(out)
+		return primitive.String(out)
 	}})
 
 	// Convert an object to a string

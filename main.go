@@ -1,3 +1,10 @@
+// Package main contains a simple CLI driver for our lisp interpreter.
+//
+// All the logic is contained within the `main` function, and it merely
+// reads the contents of the user-supplied filename, prepends the standard
+// library to that content, and executes it.
+//
+// Notably we don't contain a REPL-mode at the moment.
 package main
 
 import (
@@ -8,6 +15,7 @@ import (
 	"github.com/skx/yal/builtins"
 	"github.com/skx/yal/env"
 	"github.com/skx/yal/eval"
+	"github.com/skx/yal/primitive"
 	"github.com/skx/yal/stdlib"
 )
 
@@ -42,6 +50,10 @@ func main() {
 	interpreter := eval.New(src)
 
 	// Now evaluate the input using the specified environment
-	interpreter.Evaluate(environment)
+	out := interpreter.Evaluate(environment)
 
+	// Did we get an error?  Then show it.
+	if _, ok := out.(primitive.Error); ok {
+		fmt.Printf("Error running: %v\n", out)
+	}
 }
