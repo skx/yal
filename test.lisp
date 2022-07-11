@@ -136,6 +136,16 @@
 (assert (= (nth (list 10 20 30) 0) 10) "Got the first item of the list.")
 (assert (= (nth (list 10 20 30) 1) 20) "Got the second item of the list.")
 
+
+;; Simple test of `cond`
+(define a 6)
+(cond
+  (quote
+    (> a 20) (print "A > 20")
+    (> a 15) (print "A > 15")
+    #t       (print "A is %s" a)
+))
+
 ;
 ; all done
 ;

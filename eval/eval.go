@@ -274,6 +274,45 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment) primitive.Prim
 				}
 				return ret
 
+			// (cond
+			case primitive.Symbol("cond"):
+
+				// Iterate over the list in pairs
+				// cast the argument to a list
+				l := listExp[1].(primitive.List)
+
+				// skip the quote
+				l = l[1:]
+
+				// Iterate over the list in pairs
+				for i := 0; i < len(l); i += 2 {
+					var section []primitive.Primitive
+					if i > len(l)-2 {
+						section = l[i:]
+					} else {
+						section = l[i : i+2]
+					}
+
+					// Test that worked
+					if len(section) != 2 {
+						fmt.Printf("Section fail: %v", section)
+						return primitive.Error("expected pairs of two items")
+					}
+
+					test := section[0]
+					eval := section[1]
+
+					// need to eval test now.
+					res := ev.eval(test, e)
+
+					//					fmt.Printf("Test:%v Eval:%v Result:%v\n", test, eval, res)
+					if b, ok := res.(primitive.Bool); ok && bool(b) {
+						exp = eval
+						goto foo
+					}
+
+				}
+
 			// (if
 			case primitive.Symbol("if"):
 				test := ev.eval(listExp[1], e)
@@ -333,5 +372,6 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment) primitive.Prim
 				exp = proc.Body
 			}
 		}
+	foo:
 	}
 }
