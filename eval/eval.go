@@ -161,6 +161,10 @@ func (ev *Eval) readExpression() (primitive.Primitive, error) {
 // was executed.
 func (ev *Eval) Evaluate(e *env.Environment) primitive.Primitive {
 
+	// Reset our position so we can evaluate the same program
+	// multiple times
+	ev.offset = 0
+
 	// Out value
 	var out primitive.Primitive
 
