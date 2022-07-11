@@ -277,8 +277,7 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment) primitive.Prim
 			// (cond
 			case primitive.Symbol("cond"):
 
-				// Iterate over the list in pairs
-				// cast the argument to a list
+				// Cast the argument to a list
 				l := listExp[1].(primitive.List)
 
 				// skip the quote
@@ -295,7 +294,6 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment) primitive.Prim
 
 					// Test that worked
 					if len(section) != 2 {
-						fmt.Printf("Section fail: %v", section)
 						return primitive.Error("expected pairs of two items")
 					}
 
@@ -305,10 +303,15 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment) primitive.Prim
 					// need to eval test now.
 					res := ev.eval(test, e)
 
-					//					fmt.Printf("Test:%v Eval:%v Result:%v\n", test, eval, res)
+					// Was it a success?  Then
+					// goto our exit.
+					//
+					// This is horrid, but it short-circuits
+					// the evaluation of the rest of the
+					// list-pairs.
 					if b, ok := res.(primitive.Bool); ok && bool(b) {
 						exp = eval
-						goto foo
+						goto repeat_eval
 					}
 
 				}
@@ -372,6 +375,6 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment) primitive.Prim
 				exp = proc.Body
 			}
 		}
-	foo:
+	repeat_eval:
 	}
 }
