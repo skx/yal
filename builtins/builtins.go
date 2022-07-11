@@ -268,33 +268,34 @@ func PopulateEnvironment(env *env.Environment) {
 	// logic
 	env.Set("or", &primitive.Procedure{F: func(args []primitive.Primitive) primitive.Primitive {
 
-		// We require one argument
-		if len(args) != 1 {
-			return primitive.Error("invalid argument count")
-		}
+		// For each argument
+		for _, arg := range args {
 
-		// The argument must be a list
-		if _, ok := args[0].(primitive.List); !ok {
-			return primitive.Error("argument not a list")
-		}
+			switch v := arg.(type) {
 
-		// cast the argument to a list
-		l := args[0].(primitive.List)
-
-		// for each element of a list, if any is false then
-		// we return false
-		for _, arg := range l {
-
-			// See if we can cast to a bool
-			b, ok := arg.(primitive.Bool)
-			if ok {
-				// OK it was - is it true?
-				if b {
+			// Bool?
+			case primitive.Bool:
+				if v {
 					return primitive.Bool(true)
 				}
-			} else {
-				if !primitive.IsNil(arg) {
-					return primitive.Bool(true)
+
+			// list
+			case primitive.List:
+
+				for _, a := range v {
+
+					// See if we can cast to a bool
+					b, ok := a.(primitive.Bool)
+					if ok {
+						// OK it was - is it true?
+						if b {
+							return primitive.Bool(true)
+						}
+					} else {
+						if !primitive.IsNil(arg) {
+							return primitive.Bool(true)
+						}
+					}
 				}
 			}
 		}
@@ -303,33 +304,38 @@ func PopulateEnvironment(env *env.Environment) {
 
 	env.Set("and", &primitive.Procedure{F: func(args []primitive.Primitive) primitive.Primitive {
 
-		// We require one argument
-		if len(args) != 1 {
-			return primitive.Error("invalid argument count")
-		}
+		// For each argument
+		for _, arg := range args {
 
-		// The argument must be a list
-		if _, ok := args[0].(primitive.List); !ok {
-			return primitive.Error("argument not a list")
-		}
+			switch v := arg.(type) {
 
-		// cast the argument to a list
-		l := args[0].(primitive.List)
-
-		// for each element of a list, if any is false then
-		// we return false
-		for _, arg := range l {
-
-			// See if we can cast to a bool
-			b, ok := arg.(primitive.Bool)
-			if ok {
-				// OK it was - is it true?
-				if !b {
+			// Bool?
+			case primitive.Bool:
+				if !v {
 					return primitive.Bool(false)
 				}
-			} else {
-				if primitive.IsNil(arg) {
-					return primitive.Bool(false)
+
+			// Nil
+			case primitive.Nil:
+				return primitive.Bool(false)
+
+			// list
+			case primitive.List:
+
+				for _, a := range v {
+
+					// See if we can cast to a bool
+					b, ok := a.(primitive.Bool)
+					if ok {
+						// OK it was - is it true?
+						if !b {
+							return primitive.Bool(false)
+						}
+					} else {
+						if primitive.IsNil(arg) {
+							return primitive.Bool(false)
+						}
+					}
 				}
 			}
 		}
