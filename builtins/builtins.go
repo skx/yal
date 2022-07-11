@@ -17,7 +17,19 @@ func PopulateEnvironment(env *env.Environment) {
 
 	// maths
 	env.Set("+", &primitive.Procedure{F: func(args []primitive.Primitive) primitive.Primitive {
-		v := args[0].(primitive.Number)
+
+		// ensure we have at least one argument
+		if len(args) < 1 {
+			return primitive.Error("invalid argument count")
+		}
+
+		// the first argument must be a number.
+		v, ok := args[0].(primitive.Number)
+		if !ok {
+			return primitive.Error(fmt.Sprintf("argument '%s' was not a number", args[0].ToString()))
+		}
+
+		// now process all the rest of the arguments
 		for _, i := range args[1:] {
 
 			// check we have a number
@@ -32,7 +44,19 @@ func PopulateEnvironment(env *env.Environment) {
 	}})
 
 	env.Set("-", &primitive.Procedure{F: func(args []primitive.Primitive) primitive.Primitive {
-		v := args[0].(primitive.Number)
+
+		// ensure we have at least one argument
+		if len(args) < 1 {
+			return primitive.Error("invalid argument count")
+		}
+
+		// the first argument must be a number.
+		v, ok := args[0].(primitive.Number)
+		if !ok {
+			return primitive.Error(fmt.Sprintf("argument '%s' was not a number", args[0].ToString()))
+		}
+
+		// now process all the rest of the arguments
 		for _, i := range args[1:] {
 
 			// check we have a number
@@ -47,7 +71,18 @@ func PopulateEnvironment(env *env.Environment) {
 	}})
 
 	env.Set("*", &primitive.Procedure{F: func(args []primitive.Primitive) primitive.Primitive {
-		v := args[0].(primitive.Number)
+		// ensure we have at least one argument
+		if len(args) < 1 {
+			return primitive.Error("invalid argument count")
+		}
+
+		// the first argument must be a number.
+		v, ok := args[0].(primitive.Number)
+		if !ok {
+			return primitive.Error(fmt.Sprintf("argument '%s' was not a number", args[0].ToString()))
+		}
+
+		// now process all the rest of the arguments
 		for _, i := range args[1:] {
 
 			// check we have a number
@@ -62,7 +97,18 @@ func PopulateEnvironment(env *env.Environment) {
 	}})
 
 	env.Set("/", &primitive.Procedure{F: func(args []primitive.Primitive) primitive.Primitive {
-		v := args[0].(primitive.Number)
+		// ensure we have at least one argument
+		if len(args) < 1 {
+			return primitive.Error("invalid argument count")
+		}
+
+		// the first argument must be a number.
+		v, ok := args[0].(primitive.Number)
+		if !ok {
+			return primitive.Error(fmt.Sprintf("argument '%s' was not a number", args[0].ToString()))
+		}
+
+		// now process all the rest of the arguments
 		for _, i := range args[1:] {
 
 			// check we have a number
@@ -81,6 +127,10 @@ func PopulateEnvironment(env *env.Environment) {
 	// "<=" and ">=" can be implemented in lisp :)
 	//
 	env.Set("<", &primitive.Procedure{F: func(args []primitive.Primitive) primitive.Primitive {
+		if len(args) != 2 {
+			return primitive.Error("wrong number of arguments")
+		}
+
 		if _, ok := args[0].(primitive.Number); !ok {
 			return primitive.Error("argument not a number")
 		}
@@ -91,6 +141,10 @@ func PopulateEnvironment(env *env.Environment) {
 	}})
 
 	env.Set(">", &primitive.Procedure{F: func(args []primitive.Primitive) primitive.Primitive {
+		if len(args) != 2 {
+			return primitive.Error("wrong number of arguments")
+		}
+
 		if _, ok := args[0].(primitive.Number); !ok {
 			return primitive.Error("argument not a number")
 		}
@@ -125,6 +179,9 @@ func PopulateEnvironment(env *env.Environment) {
 		return primitive.List(args)
 	}})
 	env.Set("car", &primitive.Procedure{F: func(args []primitive.Primitive) primitive.Primitive {
+		if len(args) != 1 {
+			return primitive.Error("wrong number of arguments")
+		}
 
 		// ensure we received a list
 		if _, ok := args[0].(primitive.List); !ok {
@@ -134,6 +191,10 @@ func PopulateEnvironment(env *env.Environment) {
 		return args[0].(primitive.List)[0]
 	}})
 	env.Set("cdr", &primitive.Procedure{F: func(args []primitive.Primitive) primitive.Primitive {
+		if len(args) != 1 {
+			return primitive.Error("wrong number of arguments")
+		}
+
 		// ensure we received a list
 		if _, ok := args[0].(primitive.List); !ok {
 			return primitive.Error("argument not a list")
@@ -262,6 +323,9 @@ func PopulateEnvironment(env *env.Environment) {
 
 	// type
 	env.Set("type", &primitive.Procedure{F: func(args []primitive.Primitive) primitive.Primitive {
+		if len(args) != 1 {
+			return primitive.Error("wrong number of arguments")
+		}
 		return primitive.String(args[0].Type())
 	}})
 
@@ -344,6 +408,10 @@ func PopulateEnvironment(env *env.Environment) {
 
 	// equality
 	env.Set("eq", &primitive.Procedure{F: func(args []primitive.Primitive) primitive.Primitive {
+		if len(args) != 2 {
+			return primitive.Error("wrong number of arguments")
+		}
+
 		a := args[0]
 		b := args[1]
 
@@ -410,7 +478,7 @@ func expandStr(input string) string {
 		c := input[i]
 
 		// look for "\n", "\t", etc.
-		if c == '\\' && i < l {
+		if c == '\\' && (i+1) < l {
 
 			next := input[i+1]
 			switch next {
