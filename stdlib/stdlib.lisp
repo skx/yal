@@ -10,9 +10,8 @@
 ;; Use this to define some simple methods to test argument-types
 (define boolean?  (lambda (x) (eq (type x) "boolean")))
 (define error?    (lambda (x) (eq (type x) "error")))
-(define function? (lambda (x) (or (list
-                                     (eq (type x) "procedure(lisp)")
-                                     (eq (type x) "procedure(golang)")))))
+(define function? (lambda (x) (or (eq (type x) "procedure(lisp)")
+                                  (eq (type x) "procedure(golang)"))))
 (define list?     (lambda (x) (eq (type x) "list")))
 (define number?   (lambda (x) (eq (type x) "number")))
 (define string?   (lambda (x) (eq (type x) "string")))
