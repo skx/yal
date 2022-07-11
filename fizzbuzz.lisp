@@ -31,10 +31,10 @@
 (define fizz (lambda (n)
   (cond
     (quote
-      (and (list (divByThree n) (divByFive n)))  (print "fizzbuzz")
-      (divByThree n)                             (print "fizz")
-      (divByFive  n)                             (print "buzz")
-      #t                                         (print n)))))
+      (and (divByThree n) (divByFive n))  (print "fizzbuzz")
+      (divByThree n)                      (print "fizz")
+      (divByFive  n)                      (print "buzz")
+      #t                                  (print n)))))
 
 
 ;; Apply the function fizz, for each number 1-50
