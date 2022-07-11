@@ -110,23 +110,28 @@
 ;;
 ;; Make some basic tests using our assert function.
 ;;
-(assert (function? print) "(function? print) failed")
+(assert (function? print)  "(function? print) failed")
 (assert (function? assert) "(function? assert) failed")
-(assert (eq 6 (+ 1 2 3)) "1+2+3 != 6")
-(assert (eq 6 (+ 1 2 3)) "1+2+3 != 6")
-(assert (eq 6 (+ 1 2 3)) "1+2+3 != 6")
-(assert (eq (type type) "procedure(golang)")  "(type type)")
-(assert (eq (type print) "procedure(golang)") "(type print)")
-(assert (eq (type 1)    "number")             "(type number)")
-(assert (eq (type "me") "string")             "(type string)")
-(assert (eq (type (list 1 2)) "list")         "(type list)")
-(assert (neg? -3)  "negative number detected")
-(assert (! (neg? 0) ) "zero is not negative")
-(assert (! (neg? 30) ) "a positive number is not negative")
-(assert (= (abs -3) 3) "abs(-3) == 3")
+
+(assert (eq 6  (+ 1 2 3))     "1+2+3 != 6")
+(assert (eq 24 (* 2 3 4))     "2*3*4 != 24")
+(assert (eq 70 (- 100 10 20)) "100-10-20 != 70")
+
+(assert (eq (type type)   "procedure(golang)")  "(type type)")
+(assert (eq (type assert) "procedure(lisp)")    "(type assert)")
+(assert (eq (type 1)    "number")               "(type number)")
+(assert (eq (type "me") "string")               "(type string)")
+(assert (eq (type (list 1 2)) "list")           "(type list)")
+
+(assert (neg? -3)            "negative number detected")
+(assert (! (neg? 0) )        "zero is not negative")
+(assert (! (neg? 30) )       "a positive number is not negative")
+(assert (= (abs -3) (abs 3)) "abs(-3) == 3")
+
 (assert (= (fact 1) 1) "1! = 1")
 (assert (= (fact 2) 2) "2! = 2")
 (assert (= (fact 3) 6) "3! = 6")
+
 (assert (< 3 30)       "3 < 30")
 (assert (! (< 30 30))  "30 < 30")
 (assert (<= 30 30)     "30 < 30")
