@@ -60,9 +60,9 @@ func (ev *Eval) tokenize(str string) {
 // atom converts strings into symbols, booleans, etc, as appropriate.
 func (ev *Eval) atom(token string) primitive.Primitive {
 	switch token {
-	case "#t":
+	case "#t", "true":
 		return primitive.Bool(true)
-	case "#f":
+	case "#f", "false":
 		return primitive.Bool(false)
 	case "nil":
 		return primitive.Nil{}

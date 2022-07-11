@@ -86,6 +86,8 @@ A reasonable amount of sample code can be found in [test.lisp](test.lisp), but a
 
 We have a reasonable number of functions implemented in our golang core:
 
+* Support for strings, numbers, errors, lists, etc.
+  * `#t` is the true symbol, `#f` is false, though `true` and `false` are synonyms.
 * List operations:
   * `car`, `cdr`, `list`, & `sort`.
 * Logical operations

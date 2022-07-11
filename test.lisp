@@ -67,7 +67,7 @@
       (if (odd? x)  (print "%s is ODD"      x)))))
 
 ;; Test that we can get the correct type of each of our primitives
-(apply (list 1 "steve" (list 1 2 3) #t #f nil boolean? print)
+(apply (list 1 "steve" (list 1 2 3) true #t false #f nil boolean? print)
   (lambda (x)
     (print "'%s' has type '%s'" x (type x))))
 
@@ -143,7 +143,7 @@
   (quote
     (> a 20) (print "A > 20")
     (> a 15) (print "A > 15")
-    #t       (print "A is %s" a)
+    true     (print "A is %s" a)
 ))
 
 ;
