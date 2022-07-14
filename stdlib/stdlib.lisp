@@ -37,6 +37,9 @@
 (define odd?  (lambda (n) (! (even? n))))
 
 
+;; Square root
+(define sqrt (lambda (x) (# x 0.5)))
+
 ;; We've defined "<" and ">" in golang, but not the or-equals variants.
 ;;
 ;; Add those.
@@ -62,6 +65,7 @@
 ;; More mathematical functions relating to negative numbers.
 (define neg  (lambda (n) (- 0 n)))
 (define neg? (lambda (n) (< n 0)))
+(define pos? (lambda (n) (> n 0)))
 (define abs  (lambda (n) (if (neg? n) (neg n) n)))
 (define sign (lambda (n) (if (neg? n) (neg 1) 1)))
 

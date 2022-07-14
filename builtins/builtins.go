@@ -4,6 +4,7 @@ package builtins
 
 import (
 	"fmt"
+	"math"
 	"sort"
 	"strconv"
 	"strings"
@@ -172,6 +173,16 @@ func PopulateEnvironment(env *env.Environment) {
 			return primitive.Error("argument not a number")
 		}
 		return primitive.Number(int(args[0].(primitive.Number)) % int(args[1].(primitive.Number)))
+	}})
+
+	env.Set("#", &primitive.Procedure{F: func(args []primitive.Primitive) primitive.Primitive {
+		if _, ok := args[0].(primitive.Number); !ok {
+			return primitive.Error("argument not a number")
+		}
+		if _, ok := args[1].(primitive.Number); !ok {
+			return primitive.Error("argument not a number")
+		}
+		return primitive.Number(math.Pow(float64(args[0].(primitive.Number)), float64(args[1].(primitive.Number))))
 	}})
 
 	// List

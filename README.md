@@ -93,7 +93,7 @@ We have a reasonable number of functions implemented in our golang core:
 * Logical operations
   * `and`, & `or`.
 * Mathematical operations:
-  * `+`, `-`, `*`, `/`, & `%`
+  * `+`, `-`, `*`, `/`, `#`, & `%`.
 * String operations:
   * `split` and `join`.
 * Comparison functions:
