@@ -101,7 +101,7 @@ We have a reasonable number of functions implemented in our golang core:
 * Misc features
   * `str`, `print`, & `type`
 * Special forms
-  * `begin`, `cond`, `define`, `if`, `lambda`, `let`,  `set!`, `quote`,
+  * `begin`, `cond`, `define`, `eval`, `if`, `lambda`, `let`,  `set!`, `quote`,
 * Tail recursion optimization.
 
 Building upon those primitives we have a larger standard-library of functions written in Lisp such as:

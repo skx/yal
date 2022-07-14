@@ -142,6 +142,11 @@
 (assert (= (nth (list 10 20 30) 1) 20) "Got the second item of the list.")
 
 
+;; We have a built-in eval function, which operates upon symbols, or strings.
+(define e "(+ 3 4)")
+(print "Eval of '%s' resulted in %s" e (eval e))
+(print "Eval of '%s' resulted in %s" "(+ 40 2)" (eval "(+ 40 2)"))
+
 ;; Simple test of `cond`
 (define a 6)
 (cond

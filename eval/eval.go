@@ -252,6 +252,35 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment) primitive.Prim
 			case primitive.Symbol("quote"):
 				return listExp[1]
 
+			// (eval
+			case primitive.Symbol("eval"):
+
+				if len(listExp) != 2 {
+					return primitive.Error("Expected only a single argument")
+				}
+
+				switch val := listExp[1].(type) {
+
+				// symbol solely so we can do env. lookup
+				case primitive.Symbol:
+					str, ok := e.Get(val.ToString())
+					if ok {
+						tmp := New(str.(primitive.Primitive).ToString())
+						nEnv := env.NewEnvironment(e)
+						return tmp.Evaluate(nEnv)
+					} else {
+						return primitive.Nil{}
+					}
+
+				// string eval
+				case primitive.String:
+					tmp := New(string(val))
+					nEnv := env.NewEnvironment(e)
+					return tmp.Evaluate(nEnv)
+
+				default:
+					return primitive.Error(fmt.Sprintf("unexpected type for eval %V.", listExp[1]))
+				}
 			// (define
 			case primitive.Symbol("define"):
 				val := ev.eval(listExp[2], e)
