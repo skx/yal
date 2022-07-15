@@ -365,6 +365,23 @@ func TestMod(t *testing.T) {
 	}
 
 	//
+	// Mod 0
+	//
+	out = modFn([]primitive.Primitive{
+		primitive.Number(32),
+		primitive.Number(0),
+	})
+
+	// Will lead to an error
+	e, ok = out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if !strings.Contains(string(e), "division by zero") {
+		t.Fatalf("got error, but wrong one %v", out)
+	}
+
+	//
 	// Now a real one
 	//
 	out = modFn([]primitive.Primitive{
