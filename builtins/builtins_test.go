@@ -8,6 +8,7 @@ import (
 	"github.com/skx/yal/primitive"
 )
 
+// TestSetup just instantiates the primitives in the environment
 func TestSetup(t *testing.T) {
 
 	// Create an empty environment
@@ -26,6 +27,32 @@ func TestSetup(t *testing.T) {
 	_, ok = e.Get("print")
 	if !ok {
 		t.Fatalf("failed to find 'print' ")
+	}
+}
+
+func TestExpandString(t *testing.T) {
+
+	type TC struct {
+		in  string
+		out string
+	}
+
+	tests := []TC{
+
+		{in: "steve", out: "steve"},
+		{in: "steve\\tkemp", out: "steve\tkemp"},
+		{in: "steve\\rkemp", out: "steve\rkemp"},
+		{in: "steve\\nkemp", out: "steve\nkemp"},
+		{in: "steve\"kemp", out: "steve\"kemp"},
+		{in: "steve\\\\kemp", out: "steve\\kemp"},
+		{in: "steve\\bkemp", out: "steve\\bkemp"},
+	}
+
+	for i, test := range tests {
+
+		if expandStr(test.in) != test.out {
+			t.Fatalf("%d: expected %s, got %s", i, test.out, expandStr(test.in))
+		}
 	}
 }
 
