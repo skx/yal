@@ -280,18 +280,28 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment) primitive.Prim
 				}
 			// (define
 			case primitive.Symbol("define"):
+				if len(listExp) < 3 {
+					return primitive.Error("arity-error: not enough arguments for (define ..)")
+				}
 				val := ev.eval(listExp[2], e)
 				e.Set(string(listExp[1].(primitive.Symbol)), val)
 				return primitive.Nil{}
 
 			// (set!
 			case primitive.Symbol("set!"):
+				if len(listExp) < 3 {
+					return primitive.Error("arity-error: not enough arguments for (set! ..)")
+				}
 				val := ev.eval(listExp[2], e)
 				e.Set(string(listExp[1].(primitive.Symbol)), val)
 				return primitive.Nil{}
 
 			// (let
 			case primitive.Symbol("let"):
+				if len(listExp) < 2 {
+					return primitive.Error("arity-error: not enough arguments for (let ..)")
+				}
+
 				newEnv := env.NewEnvironment(e)
 				bindingsList := listExp[1].(primitive.List)
 				for _, binding := range bindingsList {
