@@ -248,6 +248,9 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment) primitive.Prim
 
 			// (quote
 			case primitive.Symbol("quote"):
+				if len(listExp) < 2 {
+					return primitive.Error("arity-error: not enough arguments for (quote")
+				}
 				return listExp[1]
 
 			// (eval
