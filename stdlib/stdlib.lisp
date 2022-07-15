@@ -24,8 +24,8 @@
 (define rest  (lambda (x) (cdr x)))
 
 ;; inc/dec are useful primitives to have
-(define inc  (lambda (n) (- n 1)))
-(define dec  (lambda (n) (+ n 1)))
+(define inc  (lambda (n) (+ n 1)))
+(define dec  (lambda (n) (- n 1)))
 
 ;; Not is useful
 (define !     (lambda (x) (if x #f #t)))
@@ -62,6 +62,11 @@
          (fun (car lst))
          (apply (cdr lst) fun)))))
 
+
+;; Return the length of the given list
+(define length (lambda (arg)
+   (if (nil? arg) 0
+      (inc (length (cdr arg))))))
 
 ;; Find the Nth item of a list
 (define nth (lambda (lst i)
