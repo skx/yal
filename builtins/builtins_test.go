@@ -254,3 +254,225 @@ func TestDivide(t *testing.T) {
 		t.Fatalf("got wrong result")
 	}
 }
+
+// TestMod tests "%"
+func TestMod(t *testing.T) {
+
+	// No arguments
+	out := modFn([]primitive.Primitive{})
+
+	// Will lead to an error
+	e, ok := out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if !strings.Contains(string(e), "number of arguments") {
+		t.Fatalf("got error, but wrong one %v", out)
+	}
+
+	// Argument which isn't a number
+	out = modFn([]primitive.Primitive{
+		primitive.String("foo"),
+		primitive.String("foo"),
+	})
+
+	// Will lead to an error
+	e, ok = out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if !strings.Contains(string(e), "not a number") {
+		t.Fatalf("got error, but wrong one %v", out)
+	}
+
+	// Argument which isn't a number
+	out = modFn([]primitive.Primitive{
+		primitive.Number(32),
+		primitive.String("foo"),
+	})
+
+	// Will lead to an error
+	e, ok = out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if !strings.Contains(string(e), "not a number") {
+		t.Fatalf("got error, but wrong one %v", out)
+	}
+
+	//
+	// Now a real one
+	//
+	out = modFn([]primitive.Primitive{
+		primitive.Number(12),
+		primitive.Number(3),
+	})
+
+	// Will work
+	n, ok2 := out.(primitive.Number)
+	if !ok2 {
+		t.Fatalf("expected number, got %v", out)
+	}
+	if n != 0 {
+		t.Fatalf("got wrong result")
+	}
+}
+
+// TestExpn tests "#"
+func TestExpn(t *testing.T) {
+
+	// No arguments
+	out := expnFn([]primitive.Primitive{})
+
+	// Will lead to an error
+	e, ok := out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if !strings.Contains(string(e), "number of arguments") {
+		t.Fatalf("got error, but wrong one %v", out)
+	}
+
+	// Argument which isn't a number
+	out = expnFn([]primitive.Primitive{
+		primitive.String("foo"),
+		primitive.String("foo"),
+	})
+
+	// Will lead to an error
+	e, ok = out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if !strings.Contains(string(e), "not a number") {
+		t.Fatalf("got error, but wrong one %v", out)
+	}
+
+	// Argument which isn't a number
+	out = expnFn([]primitive.Primitive{
+		primitive.Number(32),
+		primitive.String("foo"),
+	})
+
+	// Will lead to an error
+	e, ok = out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if !strings.Contains(string(e), "not a number") {
+		t.Fatalf("got error, but wrong one %v", out)
+	}
+
+	//
+	// Now a real one
+	//
+	out = expnFn([]primitive.Primitive{
+		primitive.Number(9),
+		primitive.Number(0.5),
+	})
+
+	// Will work
+	n, ok2 := out.(primitive.Number)
+	if !ok2 {
+		t.Fatalf("expected number, got %v", out)
+	}
+	if n != 3 {
+		t.Fatalf("got wrong result")
+	}
+}
+
+// TestEq tests "eq"
+func TestEq(t *testing.T) {
+
+	// No arguments
+	out := eqFn([]primitive.Primitive{})
+
+	// Will lead to an error
+	e, ok := out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if !strings.Contains(string(e), "number of arguments") {
+		t.Fatalf("got error, but wrong one %v", out)
+	}
+
+	//
+	// Now a real one
+	//
+	out = eqFn([]primitive.Primitive{
+		primitive.Number(9),
+		primitive.Number(9),
+	})
+
+	// Will work
+	n, ok2 := out.(primitive.Bool)
+	if !ok2 {
+		t.Fatalf("expected bool, got %v", out)
+	}
+	if n != true {
+		t.Fatalf("got wrong result")
+	}
+}
+
+// TestLt tests "<"
+func TestLt(t *testing.T) {
+
+	// No arguments
+	out := ltFn([]primitive.Primitive{})
+
+	// Will lead to an error
+	e, ok := out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if !strings.Contains(string(e), "number of arguments") {
+		t.Fatalf("got error, but wrong one %v", out)
+	}
+
+	// Argument which isn't a number
+	out = ltFn([]primitive.Primitive{
+		primitive.String("foo"),
+		primitive.String("foo"),
+	})
+
+	// Will lead to an error
+	e, ok = out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if !strings.Contains(string(e), "not a number") {
+		t.Fatalf("got error, but wrong one %v", out)
+	}
+
+	// Argument which isn't a number
+	out = ltFn([]primitive.Primitive{
+		primitive.Number(32),
+		primitive.String("foo"),
+	})
+
+	// Will lead to an error
+	e, ok = out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if !strings.Contains(string(e), "not a number") {
+		t.Fatalf("got error, but wrong one %v", out)
+	}
+
+	//
+	// Now a real one
+	//
+	out = ltFn([]primitive.Primitive{
+		primitive.Number(9),
+		primitive.Number(100),
+	})
+
+	// Will work
+	n, ok2 := out.(primitive.Bool)
+	if !ok2 {
+		t.Fatalf("expected bool, got %v", out)
+	}
+	if n != true {
+		t.Fatalf("got wrong result")
+	}
+}

@@ -25,6 +25,12 @@ func PopulateEnvironment(env *env.Environment) {
 	env.Set("-", &primitive.Procedure{F: minusFn})
 	env.Set("*", &primitive.Procedure{F: multiplyFn})
 	env.Set("/", &primitive.Procedure{F: divideFn})
+	env.Set("%", &primitive.Procedure{F: modFn})
+	env.Set("#", &primitive.Procedure{F: expnFn})
+
+	// comparisions
+	env.Set("<", &primitive.Procedure{F: ltFn})
+	env.Set("=", &primitive.Procedure{F: eqFn})
 
 	// When it comes to comparisons there are several we could
 	// use:
@@ -37,46 +43,6 @@ func PopulateEnvironment(env *env.Environment) {
 	//
 	// We only actually need to implement "<" in Golang, the rest
 	// can be added in lisp.
-	//
-	env.Set("<", &primitive.Procedure{F: func(args []primitive.Primitive) primitive.Primitive {
-		if len(args) != 2 {
-			return primitive.Error("wrong number of arguments")
-		}
-
-		if _, ok := args[0].(primitive.Number); !ok {
-			return primitive.Error("argument not a number")
-		}
-		if _, ok := args[1].(primitive.Number); !ok {
-			return primitive.Error("argument not a number")
-		}
-		return primitive.Bool(args[0].(primitive.Number) < args[1].(primitive.Number))
-	}})
-
-	env.Set("%", &primitive.Procedure{F: func(args []primitive.Primitive) primitive.Primitive {
-		if len(args) != 2 {
-			return primitive.Error("wrong number of arguments")
-		}
-		if _, ok := args[0].(primitive.Number); !ok {
-			return primitive.Error("argument not a number")
-		}
-		if _, ok := args[1].(primitive.Number); !ok {
-			return primitive.Error("argument not a number")
-		}
-		return primitive.Number(int(args[0].(primitive.Number)) % int(args[1].(primitive.Number)))
-	}})
-
-	env.Set("#", &primitive.Procedure{F: func(args []primitive.Primitive) primitive.Primitive {
-		if len(args) != 2 {
-			return primitive.Error("wrong number of arguments")
-		}
-		if _, ok := args[0].(primitive.Number); !ok {
-			return primitive.Error("argument not a number")
-		}
-		if _, ok := args[1].(primitive.Number); !ok {
-			return primitive.Error("argument not a number")
-		}
-		return primitive.Number(math.Pow(float64(args[0].(primitive.Number)), float64(args[1].(primitive.Number))))
-	}})
 
 	// List
 	env.Set("list", &primitive.Procedure{F: func(args []primitive.Primitive) primitive.Primitive {
@@ -310,24 +276,6 @@ func PopulateEnvironment(env *env.Environment) {
 		return primitive.Bool(true)
 	}})
 
-	// equality
-	env.Set("eq", &primitive.Procedure{F: func(args []primitive.Primitive) primitive.Primitive {
-		if len(args) != 2 {
-			return primitive.Error("wrong number of arguments")
-		}
-
-		a := args[0]
-		b := args[1]
-
-		if a.Type() != b.Type() {
-			return primitive.Bool(false)
-		}
-		if a.ToString() != b.ToString() {
-			return primitive.Bool(false)
-		}
-		return primitive.Bool(true)
-	}})
-
 	// Print
 	env.Set("sprintf", &primitive.Procedure{F: func(args []primitive.Primitive) primitive.Primitive {
 		// no args
@@ -551,4 +499,65 @@ func divideFn(args []primitive.Primitive) primitive.Primitive {
 		}
 	}
 	return primitive.Number(v)
+}
+
+// modFn implements "%"
+func modFn(args []primitive.Primitive) primitive.Primitive {
+	if len(args) != 2 {
+		return primitive.Error("wrong number of arguments")
+	}
+	if _, ok := args[0].(primitive.Number); !ok {
+		return primitive.Error("argument not a number")
+	}
+	if _, ok := args[1].(primitive.Number); !ok {
+		return primitive.Error("argument not a number")
+	}
+	return primitive.Number(int(args[0].(primitive.Number)) % int(args[1].(primitive.Number)))
+}
+
+// expnFn implements "#"
+func expnFn(args []primitive.Primitive) primitive.Primitive {
+	if len(args) != 2 {
+		return primitive.Error("wrong number of arguments")
+	}
+	if _, ok := args[0].(primitive.Number); !ok {
+		return primitive.Error("argument not a number")
+	}
+	if _, ok := args[1].(primitive.Number); !ok {
+		return primitive.Error("argument not a number")
+	}
+	return primitive.Number(math.Pow(float64(args[0].(primitive.Number)), float64(args[1].(primitive.Number))))
+}
+
+// ltFn implements "<"
+func ltFn(args []primitive.Primitive) primitive.Primitive {
+	if len(args) != 2 {
+		return primitive.Error("wrong number of arguments")
+	}
+
+	if _, ok := args[0].(primitive.Number); !ok {
+		return primitive.Error("argument not a number")
+	}
+	if _, ok := args[1].(primitive.Number); !ok {
+		return primitive.Error("argument not a number")
+	}
+	return primitive.Bool(args[0].(primitive.Number) < args[1].(primitive.Number))
+}
+
+// eqFn implements "eq"
+func eqFn(args []primitive.Primitive) primitive.Primitive {
+	if len(args) != 2 {
+		return primitive.Error("wrong number of arguments")
+	}
+
+	a := args[0]
+	b := args[1]
+
+	if a.Type() != b.Type() {
+		return primitive.Bool(false)
+	}
+	if a.ToString() != b.ToString() {
+		return primitive.Bool(false)
+	}
+	return primitive.Bool(true)
 }
