@@ -379,8 +379,21 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment) primitive.Prim
 
 			// (lambda
 			case primitive.Symbol("lambda"):
+
+				// ensure we have arguments
+				if len(listExp) < 3 {
+					return primitive.Error("wrong number of arguments")
+				}
+
+				// ensure that our arguments are a list
+				argMarkers, ok := listExp[1].(primitive.List)
+				if !ok {
+					return primitive.Error(fmt.Sprintf("expected a list for arguments, got %v", listExp[1]))
+				}
+
+				// Collect arguments
 				args := []primitive.Symbol{}
-				for _, x := range listExp[1].(primitive.List) {
+				for _, x := range argMarkers {
 					args = append(args, x.(primitive.Symbol))
 				}
 
