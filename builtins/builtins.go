@@ -50,6 +50,12 @@ func PopulateEnvironment(env *env.Environment) {
 	env.Set("cdr", &primitive.Procedure{F: cdrFn})
 	env.Set("list", &primitive.Procedure{F: listFn})
 
+	// core
+	env.Set("type", &primitive.Procedure{F: typeFn})
+
+	// string
+	env.Set("str", &primitive.Procedure{F: strFn})
+
 	env.Set("sort", &primitive.Procedure{F: func(args []primitive.Primitive) primitive.Primitive {
 
 		// If we have only a single argument
@@ -167,14 +173,6 @@ func PopulateEnvironment(env *env.Environment) {
 		}
 
 		return primitive.String(tmp)
-	}})
-
-	// type
-	env.Set("type", &primitive.Procedure{F: func(args []primitive.Primitive) primitive.Primitive {
-		if len(args) != 1 {
-			return primitive.Error("wrong number of arguments")
-		}
-		return primitive.String(args[0].Type())
 	}})
 
 	// logic
@@ -316,10 +314,6 @@ func PopulateEnvironment(env *env.Environment) {
 		out := fmt.Sprintf(frmt, parm...)
 		fmt.Println(out)
 		return primitive.String(out)
-	}})
-	// Convert an object to a string
-	env.Set("str", &primitive.Procedure{F: func(args []primitive.Primitive) primitive.Primitive {
-		return primitive.String(args[0].ToString())
 	}})
 
 }
@@ -573,4 +567,17 @@ func cdrFn(args []primitive.Primitive) primitive.Primitive {
 	}
 
 	return args[0].(primitive.List)[1:]
+}
+
+// typeFn implements "type"
+func typeFn(args []primitive.Primitive) primitive.Primitive {
+	if len(args) != 1 {
+		return primitive.Error("wrong number of arguments")
+	}
+	return primitive.String(args[0].Type())
+}
+
+// strFn implements "str"
+func strFn(args []primitive.Primitive) primitive.Primitive {
+	return primitive.String(args[0].ToString())
 }

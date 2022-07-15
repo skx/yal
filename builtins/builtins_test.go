@@ -635,3 +635,49 @@ func TestCdr(t *testing.T) {
 		t.Fatalf("got wrong result : %v", r)
 	}
 }
+
+func TestStr(t *testing.T) {
+
+	// calling with an arg
+	out := strFn([]primitive.Primitive{
+		primitive.Number(32),
+	})
+
+	// Will lead to an string
+	e, ok := out.(primitive.String)
+	if !ok {
+		t.Fatalf("expected string, got %v", out)
+	}
+	if e != "32" {
+		t.Fatalf("got wrong result %v", out)
+	}
+}
+
+func TestType(t *testing.T) {
+
+	// No arguments
+	out := typeFn([]primitive.Primitive{})
+
+	// Will lead to an error
+	e, ok := out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if !strings.Contains(string(e), "number of arguments") {
+		t.Fatalf("got error, but wrong one %v", out)
+	}
+
+	// calling with an arg
+	out = typeFn([]primitive.Primitive{
+		primitive.Number(32),
+	})
+
+	// Will lead to an string
+	e2, ok2 := out.(primitive.String)
+	if !ok2 {
+		t.Fatalf("expected string, got %v", out)
+	}
+	if e2 != "number" {
+		t.Fatalf("got wrong result %v", out)
+	}
+}
