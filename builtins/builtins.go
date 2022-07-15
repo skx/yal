@@ -13,115 +13,18 @@ import (
 	"github.com/skx/yal/primitive"
 )
 
+// PrimitiveFn is the type which represents a function signature for
+// a lisp-usable function implemented in golang
+type PrimitiveFn func(args []primitive.Primitive) primitive.Primitive
+
 // PopulateEnvironment registers our default primitives
 func PopulateEnvironment(env *env.Environment) {
 
 	// maths
-	env.Set("+", &primitive.Procedure{F: func(args []primitive.Primitive) primitive.Primitive {
-
-		// ensure we have at least one argument
-		if len(args) < 1 {
-			return primitive.Error("invalid argument count")
-		}
-
-		// the first argument must be a number.
-		v, ok := args[0].(primitive.Number)
-		if !ok {
-			return primitive.Error(fmt.Sprintf("argument '%s' was not a number", args[0].ToString()))
-		}
-
-		// now process all the rest of the arguments
-		for _, i := range args[1:] {
-
-			// check we have a number
-			n, ok := i.(primitive.Number)
-			if ok {
-				v += n
-			} else {
-				return primitive.Error(fmt.Sprintf("argument %s was not a number", i.ToString()))
-			}
-		}
-		return primitive.Number(v)
-	}})
-
-	env.Set("-", &primitive.Procedure{F: func(args []primitive.Primitive) primitive.Primitive {
-
-		// ensure we have at least one argument
-		if len(args) < 1 {
-			return primitive.Error("invalid argument count")
-		}
-
-		// the first argument must be a number.
-		v, ok := args[0].(primitive.Number)
-		if !ok {
-			return primitive.Error(fmt.Sprintf("argument '%s' was not a number", args[0].ToString()))
-		}
-
-		// now process all the rest of the arguments
-		for _, i := range args[1:] {
-
-			// check we have a number
-			n, ok := i.(primitive.Number)
-			if ok {
-				v -= n
-			} else {
-				return primitive.Error(fmt.Sprintf("argument %s was not a number", i.ToString()))
-			}
-		}
-		return primitive.Number(v)
-	}})
-
-	env.Set("*", &primitive.Procedure{F: func(args []primitive.Primitive) primitive.Primitive {
-		// ensure we have at least one argument
-		if len(args) < 1 {
-			return primitive.Error("invalid argument count")
-		}
-
-		// the first argument must be a number.
-		v, ok := args[0].(primitive.Number)
-		if !ok {
-			return primitive.Error(fmt.Sprintf("argument '%s' was not a number", args[0].ToString()))
-		}
-
-		// now process all the rest of the arguments
-		for _, i := range args[1:] {
-
-			// check we have a number
-			n, ok := i.(primitive.Number)
-			if ok {
-				v *= n
-			} else {
-				return primitive.Error(fmt.Sprintf("argument %s was not a number", i.ToString()))
-			}
-		}
-		return primitive.Number(v)
-	}})
-
-	env.Set("/", &primitive.Procedure{F: func(args []primitive.Primitive) primitive.Primitive {
-		// ensure we have at least one argument
-		if len(args) < 1 {
-			return primitive.Error("invalid argument count")
-		}
-
-		// the first argument must be a number.
-		v, ok := args[0].(primitive.Number)
-		if !ok {
-			return primitive.Error(fmt.Sprintf("argument '%s' was not a number", args[0].ToString()))
-		}
-
-		// now process all the rest of the arguments
-		for _, i := range args[1:] {
-
-			// check we have a number
-			n, ok := i.(primitive.Number)
-			if ok {
-				v /= n
-			} else {
-				return primitive.Error(fmt.Sprintf("argument %s was not a number", i.ToString()))
-			}
-		}
-		return primitive.Number(v)
-	}})
+	env.Set("+", &primitive.Procedure{F: plusFn})
+	env.Set("-", &primitive.Procedure{F: minusFn})
+	env.Set("*", &primitive.Procedure{F: multiplyFn})
+	env.Set("/", &primitive.Procedure{F: divideFn})
 
 	// When it comes to comparisons there are several we could
 	// use:
@@ -150,6 +53,9 @@ func PopulateEnvironment(env *env.Environment) {
 	}})
 
 	env.Set("%", &primitive.Procedure{F: func(args []primitive.Primitive) primitive.Primitive {
+		if len(args) != 2 {
+			return primitive.Error("wrong number of arguments")
+		}
 		if _, ok := args[0].(primitive.Number); !ok {
 			return primitive.Error("argument not a number")
 		}
@@ -160,6 +66,9 @@ func PopulateEnvironment(env *env.Environment) {
 	}})
 
 	env.Set("#", &primitive.Procedure{F: func(args []primitive.Primitive) primitive.Primitive {
+		if len(args) != 2 {
+			return primitive.Error("wrong number of arguments")
+		}
 		if _, ok := args[0].(primitive.Number); !ok {
 			return primitive.Error("argument not a number")
 		}
@@ -532,4 +441,114 @@ func expandStr(input string) string {
 	}
 
 	return out
+}
+
+// plusFn implements "+"
+func plusFn(args []primitive.Primitive) primitive.Primitive {
+
+	// ensure we have at least one argument
+	if len(args) < 1 {
+		return primitive.Error("invalid argument count")
+	}
+
+	// the first argument must be a number.
+	v, ok := args[0].(primitive.Number)
+	if !ok {
+		return primitive.Error(fmt.Sprintf("argument '%s' was not a number", args[0].ToString()))
+	}
+
+	// now process all the rest of the arguments
+	for _, i := range args[1:] {
+
+		// check we have a number
+		n, ok := i.(primitive.Number)
+		if ok {
+			v += n
+		} else {
+			return primitive.Error(fmt.Sprintf("argument %s was not a number", i.ToString()))
+		}
+	}
+	return primitive.Number(v)
+}
+
+// minusFn implements "+"
+func minusFn(args []primitive.Primitive) primitive.Primitive {
+
+	// ensure we have at least one argument
+	if len(args) < 1 {
+		return primitive.Error("invalid argument count")
+	}
+
+	// the first argument must be a number.
+	v, ok := args[0].(primitive.Number)
+	if !ok {
+		return primitive.Error(fmt.Sprintf("argument '%s' was not a number", args[0].ToString()))
+	}
+
+	// now process all the rest of the arguments
+	for _, i := range args[1:] {
+
+		// check we have a number
+		n, ok := i.(primitive.Number)
+		if ok {
+			v -= n
+		} else {
+			return primitive.Error(fmt.Sprintf("argument %s was not a number", i.ToString()))
+		}
+	}
+	return primitive.Number(v)
+}
+
+// multiplyFn implements "*"
+func multiplyFn(args []primitive.Primitive) primitive.Primitive {
+	// ensure we have at least one argument
+	if len(args) < 1 {
+		return primitive.Error("invalid argument count")
+	}
+
+	// the first argument must be a number.
+	v, ok := args[0].(primitive.Number)
+	if !ok {
+		return primitive.Error(fmt.Sprintf("argument '%s' was not a number", args[0].ToString()))
+	}
+
+	// now process all the rest of the arguments
+	for _, i := range args[1:] {
+
+		// check we have a number
+		n, ok := i.(primitive.Number)
+		if ok {
+			v *= n
+		} else {
+			return primitive.Error(fmt.Sprintf("argument %s was not a number", i.ToString()))
+		}
+	}
+	return primitive.Number(v)
+}
+
+// divideFn implements "/"
+func divideFn(args []primitive.Primitive) primitive.Primitive {
+	// ensure we have at least one argument
+	if len(args) < 1 {
+		return primitive.Error("invalid argument count")
+	}
+
+	// the first argument must be a number.
+	v, ok := args[0].(primitive.Number)
+	if !ok {
+		return primitive.Error(fmt.Sprintf("argument '%s' was not a number", args[0].ToString()))
+	}
+
+	// now process all the rest of the arguments
+	for _, i := range args[1:] {
+
+		// check we have a number
+		n, ok := i.(primitive.Number)
+		if ok {
+			v /= n
+		} else {
+			return primitive.Error(fmt.Sprintf("argument %s was not a number", i.ToString()))
+		}
+	}
+	return primitive.Number(v)
 }
