@@ -175,6 +175,12 @@ func (ev *Eval) Evaluate(e *env.Environment) primitive.Primitive {
 
 		// Evaluate, and save the result
 		out = ev.eval(expr, e)
+
+		// If this is an error then return that immediately
+		switch out.(type) {
+		case *primitive.Error, primitive.Error:
+			return out
+		}
 	}
 	return out
 }
@@ -372,7 +378,7 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment) primitive.Prim
 				procExp := ev.eval(listExp[0], e)
 				proc, ok := procExp.(*primitive.Procedure)
 				if !ok {
-					return primitive.Error(fmt.Sprintf("argument '%s' not a function", procExp))
+					return primitive.Error(fmt.Sprintf("argument '%s' not a function", listExp[0].ToString()))
 				}
 
 				// build up the arguments to pass to the function

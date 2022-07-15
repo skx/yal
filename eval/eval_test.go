@@ -105,7 +105,7 @@ func TestEvaluate(t *testing.T) {
 		{"(= -1 -1)", "#t"},
 
 		// errors
-		{"(invalid)", "ERROR{argument '{}' not a function}"},
+		{"(invalid)", "ERROR{argument 'invalid' not a function}"},
 		{"(eval 'foo 'bar)", "ERROR{Expected only a single argument}"},
 		{"(eval 3)", "ERROR{unexpected type for eval %!V(primitive.Number=3).}"},
 		{"(cond (quote 3))", "ERROR{expected pairs of two items}"},
