@@ -746,6 +746,35 @@ func TestType(t *testing.T) {
 	}
 }
 
+func TestError(t *testing.T) {
+
+	// No arguments
+	out := errorFn([]primitive.Primitive{})
+
+	// Will lead to an error
+	e, ok := out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if !strings.Contains(string(e), "number of arguments") {
+		t.Fatalf("got error, but wrong one %v", out)
+	}
+
+	// calling with an arg
+	out = errorFn([]primitive.Primitive{
+		primitive.String("No Cheese Detected"),
+	})
+
+	// Will lead to an string
+	e, ok = out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if e != "No Cheese Detected" {
+		t.Fatalf("got wrong error %v", out)
+	}
+}
+
 // test nil?
 func TestNil(t *testing.T) {
 

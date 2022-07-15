@@ -54,6 +54,7 @@ func PopulateEnvironment(env *env.Environment) {
 	env.Set("join", &primitive.Procedure{F: joinFn})
 
 	// core
+	env.Set("error", &primitive.Procedure{F: errorFn})
 	env.Set("type", &primitive.Procedure{F: typeFn})
 	env.Set("sprintf", &primitive.Procedure{F: sprintfFn})
 	env.Set("print", &primitive.Procedure{F: printFn})
@@ -321,6 +322,14 @@ func cdrFn(args []primitive.Primitive) primitive.Primitive {
 	}
 
 	return args[0].(primitive.List)[1:]
+}
+
+// errorFn implements "error"
+func errorFn(args []primitive.Primitive) primitive.Primitive {
+	if len(args) != 1 {
+		return primitive.Error("wrong number of arguments")
+	}
+	return primitive.Error(args[0].ToString())
 }
 
 // typeFn implements "type"
