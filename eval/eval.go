@@ -323,7 +323,7 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment) primitive.Prim
 						return primitive.Error(fmt.Sprintf("binding value is not a list, got %v", binding))
 					}
 
-					if len(bl) < 1 {
+					if len(bl) < 2 {
 						return primitive.Error("arity-error: binding list had missing arguments")
 					}
 					// get the value
@@ -414,7 +414,12 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment) primitive.Prim
 				// Collect arguments
 				args := []primitive.Symbol{}
 				for _, x := range argMarkers {
-					args = append(args, x.(primitive.Symbol))
+
+					xs, ok := x.(primitive.Symbol)
+					if !ok {
+						return primitive.Error(fmt.Sprintf("expected a symbol for an argument, got %v", x))
+					}
+					args = append(args, xs)
 				}
 
 				return &primitive.Procedure{

@@ -58,10 +58,9 @@
 (define apply (lambda (lst fun)
   (if (nil? lst)
       ()
-    (if list? lst
       (begin
          (fun (car lst))
-         (apply (cdr lst) fun))))))
+         (apply (cdr lst) fun)))))
 
 
 ;; Return the length of the given list
