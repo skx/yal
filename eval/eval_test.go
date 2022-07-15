@@ -39,11 +39,15 @@ func TestEvaluate(t *testing.T) {
 		{"(let ((a 5)) (nil? a))", "#f"},
 		{"(let ((a 5)) a)", "5"},
 		{"(let ((a 5) (b 6)) a (* a b))", "30"},
+		{"(let ((a 5)) (set! a 44) a)", "44"},
+		{"(let ((a 5)) c)", "nil"},
 
 		// lists
 		{"'()", "()"},
+		{"()", "()"},
 		{"(car '(1 2 3))", "1"},
 		{"(cdr '(1 2 3))", "(2 3)"},
+		{"(begin 1 2)", "2"},
 
 		// numbers
 		{"3", "3"},
@@ -51,7 +55,20 @@ func TestEvaluate(t *testing.T) {
 		// nil
 		{"nil", "nil"},
 
-		// mathes
+		// eval
+		{"(eval \"(+ 1 2)\")", "3"},
+		{"(let ((a \"(+ 1 23)\")) (eval a))", "24"},
+		{"(eval c)", "nil"},
+
+		// cond
+		{`(define a 44)
+ (cond
+  (quote
+    (> a 20) "big"
+    true     "fallback"))`,
+			"big"},
+
+		// maths
 		{"(+ 3 1)", "4"},
 		{"(- 3 1)", "2"},
 		{"(/ 4 2)", "2"},
@@ -84,6 +101,15 @@ func TestEvaluate(t *testing.T) {
 		{"(= 10 3)", "#f"},
 		{"(= 10 10)", "#t"},
 		{"(= -1 -1)", "#t"},
+
+		// errors
+		{"(invalid)", "ERROR{argument '{}' not a function}"},
+		{"(eval 'foo 'bar)", "ERROR{Expected only a single argument}"},
+		{"(eval 3)", "ERROR{unexpected type for eval %!V(primitive.Number=3).}"},
+		{"(cond (quote 3))", "ERROR{expected pairs of two items}"},
+
+		{"))))", "nil"},
+		{"(((((", "nil"},
 	}
 
 	for _, test := range tests {
