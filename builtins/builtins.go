@@ -21,12 +21,12 @@ type PrimitiveFn func(args []primitive.Primitive) primitive.Primitive
 func PopulateEnvironment(env *env.Environment) {
 
 	// maths
+	env.Set("#", &primitive.Procedure{F: expnFn})
+	env.Set("%", &primitive.Procedure{F: modFn})
+	env.Set("*", &primitive.Procedure{F: multiplyFn})
 	env.Set("+", &primitive.Procedure{F: plusFn})
 	env.Set("-", &primitive.Procedure{F: minusFn})
-	env.Set("*", &primitive.Procedure{F: multiplyFn})
 	env.Set("/", &primitive.Procedure{F: divideFn})
-	env.Set("%", &primitive.Procedure{F: modFn})
-	env.Set("#", &primitive.Procedure{F: expnFn})
 
 	// comparisions
 	//
@@ -46,33 +46,10 @@ func PopulateEnvironment(env *env.Environment) {
 	env.Set("eq", &primitive.Procedure{F: eqFn})
 
 	// List
-	env.Set("list", &primitive.Procedure{F: func(args []primitive.Primitive) primitive.Primitive {
-		return primitive.List(args)
-	}})
-	env.Set("car", &primitive.Procedure{F: func(args []primitive.Primitive) primitive.Primitive {
-		if len(args) != 1 {
-			return primitive.Error("wrong number of arguments")
-		}
+	env.Set("car", &primitive.Procedure{F: carFn})
+	env.Set("cdr", &primitive.Procedure{F: cdrFn})
+	env.Set("list", &primitive.Procedure{F: listFn})
 
-		// ensure we received a list
-		if _, ok := args[0].(primitive.List); !ok {
-			return primitive.Error("argument not a list")
-		}
-
-		return args[0].(primitive.List)[0]
-	}})
-	env.Set("cdr", &primitive.Procedure{F: func(args []primitive.Primitive) primitive.Primitive {
-		if len(args) != 1 {
-			return primitive.Error("wrong number of arguments")
-		}
-
-		// ensure we received a list
-		if _, ok := args[0].(primitive.List); !ok {
-			return primitive.Error("argument not a list")
-		}
-
-		return args[0].(primitive.List)[1:]
-	}})
 	env.Set("sort", &primitive.Procedure{F: func(args []primitive.Primitive) primitive.Primitive {
 
 		// If we have only a single argument
@@ -561,4 +538,39 @@ func eqFn(args []primitive.Primitive) primitive.Primitive {
 		return primitive.Bool(false)
 	}
 	return primitive.Bool(true)
+}
+
+// listFn implements "list"
+func listFn(args []primitive.Primitive) primitive.Primitive {
+	return primitive.List(args)
+}
+
+// carFn implements "car"
+func carFn(args []primitive.Primitive) primitive.Primitive {
+
+	if len(args) != 1 {
+		return primitive.Error("wrong number of arguments")
+	}
+
+	// ensure we received a list
+	if _, ok := args[0].(primitive.List); !ok {
+		return primitive.Error("argument not a list")
+	}
+
+	return args[0].(primitive.List)[0]
+}
+
+// cdrFn implements "cdr"
+func cdrFn(args []primitive.Primitive) primitive.Primitive {
+
+	if len(args) != 1 {
+		return primitive.Error("wrong number of arguments")
+	}
+
+	// ensure we received a list
+	if _, ok := args[0].(primitive.List); !ok {
+		return primitive.Error("argument not a list")
+	}
+
+	return args[0].(primitive.List)[1:]
 }

@@ -510,3 +510,128 @@ func TestLt(t *testing.T) {
 		t.Fatalf("got wrong result")
 	}
 }
+
+func TestList(t *testing.T) {
+
+	// No arguments
+	out := listFn([]primitive.Primitive{})
+
+	// No error
+	e, ok := out.(primitive.List)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if e.ToString() != "()" {
+		t.Fatalf("unexpected output %v", out)
+	}
+
+	// Two arguments
+	out = listFn([]primitive.Primitive{
+		primitive.Number(3),
+		primitive.Number(43),
+	})
+
+	// No error
+	e, ok = out.(primitive.List)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if e.ToString() != "(3 43)" {
+		t.Fatalf("unexpected output %v", out)
+	}
+}
+
+// Test (car
+func TestCar(t *testing.T) {
+
+	// No arguments
+	out := carFn([]primitive.Primitive{})
+
+	// Will lead to an error
+	e, ok := out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if !strings.Contains(string(e), "number of arguments") {
+		t.Fatalf("got error, but wrong one %v", out)
+	}
+
+	// One argument
+	out = carFn([]primitive.Primitive{
+		primitive.Number(3),
+	})
+
+	// Will lead to an error
+	e, ok = out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if !strings.Contains(string(e), "not a list") {
+		t.Fatalf("got error, but wrong one %v", out)
+	}
+
+	// Now a list
+	out = carFn([]primitive.Primitive{
+		primitive.List{
+			primitive.Number(3),
+			primitive.Number(4),
+		},
+	})
+
+	// No error
+	r, ok2 := out.(primitive.Number)
+	if !ok2 {
+		t.Fatalf("expected number, got %v", out)
+	}
+	if r.ToString() != "3" {
+		t.Fatalf("got wrong result : %v", r)
+	}
+}
+
+// Test (cdr
+func TestCdr(t *testing.T) {
+
+	// No arguments
+	out := cdrFn([]primitive.Primitive{})
+
+	// Will lead to an error
+	e, ok := out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if !strings.Contains(string(e), "number of arguments") {
+		t.Fatalf("got error, but wrong one %v", out)
+	}
+
+	// One argument
+	out = cdrFn([]primitive.Primitive{
+		primitive.Number(3),
+	})
+
+	// Will lead to an error
+	e, ok = out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if !strings.Contains(string(e), "not a list") {
+		t.Fatalf("got error, but wrong one %v", out)
+	}
+
+	// Now a list
+	out = cdrFn([]primitive.Primitive{
+		primitive.List{
+			primitive.Number(3),
+			primitive.Number(4),
+			primitive.Number(5),
+		},
+	})
+
+	// No error
+	r, ok2 := out.(primitive.List)
+	if !ok2 {
+		t.Fatalf("expected list, got %v", out)
+	}
+	if r.ToString() != "(4 5)" {
+		t.Fatalf("got wrong result : %v", r)
+	}
+}
