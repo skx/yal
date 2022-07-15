@@ -58,6 +58,19 @@ func TestEvaluate(t *testing.T) {
 		{"(* 4 -1)", "-4"},
 		{"(# 3 2)", "9"},
 
+		// since we're variadic we start with the first
+		// number, and apply the operation to any subsequent
+		// ones.
+		//
+		// so "- 3" is "3 [- nothing]" as there were no more args
+		//
+		// Explicitly "(- 3)" is NOT "-3".
+		//
+		{"(+ 3)", "3"},
+		{"(- 3)", "3"},
+		{"(/ 3)", "3"},
+		{"(* 3)", "3"},
+
 		// strings
 		{`"steve"`, "steve"},
 		{`(split "steve" "")`, `(s t e v e)`},
