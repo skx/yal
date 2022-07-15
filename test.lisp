@@ -20,7 +20,7 @@
 ;; Invoke the factorial function, using apply
 (apply (list 1 2 3 4 5 6 7 8 9 10)
   (lambda (x)
-    (print "%s! => %s" x )))
+    (print "%s! => %s" x (fact x))))
 
 
 ; Split a string into a list, reverse it, and join it
