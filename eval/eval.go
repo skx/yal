@@ -382,6 +382,10 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment) primitive.Prim
 
 			// (if
 			case primitive.Symbol("if"):
+				if len(listExp) < 2 {
+					return primitive.Error("arity-error: not enough arguments for (set! ..)")
+				}
+
 				test := ev.eval(listExp[1], e)
 				if b, ok := test.(primitive.Bool); (ok && !bool(b)) || primitive.IsNil(test) {
 					if len(listExp) < 4 {
