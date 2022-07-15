@@ -393,6 +393,15 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment) primitive.Prim
 					return proc.F(args)
 				}
 
+				// Check that the arguments supplied
+				// match those that are expected.
+				//
+				// TODO: In the future we might support &rest
+				//
+				if len(args) != len(proc.Args) {
+					return primitive.Error(fmt.Sprintf("arity-error - function '%s' requires %d argument(s), %d provided", listExp[0].ToString(), len(proc.Args), len(args)))
+
+				}
 				// If not then it's a user-function,
 				// create a new environment/scope to set the
 				// parameter values, and evaluate the body.
