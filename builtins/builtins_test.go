@@ -998,3 +998,71 @@ func TestSplit(t *testing.T) {
 	}
 
 }
+
+func TestSort(t *testing.T) {
+
+	// No arguments
+	out := sortFn([]primitive.Primitive{})
+
+	// Will lead to an error
+	e, ok := out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if !strings.Contains(string(e), "invalid argument count") {
+		t.Fatalf("got error, but wrong one %v", out)
+	}
+
+	// Not a list
+	out = sortFn([]primitive.Primitive{
+		primitive.Number(3),
+	})
+
+	e, ok = out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if !strings.Contains(string(e), "not a list") {
+		t.Fatalf("got error, but wrong one %v", out)
+	}
+
+	//
+	// Now we sort
+	//
+	out = sortFn([]primitive.Primitive{
+		primitive.List{
+			primitive.Number(30),
+			primitive.Number(3),
+			primitive.Number(-3),
+		},
+	})
+
+	// Will lead to an error
+	s, ok2 := out.(primitive.List)
+	if !ok2 {
+		t.Fatalf("expected list, got %v", out)
+	}
+	if s.ToString() != "(-3 3 30)" {
+		t.Fatalf("got wrong result %v", s)
+	}
+
+	//
+	// Now we sort a different range of things
+	//
+	out = sortFn([]primitive.Primitive{
+		primitive.List{
+			primitive.Bool(true),
+			primitive.String("steve"),
+			primitive.Number(3),
+		},
+	})
+
+	s, ok2 = out.(primitive.List)
+	if !ok2 {
+		t.Fatalf("expected list, got %v", out)
+	}
+	if s.ToString() != "(#t 3 steve)" {
+		t.Fatalf("got wrong result %v", s)
+	}
+
+}

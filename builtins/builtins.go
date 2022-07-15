@@ -57,53 +57,13 @@ func PopulateEnvironment(env *env.Environment) {
 	env.Set("type", &primitive.Procedure{F: typeFn})
 	env.Set("sprintf", &primitive.Procedure{F: sprintfFn})
 	env.Set("print", &primitive.Procedure{F: printFn})
+	env.Set("sort", &primitive.Procedure{F: sortFn})
 
 	// string
 	env.Set("str", &primitive.Procedure{F: strFn})
 	env.Set("split", &primitive.Procedure{F: splitFn})
 
-	env.Set("sort", &primitive.Procedure{F: func(args []primitive.Primitive) primitive.Primitive {
-
-		// If we have only a single argument
-		if len(args) != 1 {
-			return primitive.Error("invalid argument count")
-		}
-
-		// Which is a list
-		if _, ok := args[0].(primitive.List); !ok {
-			return primitive.Error("argument not a list")
-		}
-
-		// Cast
-		l := args[0].(primitive.List)
-
-		// Copy
-		var c primitive.List
-		c = append(c, l...)
-
-		// Sort the copy of the list
-		sort.Slice(c, func(i, j int) bool {
-
-			// If we have numbers we can sort
-			if _, ok := c[i].(primitive.Number); ok {
-				if _, ok := c[j].(primitive.Number); ok {
-
-					a, _ := strconv.ParseFloat(c[i].ToString(), 64)
-					b, _ := strconv.ParseFloat(c[j].ToString(), 64)
-
-					return a < b
-				}
-			}
-
-			// Otherwise we sort as strings
-			a := c[i].ToString()
-			b := c[j].ToString()
-			return a < b
-		})
-
-		return c
-	}})
-
+	// logical: or + and
 	// logic
 	env.Set("or", &primitive.Procedure{F: func(args []primitive.Primitive) primitive.Primitive {
 
@@ -587,4 +547,46 @@ func joinFn(args []primitive.Primitive) primitive.Primitive {
 	}
 
 	return primitive.String(tmp)
+}
+
+func sortFn(args []primitive.Primitive) primitive.Primitive {
+	// If we have only a single argument
+	if len(args) != 1 {
+		return primitive.Error("invalid argument count")
+	}
+
+	// Which is a list
+	if _, ok := args[0].(primitive.List); !ok {
+		return primitive.Error("argument not a list")
+	}
+
+	// Cast
+	l := args[0].(primitive.List)
+
+	// Copy
+	var c primitive.List
+	c = append(c, l...)
+
+	// Sort the copy of the list
+	sort.Slice(c, func(i, j int) bool {
+
+		// If we have numbers we can sort
+		if _, ok := c[i].(primitive.Number); ok {
+			if _, ok := c[j].(primitive.Number); ok {
+
+				a, _ := strconv.ParseFloat(c[i].ToString(), 64)
+				b, _ := strconv.ParseFloat(c[j].ToString(), 64)
+
+				return a < b
+			}
+		}
+
+		// Otherwise we sort as strings
+		a := c[i].ToString()
+		b := c[j].ToString()
+		return a < b
+	})
+
+	return c
+
 }
