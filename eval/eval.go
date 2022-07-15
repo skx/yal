@@ -313,7 +313,17 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment) primitive.Prim
 					return primitive.Error(fmt.Sprintf("argument is not a list, got %v", listExp[1]))
 				}
 				for _, binding := range bindingsList {
+
+					// ensure we got a list
+					_, ok := binding.(primitive.List)
+					if !ok {
+						return primitive.Error(fmt.Sprintf("binding value is not a list, got %v", binding))
+					}
+
+					// get the value
 					bindingVal := ev.eval(binding.(primitive.List)[1], e)
+
+					// set the parameter
 					newEnv.Set(string(binding.(primitive.List)[0].(primitive.Symbol)), bindingVal)
 				}
 				var ret primitive.Primitive
