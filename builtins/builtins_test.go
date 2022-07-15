@@ -4,8 +4,30 @@ import (
 	"strings"
 	"testing"
 
+	"github.com/skx/yal/env"
 	"github.com/skx/yal/primitive"
 )
+
+func TestSetup(t *testing.T) {
+
+	// Create an empty environment
+	e := env.New()
+
+	// Before we start we have no functions
+	_, ok := e.Get("print")
+	if ok {
+		t.Fatalf("didn't expect to get 'print' but did")
+	}
+
+	// Setup the builtins
+	PopulateEnvironment(e)
+
+	// Now we have functions
+	_, ok = e.Get("print")
+	if !ok {
+		t.Fatalf("failed to find 'print' ")
+	}
+}
 
 // TestPlus tests "+"
 func TestPlus(t *testing.T) {

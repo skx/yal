@@ -28,7 +28,7 @@ func PopulateEnvironment(env *env.Environment) {
 	env.Set("-", &primitive.Procedure{F: minusFn})
 	env.Set("/", &primitive.Procedure{F: divideFn})
 
-	// comparisions
+	// comparisons
 	//
 	// When it comes to comparisons there are several we could
 	// use:
@@ -64,83 +64,8 @@ func PopulateEnvironment(env *env.Environment) {
 	env.Set("split", &primitive.Procedure{F: splitFn})
 
 	// logical: or + and
-	// logic
-	env.Set("or", &primitive.Procedure{F: func(args []primitive.Primitive) primitive.Primitive {
-
-		// For each argument
-		for _, arg := range args {
-
-			switch v := arg.(type) {
-
-			// Bool?
-			case primitive.Bool:
-				if v {
-					return primitive.Bool(true)
-				}
-
-			// list
-			case primitive.List:
-
-				for _, a := range v {
-
-					// See if we can cast to a bool
-					b, ok := a.(primitive.Bool)
-					if ok {
-						// OK it was - is it true?
-						if b {
-							return primitive.Bool(true)
-						}
-					} else {
-						if !primitive.IsNil(arg) {
-							return primitive.Bool(true)
-						}
-					}
-				}
-			}
-		}
-		return primitive.Bool(false)
-	}})
-
-	env.Set("and", &primitive.Procedure{F: func(args []primitive.Primitive) primitive.Primitive {
-
-		// For each argument
-		for _, arg := range args {
-
-			switch v := arg.(type) {
-
-			// Bool?
-			case primitive.Bool:
-				if !v {
-					return primitive.Bool(false)
-				}
-
-			// Nil
-			case primitive.Nil:
-				return primitive.Bool(false)
-
-			// list
-			case primitive.List:
-
-				for _, a := range v {
-
-					// See if we can cast to a bool
-					b, ok := a.(primitive.Bool)
-					if ok {
-						// OK it was - is it true?
-						if !b {
-							return primitive.Bool(false)
-						}
-					} else {
-						if primitive.IsNil(arg) {
-							return primitive.Bool(false)
-						}
-					}
-				}
-			}
-		}
-		return primitive.Bool(true)
-	}})
-
+	env.Set("and", &primitive.Procedure{F: andFn})
+	env.Set("or", &primitive.Procedure{F: orFn})
 }
 
 // Convert a string such as "steve\tkemp" into "steve<TAB>kemp"
@@ -589,4 +514,80 @@ func sortFn(args []primitive.Primitive) primitive.Primitive {
 
 	return c
 
+}
+
+func andFn(args []primitive.Primitive) primitive.Primitive {
+
+	// For each argument
+	for _, arg := range args {
+
+		switch v := arg.(type) {
+
+		// Bool?
+		case primitive.Bool:
+			if !v {
+				return primitive.Bool(false)
+			}
+
+		// Nil
+		case primitive.Nil:
+			return primitive.Bool(false)
+
+		// list
+		case primitive.List:
+
+			for _, a := range v {
+
+				// See if we can cast to a bool
+				b, ok := a.(primitive.Bool)
+				if ok {
+					// OK it was - is it true?
+					if !b {
+						return primitive.Bool(false)
+					}
+				} else {
+					if primitive.IsNil(arg) {
+						return primitive.Bool(false)
+					}
+				}
+			}
+		}
+	}
+	return primitive.Bool(true)
+}
+
+func orFn(args []primitive.Primitive) primitive.Primitive {
+
+	// For each argument
+	for _, arg := range args {
+
+		switch v := arg.(type) {
+
+		// Bool?
+		case primitive.Bool:
+			if v {
+				return primitive.Bool(true)
+			}
+
+		// list
+		case primitive.List:
+
+			for _, a := range v {
+
+				// See if we can cast to a bool
+				b, ok := a.(primitive.Bool)
+				if ok {
+					// OK it was - is it true?
+					if b {
+						return primitive.Bool(true)
+					}
+				} else {
+					if !primitive.IsNil(arg) {
+						return primitive.Bool(true)
+					}
+				}
+			}
+		}
+	}
+	return primitive.Bool(false)
 }
