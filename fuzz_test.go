@@ -33,6 +33,8 @@ func FuzzYAL(f *testing.F) {
 	// report those known-bad things.
 	known := []string{
 		"not a function",
+		"arity-error",
+		"wrong number of arguments",
 	}
 
 	f.Fuzz(func(t *testing.T, input []byte) {
