@@ -397,7 +397,7 @@ func TestEq(t *testing.T) {
 	}
 
 	//
-	// Now a real one
+	// Now a real one: equal
 	//
 	out = eqFn([]primitive.Primitive{
 		primitive.Number(9),
@@ -410,6 +410,40 @@ func TestEq(t *testing.T) {
 		t.Fatalf("expected bool, got %v", out)
 	}
 	if n != true {
+		t.Fatalf("got wrong result")
+	}
+
+	//
+	// Now a real one: unequal values
+	//
+	out = eqFn([]primitive.Primitive{
+		primitive.String("99"),
+		primitive.String("9"),
+	})
+
+	// Will work
+	n, ok2 = out.(primitive.Bool)
+	if !ok2 {
+		t.Fatalf("expected bool, got %v", out)
+	}
+	if n != false {
+		t.Fatalf("got wrong result")
+	}
+
+	//
+	// Now a real one: unequal types
+	//
+	out = eqFn([]primitive.Primitive{
+		primitive.Number(9),
+		primitive.String("9"),
+	})
+
+	// Will work
+	n, ok2 = out.(primitive.Bool)
+	if !ok2 {
+		t.Fatalf("expected bool, got %v", out)
+	}
+	if n != false {
 		t.Fatalf("got wrong result")
 	}
 }
