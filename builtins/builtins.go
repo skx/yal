@@ -29,9 +29,7 @@ func PopulateEnvironment(env *env.Environment) {
 	env.Set("#", &primitive.Procedure{F: expnFn})
 
 	// comparisions
-	env.Set("<", &primitive.Procedure{F: ltFn})
-	env.Set("=", &primitive.Procedure{F: eqFn})
-
+	//
 	// When it comes to comparisons there are several we could
 	// use:
 	//
@@ -39,10 +37,13 @@ func PopulateEnvironment(env *env.Environment) {
 	//  <=
 	//  >
 	//  >=
-	//  =
 	//
 	// We only actually need to implement "<" in Golang, the rest
 	// can be added in lisp.
+	env.Set("<", &primitive.Procedure{F: ltFn})
+
+	// equality
+	env.Set("eq", &primitive.Procedure{F: eqFn})
 
 	// List
 	env.Set("list", &primitive.Procedure{F: func(args []primitive.Primitive) primitive.Primitive {
