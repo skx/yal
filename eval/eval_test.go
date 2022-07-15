@@ -5,6 +5,7 @@ import (
 
 	"github.com/skx/yal/builtins"
 	"github.com/skx/yal/env"
+	"github.com/skx/yal/stdlib"
 )
 
 func TestEvaluate(t *testing.T) {
@@ -67,12 +68,19 @@ func TestEvaluate(t *testing.T) {
 		{"(< 10 3)", "#f"},
 		{"(> 1 3)", "#f"},
 		{"(> 10 3)", "#t"},
+		{"(= 10 3)", "#f"},
+		{"(= 10 10)", "#t"},
+		{"(= -1 -1)", "#t"},
 	}
 
 	for _, test := range tests {
 
+		// Load our standard library
+		st := stdlib.Contents()
+		std := string(st)
+
 		// Create a new interpreter
-		l := New(test.input)
+		l := New(std + "\n" + test.input)
 
 		// With a new environment
 		env := env.New()

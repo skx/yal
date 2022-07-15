@@ -40,12 +40,19 @@
 ;; Square root
 (define sqrt (lambda (x) (# x 0.5)))
 
-;; We've defined "<" and ">" in golang, but not the or-equals variants.
+;; We've defined "<" in golang, we can now implement
 ;;
-;; Add those.
+;; >
+;; <=
+;; >=
+;; =
+;;
+;; In terms of other things
+;;
+(define >  (lambda (a b) (< b a)))
 (define >= (lambda (a b) (! (< a b))))
 (define <= (lambda (a b) (! (> a b))))
-
+(define =  (lambda (a b) (eq (- a b) 0)))
 
 ;; A useful helper to apply a given function to each element of a list.
 (define apply (lambda (lst fun)

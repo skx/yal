@@ -123,9 +123,17 @@ func PopulateEnvironment(env *env.Environment) {
 		return primitive.Number(v)
 	}})
 
-	// Only added "<" + ">"
+	// When it comes to comparisons there are several we could
+	// use:
 	//
-	// "<=" and ">=" can be implemented in lisp :)
+	//  <
+	//  <=
+	//  >
+	//  >=
+	//  =
+	//
+	// We only actually need to implement "<" in Golang, the rest
+	// can be added in lisp.
 	//
 	env.Set("<", &primitive.Procedure{F: func(args []primitive.Primitive) primitive.Primitive {
 		if len(args) != 2 {
@@ -139,30 +147,6 @@ func PopulateEnvironment(env *env.Environment) {
 			return primitive.Error("argument not a number")
 		}
 		return primitive.Bool(args[0].(primitive.Number) < args[1].(primitive.Number))
-	}})
-
-	env.Set(">", &primitive.Procedure{F: func(args []primitive.Primitive) primitive.Primitive {
-		if len(args) != 2 {
-			return primitive.Error("wrong number of arguments")
-		}
-
-		if _, ok := args[0].(primitive.Number); !ok {
-			return primitive.Error("argument not a number")
-		}
-		if _, ok := args[1].(primitive.Number); !ok {
-			return primitive.Error("argument not a number")
-		}
-		return primitive.Bool(args[0].(primitive.Number) > args[1].(primitive.Number))
-	}})
-
-	env.Set("=", &primitive.Procedure{F: func(args []primitive.Primitive) primitive.Primitive {
-		if _, ok := args[0].(primitive.Number); !ok {
-			return primitive.Error("argument not a number")
-		}
-		if _, ok := args[1].(primitive.Number); !ok {
-			return primitive.Error("argument not a number")
-		}
-		return primitive.Bool(args[0].(primitive.Number) == args[1].(primitive.Number))
 	}})
 
 	env.Set("%", &primitive.Procedure{F: func(args []primitive.Primitive) primitive.Primitive {
