@@ -283,9 +283,14 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment) primitive.Prim
 				if len(listExp) < 3 {
 					return primitive.Error("arity-error: not enough arguments for (define ..)")
 				}
-				val := ev.eval(listExp[2], e)
-				e.Set(string(listExp[1].(primitive.Symbol)), val)
-				return primitive.Nil{}
+				symb, ok := listExp[1].(primitive.Symbol)
+				if ok {
+
+					val := ev.eval(listExp[2], e)
+					e.Set(string(symb), val)
+					return primitive.Nil{}
+				}
+				return primitive.Error(fmt.Sprintf("Expected a symbol, got %v", listExp[1]))
 
 			// (set!
 			case primitive.Symbol("set!"):

@@ -100,6 +100,7 @@ func FuzzYAL(f *testing.F) {
 		"not a number",
 		"not a list",
 		"not a string",
+		"expected a symbol",
 	}
 
 	f.Fuzz(func(t *testing.T, input []byte) {
@@ -126,9 +127,11 @@ func FuzzYAL(f *testing.F) {
 
 		switch out.(type) {
 		case *primitive.Error, primitive.Error:
+			str := strings.ToLower(out.ToString())
+
 			// does it look familiar?
 			for _, v := range known {
-				if strings.Contains(out.ToString(), v) {
+				if strings.Contains(str, v) {
 					found = true
 				}
 			}
