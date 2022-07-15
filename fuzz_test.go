@@ -101,6 +101,7 @@ func FuzzYAL(f *testing.F) {
 		"not a list",
 		"not a string",
 		"expected a symbol",
+		"expected a list",
 		"error expanding argument",
 	}
 

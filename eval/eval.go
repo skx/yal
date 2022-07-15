@@ -318,13 +318,16 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment) primitive.Prim
 				for _, binding := range bindingsList {
 
 					// ensure we got a list
-					_, ok := binding.(primitive.List)
+					bl, ok := binding.(primitive.List)
 					if !ok {
 						return primitive.Error(fmt.Sprintf("binding value is not a list, got %v", binding))
 					}
 
+					if len(bl) < 1 {
+						return primitive.Error("arity-error: binding list had missing arguments")
+					}
 					// get the value
-					bindingVal := ev.eval(binding.(primitive.List)[1], e)
+					bindingVal := ev.eval(bl[1], e)
 
 					// set the parameter
 					newEnv.Set(string(binding.(primitive.List)[0].(primitive.Symbol)), bindingVal)
