@@ -130,14 +130,6 @@ func (ev *Eval) readExpression() (primitive.Primitive, error) {
 		// which means we skip over the closing ")" character.
 		ev.offset++
 
-		// Now rewrite our input a little if it is a (define ..) list
-		if len(list) > 0 && list[0] == primitive.Symbol("define") {
-			// (define (f ...) (...)) => (define f (lambda (...) (...)))
-			if argsList, ok := list[1].(primitive.List); ok {
-				return primitive.List{ev.atom("define"), argsList[0], primitive.List{ev.atom("lambda"), argsList[1:], list[2]}}, nil
-			}
-		}
-
 		return list, nil
 	case ")":
 		// We shouldn't ever hit this, because we skip over

@@ -109,6 +109,8 @@ func TestEvaluate(t *testing.T) {
 		{"(cond (quote 3))", "ERROR{expected pairs of two items}"},
 
 		{"))))", "nil"},
+		{"'", "nil"},
+		{"(3 3 ", "nil"},
 		{"(((((", "nil"},
 	}
 
