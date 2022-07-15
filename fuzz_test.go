@@ -35,6 +35,7 @@ func FuzzYAL(f *testing.F) {
 		"not a function",
 		"arity-error",
 		"wrong number of arguments",
+		"invalid argument count",
 	}
 
 	f.Fuzz(func(t *testing.T, input []byte) {
