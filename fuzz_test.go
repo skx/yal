@@ -101,6 +101,7 @@ func FuzzYAL(f *testing.F) {
 		"not a list",
 		"not a string",
 		"expected a symbol",
+		"error expanding argument",
 	}
 
 	f.Fuzz(func(t *testing.T, input []byte) {

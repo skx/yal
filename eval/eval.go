@@ -416,6 +416,10 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment) primitive.Prim
 				args := []primitive.Primitive{}
 				for _, argExp := range listExp[1:] {
 					evalArgExp := ev.eval(argExp, e)
+					_, ok := evalArgExp.(primitive.Error)
+					if ok {
+						return primitive.Error(fmt.Sprintf("error expanding argument %v", argExp))
+					}
 					args = append(args, evalArgExp)
 				}
 
