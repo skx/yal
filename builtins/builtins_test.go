@@ -681,3 +681,141 @@ func TestType(t *testing.T) {
 		t.Fatalf("got wrong result %v", out)
 	}
 }
+
+// test nil?
+func TestNil(t *testing.T) {
+
+	// No arguments
+	out := nilFn([]primitive.Primitive{})
+
+	// Will lead to an error
+	e, ok := out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if !strings.Contains(string(e), "number of arguments") {
+		t.Fatalf("got error, but wrong one %v", out)
+	}
+
+	// nil is nil
+	out = nilFn([]primitive.Primitive{
+		primitive.Nil{},
+	})
+
+	// Will lead to a bool
+	b, ok2 := out.(primitive.Bool)
+	if !ok2 {
+		t.Fatalf("unexpected type, expected bool, got %v", out)
+	}
+	if !b {
+		t.Fatalf("wrong result")
+	}
+
+	// empty list is nil
+	out = nilFn([]primitive.Primitive{
+		primitive.List{},
+	})
+
+	// Will lead to a bool
+	b, ok2 = out.(primitive.Bool)
+	if !ok2 {
+		t.Fatalf("unexpected type, expected bool, got %v", out)
+	}
+	if !b {
+		t.Fatalf("wrong result")
+	}
+
+	// Finally a number is not a nil
+	out = nilFn([]primitive.Primitive{
+		primitive.Number(32),
+	})
+
+	// Will lead to a bool
+	b, ok2 = out.(primitive.Bool)
+	if !ok2 {
+		t.Fatalf("unexpected type, expected bool, got %v", out)
+	}
+	if b {
+		t.Fatalf("wrong result")
+	}
+}
+
+func TestCons(t *testing.T) {
+
+	// No arguments
+	out := consFn([]primitive.Primitive{})
+
+	// Will lead to an error
+	e, ok := out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if !strings.Contains(string(e), "wrong number of arguments") {
+		t.Fatalf("got error, but wrong one %v", out)
+	}
+
+	// one argument, string -> list
+	out = consFn([]primitive.Primitive{
+		primitive.String("steve"),
+	})
+
+	out, ok2 := out.(primitive.List)
+	if !ok2 {
+		t.Errorf("expected list")
+	}
+	if out.ToString() != "(steve)" {
+		t.Fatalf("wrong result")
+	}
+
+	// A list with a nil second element is gonna be truncated
+	out = consFn([]primitive.Primitive{
+		primitive.String("steve"),
+		primitive.Nil{},
+	})
+
+	out, ok2 = out.(primitive.List)
+	if !ok2 {
+		t.Errorf("expected list")
+	}
+	if out.ToString() != "(steve)" {
+		t.Fatalf("wrong result")
+	}
+
+	// A list and a number
+	a := []primitive.Primitive{
+		primitive.List{
+			primitive.Number(3),
+			primitive.Number(4),
+		},
+		primitive.Number(5),
+	}
+
+	// A number and a list
+	b := []primitive.Primitive{
+		primitive.Number(5),
+		primitive.List{
+			primitive.Number(3),
+			primitive.Number(4),
+		},
+	}
+
+	// first one
+	out = consFn(a)
+	out, ok2 = out.(primitive.List)
+	if !ok2 {
+		t.Errorf("expected list")
+	}
+	if out.ToString() != "((3 4) 5)" {
+		t.Fatalf("wrong result, got %v", out)
+	}
+
+	// second one
+	out = consFn(b)
+	out, ok2 = out.(primitive.List)
+	if !ok2 {
+		t.Errorf("expected list")
+	}
+	if out.ToString() != "(5 3 4)" {
+		t.Fatalf("wrong result, got %v", out)
+	}
+}

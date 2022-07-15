@@ -44,10 +44,12 @@ func PopulateEnvironment(env *env.Environment) {
 
 	// equality
 	env.Set("eq", &primitive.Procedure{F: eqFn})
+	env.Set("nil?", &primitive.Procedure{F: nilFn})
 
 	// List
 	env.Set("car", &primitive.Procedure{F: carFn})
 	env.Set("cdr", &primitive.Procedure{F: cdrFn})
+	env.Set("cons", &primitive.Procedure{F: consFn})
 	env.Set("list", &primitive.Procedure{F: listFn})
 
 	// core
@@ -96,33 +98,6 @@ func PopulateEnvironment(env *env.Environment) {
 		})
 
 		return c
-	}})
-
-	// nil
-	env.Set("nil?", &primitive.Procedure{F: func(args []primitive.Primitive) primitive.Primitive {
-		// nil is nil (yeah, really)
-		if primitive.IsNil(args[0]) {
-			return primitive.Bool(true)
-		}
-
-		// an empty list is nil.
-		if list, ok := args[0].(primitive.List); ok {
-			return primitive.Bool(len(list) == 0)
-		}
-		return primitive.Bool(false)
-	}})
-
-	env.Set("cons", &primitive.Procedure{F: func(args []primitive.Primitive) primitive.Primitive {
-		if len(args) == 1 {
-			return primitive.List{args[0]}
-		}
-		if args[1] == nil || primitive.IsNil(args[1]) {
-			return primitive.List{args[0]}
-		}
-		if _, ok := args[1].(primitive.List); ok {
-			return append(primitive.List{args[0]}, args[1].(primitive.List)...)
-		}
-		return primitive.List{args[0], args[1]}
 	}})
 
 	// string functions
@@ -580,4 +555,40 @@ func typeFn(args []primitive.Primitive) primitive.Primitive {
 // strFn implements "str"
 func strFn(args []primitive.Primitive) primitive.Primitive {
 	return primitive.String(args[0].ToString())
+}
+
+// nilFn implements nil?
+func nilFn(args []primitive.Primitive) primitive.Primitive {
+	if len(args) != 1 {
+		return primitive.Error("wrong number of arguments")
+	}
+
+	// nil is nil (yeah, really)
+	if primitive.IsNil(args[0]) {
+		return primitive.Bool(true)
+	}
+
+	// an empty list is nil.
+	if list, ok := args[0].(primitive.List); ok {
+		return primitive.Bool(len(list) == 0)
+	}
+	return primitive.Bool(false)
+
+}
+
+func consFn(args []primitive.Primitive) primitive.Primitive {
+	if len(args) < 1 {
+		return primitive.Error("wrong number of arguments")
+	}
+
+	if len(args) == 1 {
+		return primitive.List{args[0]}
+	}
+	if args[1] == nil || primitive.IsNil(args[1]) {
+		return primitive.List{args[0]}
+	}
+	if _, ok := args[1].(primitive.List); ok {
+		return append(primitive.List{args[0]}, args[1].(primitive.List)...)
+	}
+	return primitive.List{args[0], args[1]}
 }
