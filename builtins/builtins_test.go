@@ -819,3 +819,182 @@ func TestCons(t *testing.T) {
 		t.Fatalf("wrong result, got %v", out)
 	}
 }
+
+func TestPrint(t *testing.T) {
+
+	// No arguments
+	out := printFn([]primitive.Primitive{})
+
+	// Will lead to an error
+	e, ok := out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if !strings.Contains(string(e), "wrong number of arguments") {
+		t.Fatalf("got error, but wrong one %v", out)
+	}
+
+	// One argument
+	out = printFn([]primitive.Primitive{
+		primitive.String("Hello!"),
+	})
+
+	e2, ok2 := out.(primitive.String)
+	if !ok2 {
+		t.Fatalf("expected string, got %v", out)
+	}
+	if e2 != "Hello!" {
+		t.Fatalf("got error, but wrong one %v", e2)
+	}
+
+	// Two argument
+	out = printFn([]primitive.Primitive{
+		primitive.String("Hello %s!"),
+		primitive.String("Steve"),
+	})
+
+	e2, ok2 = out.(primitive.String)
+	if !ok2 {
+		t.Fatalf("expected string, got %v", out)
+	}
+	if e2 != "Hello Steve!" {
+		t.Fatalf("got error, but wrong one %v", e2)
+	}
+}
+
+func TestSprintf(t *testing.T) {
+
+	// No arguments
+	out := sprintfFn([]primitive.Primitive{})
+
+	// Will lead to an error
+	e, ok := out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if !strings.Contains(string(e), "wrong number of arguments") {
+		t.Fatalf("got error, but wrong one %v", out)
+	}
+
+	// Two arguments
+	out = sprintfFn([]primitive.Primitive{
+		primitive.String("Hello\t\"%s\"\n\r!"),
+		primitive.String("world"),
+	})
+
+	e2, ok2 := out.(primitive.String)
+	if !ok2 {
+		t.Fatalf("expected string, got %v", out)
+	}
+	if e2 != "Hello\t\"world\"\n\r!" {
+		t.Fatalf("got wrong result %v", e2)
+	}
+}
+
+func TestJoin(t *testing.T) {
+
+	// No arguments
+	out := joinFn([]primitive.Primitive{})
+
+	// Will lead to an error
+	e, ok := out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if !strings.Contains(string(e), "invalid argument count") {
+		t.Fatalf("got error, but wrong one %v", out)
+	}
+
+	// Not a list
+	out = joinFn([]primitive.Primitive{
+		primitive.String("s"),
+	})
+
+	// Will lead to an error
+	e, ok = out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if !strings.Contains(string(e), "not a list") {
+		t.Fatalf("got error, but wrong one %v", out)
+	}
+
+	// Now a list
+	out = joinFn([]primitive.Primitive{
+		primitive.List{
+			primitive.Number(3),
+			primitive.Number(4),
+		},
+	})
+
+	s, ok2 := out.(primitive.String)
+	if !ok2 {
+		t.Fatalf("expected string, got %v", s)
+	}
+	if s != "34" {
+		t.Fatalf("got wrong result %v", s)
+	}
+}
+
+func TestSplit(t *testing.T) {
+
+	// No arguments
+	out := splitFn([]primitive.Primitive{})
+
+	// Will lead to an error
+	e, ok := out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if !strings.Contains(string(e), "invalid argument count") {
+		t.Fatalf("got error, but wrong one %v", out)
+	}
+
+	// Arguments that aren't strings: 1
+	out = splitFn([]primitive.Primitive{
+		primitive.String("foo"),
+		primitive.Number(3),
+	})
+
+	// Will lead to an error
+	e, ok = out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if !strings.Contains(string(e), "not a string") {
+		t.Fatalf("got error, but wrong one %v", out)
+	}
+
+	// Arguments that aren't strings: 2
+	out = splitFn([]primitive.Primitive{
+		primitive.Number(3),
+		primitive.String("foo"),
+	})
+
+	// Will lead to an error
+	e, ok = out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if !strings.Contains(string(e), "not a string") {
+		t.Fatalf("got error, but wrong one %v", out)
+	}
+
+	//
+	// Now a proper split
+	//
+	out = splitFn([]primitive.Primitive{
+		primitive.String("foo"),
+		primitive.String(""),
+	})
+
+	// Will lead to a list
+	l, ok2 := out.(primitive.List)
+	if !ok2 {
+		t.Fatalf("expected list, got %v", out)
+	}
+	if l.ToString() != "(f o o)" {
+		t.Fatalf("got wrong result %v", out)
+	}
+
+}

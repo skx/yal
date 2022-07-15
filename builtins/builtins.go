@@ -51,12 +51,16 @@ func PopulateEnvironment(env *env.Environment) {
 	env.Set("cdr", &primitive.Procedure{F: cdrFn})
 	env.Set("cons", &primitive.Procedure{F: consFn})
 	env.Set("list", &primitive.Procedure{F: listFn})
+	env.Set("join", &primitive.Procedure{F: joinFn})
 
 	// core
 	env.Set("type", &primitive.Procedure{F: typeFn})
+	env.Set("sprintf", &primitive.Procedure{F: sprintfFn})
+	env.Set("print", &primitive.Procedure{F: printFn})
 
 	// string
 	env.Set("str", &primitive.Procedure{F: strFn})
+	env.Set("split", &primitive.Procedure{F: splitFn})
 
 	env.Set("sort", &primitive.Procedure{F: func(args []primitive.Primitive) primitive.Primitive {
 
@@ -98,56 +102,6 @@ func PopulateEnvironment(env *env.Environment) {
 		})
 
 		return c
-	}})
-
-	// string functions
-	env.Set("split", &primitive.Procedure{F: func(args []primitive.Primitive) primitive.Primitive {
-
-		// We require two arguments
-		if len(args) != 2 {
-			return primitive.Error("invalid argument count")
-		}
-
-		// Both arguments must be strings
-		if _, ok := args[0].(primitive.String); !ok {
-			return primitive.Error("argument not a string")
-		}
-		if _, ok := args[1].(primitive.String); !ok {
-			return primitive.Error("argument not a string")
-		}
-
-		// split
-		out := strings.Split(args[0].ToString(), args[1].ToString())
-
-		var c primitive.List
-
-		for _, x := range out {
-			c = append(c, primitive.String(x))
-		}
-
-		return c
-	}})
-
-	// string functions
-	env.Set("join", &primitive.Procedure{F: func(args []primitive.Primitive) primitive.Primitive {
-
-		// We require one argument
-		if len(args) != 1 {
-			return primitive.Error("invalid argument count")
-		}
-
-		// The argument must be a list
-		if _, ok := args[0].(primitive.List); !ok {
-			return primitive.Error("argument not a list")
-		}
-
-		tmp := ""
-
-		for _, t := range args[0].(primitive.List) {
-			tmp += t.ToString()
-		}
-
-		return primitive.String(tmp)
 	}})
 
 	// logic
@@ -225,70 +179,6 @@ func PopulateEnvironment(env *env.Environment) {
 			}
 		}
 		return primitive.Bool(true)
-	}})
-
-	// Print
-	env.Set("sprintf", &primitive.Procedure{F: func(args []primitive.Primitive) primitive.Primitive {
-		// no args
-		if len(args) < 1 {
-			return primitive.Nil{}
-		}
-
-		// one arg
-		if len(args) == 1 {
-			// expand
-			str := expandStr(args[0].ToString())
-
-			// show & return
-			fmt.Println(str)
-			return primitive.String(str)
-		}
-
-		// OK format-string
-		frmt := expandStr(args[0].ToString())
-		parm := []any{}
-
-		for i, a := range args {
-			if i == 0 {
-				continue
-			}
-			parm = append(parm, a.ToString())
-		}
-
-		out := fmt.Sprintf(frmt, parm...)
-		return primitive.String(out)
-	}})
-
-	env.Set("print", &primitive.Procedure{F: func(args []primitive.Primitive) primitive.Primitive {
-		// no args
-		if len(args) < 1 {
-			return primitive.Nil{}
-		}
-
-		// one arg
-		if len(args) == 1 {
-			// expand
-			str := expandStr(args[0].ToString())
-
-			// show & return
-			fmt.Println(str)
-			return primitive.String(str)
-		}
-
-		// OK format-string
-		frmt := expandStr(args[0].ToString())
-		parm := []any{}
-
-		for i, a := range args {
-			if i == 0 {
-				continue
-			}
-			parm = append(parm, a.ToString())
-		}
-
-		out := fmt.Sprintf(frmt, parm...)
-		fmt.Println(out)
-		return primitive.String(out)
 	}})
 
 }
@@ -591,4 +481,110 @@ func consFn(args []primitive.Primitive) primitive.Primitive {
 		return append(primitive.List{args[0]}, args[1].(primitive.List)...)
 	}
 	return primitive.List{args[0], args[1]}
+}
+
+// (print
+func printFn(args []primitive.Primitive) primitive.Primitive {
+	// no args
+	if len(args) < 1 {
+		return primitive.Error("wrong number of arguments")
+	}
+
+	// one arg
+	if len(args) == 1 {
+		// expand
+		str := expandStr(args[0].ToString())
+
+		// show & return
+		fmt.Println(str)
+		return primitive.String(str)
+	}
+
+	// OK format-string
+	frmt := expandStr(args[0].ToString())
+	parm := []any{}
+
+	for i, a := range args {
+		if i == 0 {
+			continue
+		}
+		parm = append(parm, a.ToString())
+	}
+
+	out := fmt.Sprintf(frmt, parm...)
+	fmt.Println(out)
+	return primitive.String(out)
+}
+
+// (sprintf "fmt" "arg1" ... "argN")
+func sprintfFn(args []primitive.Primitive) primitive.Primitive {
+
+	// we need 2+ arguments
+	if len(args) < 2 {
+		return primitive.Error("wrong number of arguments")
+	}
+
+	// OK format-string
+	frmt := expandStr(args[0].ToString())
+	parm := []any{}
+
+	for i, a := range args {
+		if i == 0 {
+			continue
+		}
+		parm = append(parm, a.ToString())
+	}
+
+	out := fmt.Sprintf(frmt, parm...)
+	return primitive.String(out)
+}
+
+// (split "str" "by")
+func splitFn(args []primitive.Primitive) primitive.Primitive {
+
+	// We require two arguments
+	if len(args) != 2 {
+		return primitive.Error("invalid argument count")
+	}
+
+	// Both arguments must be strings
+	if _, ok := args[0].(primitive.String); !ok {
+		return primitive.Error("argument not a string")
+	}
+	if _, ok := args[1].(primitive.String); !ok {
+		return primitive.Error("argument not a string")
+	}
+
+	// split
+	out := strings.Split(args[0].ToString(), args[1].ToString())
+
+	var c primitive.List
+
+	for _, x := range out {
+		c = append(c, primitive.String(x))
+	}
+
+	return c
+}
+
+// (join (1 2 3)
+func joinFn(args []primitive.Primitive) primitive.Primitive {
+
+	// We require one argument
+	if len(args) != 1 {
+		return primitive.Error("invalid argument count")
+	}
+
+	// The argument must be a list
+	if _, ok := args[0].(primitive.List); !ok {
+		return primitive.Error("argument not a list")
+	}
+
+	tmp := ""
+
+	for _, t := range args[0].(primitive.List) {
+		tmp += t.ToString()
+	}
+
+	return primitive.String(tmp)
 }
