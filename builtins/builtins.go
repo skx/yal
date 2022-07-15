@@ -215,6 +215,10 @@ func divideFn(args []primitive.Primitive) primitive.Primitive {
 		// check we have a number
 		n, ok := i.(primitive.Number)
 		if ok {
+			if n == 0 {
+				return primitive.Error("attempted division by zero")
+			}
+
 			v /= n
 		} else {
 			return primitive.Error(fmt.Sprintf("argument %s was not a number", i.ToString()))
