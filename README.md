@@ -99,7 +99,7 @@ We have a reasonable number of functions implemented in our golang core:
 * Comparison functions:
   * `<`, `<=`, `>`, `>=`, `=`, & `eq`.
 * Misc features
-  * `str`, `print`, & `type`
+  * `error`, `str`, `print`, & `type`
 * Special forms
   * `begin`, `cond`, `define`, `eval`, `if`, `lambda`, `let`,  `set!`, `quote`,
 * Tail recursion optimization.
@@ -124,6 +124,37 @@ Notable omissions here:
 
 * No macros.
 * No vectors/hashes/records.
+
+
+## Fuzz Testing
+
+If you're working with go 1.18+ you'll be able to run a fuzz-test of the interpreter, without the need for any external tools.
+
+Run the included driver like so:
+
+```sh
+go test -fuzztime=300s -parallel=1 -fuzz=FuzzYAL -v
+```
+
+Sample output will look like this:
+
+```
+=== FUZZ  FuzzYAL
+fuzz: elapsed: 0s, gathering baseline coverage: 0/38 completed
+fuzz: elapsed: 0s, gathering baseline coverage: 38/38 completed, now fuzzing with 1 workers
+fuzz: elapsed: 3s, execs: 39 (13/sec), new interesting: 0 (total: 38)
+fuzz: elapsed: 6s, execs: 39 (0/sec), new interesting: 0 (total: 38)
+fuzz: elapsed: 9s, execs: 39 (0/sec), new interesting: 0 (total: 38)
+fuzz: elapsed: 12s, execs: 39 (0/sec), new interesting: 0 (total: 38)
+fuzz: elapsed: 15s, execs: 39 (0/sec), new interesting: 0 (total: 38)
+fuzz: elapsed: 18s, execs: 39 (0/sec), new interesting: 0 (total: 38)
+fuzz: elapsed: 21s, execs: 39 (0/sec), new interesting: 0 (total: 38)
+fuzz: elapsed: 24s, execs: 39 (0/sec), new interesting: 0 (total: 38)
+fuzz: elapsed: 27s, execs: 39 (0/sec), new interesting: 0 (total: 38)
+```
+
+If you find a crash then it is either a bug which needs to be fixed, or a false-positive (i.e. a function reports an error which is expected) in which case the fuzz-test should be updated to add it to the list of known-OK results.  (For example "division by zero" is a fatal error, so that's a known-OK result).
+
 
 
 
