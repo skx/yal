@@ -268,9 +268,8 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment) primitive.Prim
 						tmp := New(str.(primitive.Primitive).ToString())
 						nEnv := env.NewEnvironment(e)
 						return tmp.Evaluate(nEnv)
-					} else {
-						return primitive.Nil{}
 					}
+					return primitive.Nil{}
 
 				// string eval
 				case primitive.String:

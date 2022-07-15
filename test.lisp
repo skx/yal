@@ -160,3 +160,4 @@
 ; all done
 ;
 (print "All done")
+(print (sprintf "One:%s TWO:%s" "one" (/ 3 4)))

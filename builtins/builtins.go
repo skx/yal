@@ -436,6 +436,37 @@ func PopulateEnvironment(env *env.Environment) {
 	}})
 
 	// Print
+	env.Set("sprintf", &primitive.Procedure{F: func(args []primitive.Primitive) primitive.Primitive {
+		// no args
+		if len(args) < 1 {
+			return primitive.Nil{}
+		}
+
+		// one arg
+		if len(args) == 1 {
+			// expand
+			str := expandStr(args[0].ToString())
+
+			// show & return
+			fmt.Println(str)
+			return primitive.String(str)
+		}
+
+		// OK format-string
+		frmt := expandStr(args[0].ToString())
+		parm := []any{}
+
+		for i, a := range args {
+			if i == 0 {
+				continue
+			}
+			parm = append(parm, a.ToString())
+		}
+
+		out := fmt.Sprintf(frmt, parm...)
+		return primitive.String(out)
+	}})
+
 	env.Set("print", &primitive.Procedure{F: func(args []primitive.Primitive) primitive.Primitive {
 		// no args
 		if len(args) < 1 {
@@ -467,7 +498,6 @@ func PopulateEnvironment(env *env.Environment) {
 		fmt.Println(out)
 		return primitive.String(out)
 	}})
-
 	// Convert an object to a string
 	env.Set("str", &primitive.Procedure{F: func(args []primitive.Primitive) primitive.Primitive {
 		return primitive.String(args[0].ToString())
