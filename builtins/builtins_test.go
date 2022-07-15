@@ -1088,3 +1088,187 @@ func TestSort(t *testing.T) {
 	}
 
 }
+
+func TestOr(t *testing.T) {
+
+	type TC struct {
+		in  []primitive.Primitive
+		out primitive.Bool
+	}
+
+	tests := []TC{
+		{
+			in: []primitive.Primitive{
+				primitive.Bool(true),
+			},
+			out: primitive.Bool(true),
+		},
+		{
+			// We either want a TRUE or a list of TRUE
+			in: []primitive.Primitive{
+				primitive.String("steve"),
+			},
+			out: primitive.Bool(false),
+		},
+		{
+			// list: true
+			in: []primitive.Primitive{
+				primitive.List{
+					primitive.Bool(true),
+				},
+			},
+			out: primitive.Bool(true),
+		},
+		{
+			// list: false, false, true
+			in: []primitive.Primitive{
+				primitive.List{
+					primitive.Bool(false),
+					primitive.Bool(false),
+					primitive.Bool(true),
+				},
+			},
+			out: primitive.Bool(true),
+		},
+		{
+			// list: false, false
+			in: []primitive.Primitive{
+				primitive.List{
+					primitive.Bool(false),
+					primitive.Bool(false),
+				},
+			},
+			out: primitive.Bool(false),
+		},
+		{
+			// list: false, false, "steve"
+			in: []primitive.Primitive{
+				primitive.List{
+					primitive.Bool(false),
+					primitive.Bool(false),
+					primitive.String("steve"),
+				},
+			},
+			out: primitive.Bool(true),
+		},
+	}
+
+	for _, test := range tests {
+
+		out := orFn(test.in)
+
+		if out != test.out {
+			t.Fatalf("expected '%v' - got '%v'",
+				test.out, out)
+		}
+	}
+}
+
+func TestAnd(t *testing.T) {
+
+	type TC struct {
+		in  []primitive.Primitive
+		out primitive.Bool
+	}
+
+	tests := []TC{
+		{ // 0
+			// nil
+			in: []primitive.Primitive{
+				primitive.Nil{},
+			},
+			out: primitive.Bool(false),
+		},
+		{ // 1
+			// true
+			in: []primitive.Primitive{
+				primitive.Bool(true),
+			},
+			out: primitive.Bool(true),
+		},
+		{ // 2
+			// false
+			in: []primitive.Primitive{
+				primitive.Bool(false),
+			},
+			out: primitive.Bool(false),
+		},
+		{ // 3
+			in: []primitive.Primitive{
+				primitive.String("steve"),
+			},
+			out: primitive.Bool(true),
+		},
+		{ // 4
+			// list: true
+			in: []primitive.Primitive{
+				primitive.List{
+					primitive.Bool(true),
+				},
+			},
+			out: primitive.Bool(true),
+		},
+		{ // 5
+			// list: true, nil
+			in: []primitive.Primitive{
+				primitive.List{
+					primitive.Bool(true),
+					primitive.Nil{},
+				},
+			},
+			out: primitive.Bool(false),
+		},
+		{
+			// list: true, true
+			in: []primitive.Primitive{
+				primitive.List{
+					primitive.Bool(true),
+					primitive.Bool(true),
+				},
+			},
+			out: primitive.Bool(true),
+		},
+		{
+			// list: false, false
+			in: []primitive.Primitive{
+				primitive.List{
+					primitive.Bool(false),
+					primitive.Bool(false),
+				},
+			},
+			out: primitive.Bool(false),
+		},
+		{
+			// list: false, true
+			in: []primitive.Primitive{
+				primitive.List{
+					primitive.Bool(false),
+					primitive.Bool(true),
+				},
+			},
+			out: primitive.Bool(false),
+		},
+		{
+			// list: true, true, "steve"
+			in: []primitive.Primitive{
+				primitive.List{
+					primitive.Bool(true),
+					primitive.Bool(true),
+					primitive.String("steve"),
+				},
+			},
+			out: primitive.Bool(true),
+		},
+	}
+
+	for i, test := range tests {
+
+		out := andFn(test.in)
+
+		if out != test.out {
+			t.Fatalf("%d: expected '%v' - got '%v'",
+				i,
+				test.out, out)
+		}
+	}
+}

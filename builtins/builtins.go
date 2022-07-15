@@ -546,7 +546,7 @@ func andFn(args []primitive.Primitive) primitive.Primitive {
 						return primitive.Bool(false)
 					}
 				} else {
-					if primitive.IsNil(arg) {
+					if primitive.IsNil(a) {
 						return primitive.Bool(false)
 					}
 				}
@@ -582,7 +582,7 @@ func orFn(args []primitive.Primitive) primitive.Primitive {
 						return primitive.Bool(true)
 					}
 				} else {
-					if !primitive.IsNil(arg) {
+					if !primitive.IsNil(a) {
 						return primitive.Bool(true)
 					}
 				}
