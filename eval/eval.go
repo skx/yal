@@ -391,7 +391,7 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment) primitive.Prim
 
 			// (if
 			case primitive.Symbol("if"):
-				if len(listExp) < 2 {
+				if len(listExp) < 3 {
 					return primitive.Error("arity-error: not enough arguments for (if ..)")
 				}
 
@@ -450,7 +450,6 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment) primitive.Prim
 				args := []primitive.Primitive{}
 				for _, argExp := range listExp[1:] {
 
-					fmt.Printf("Expanding:%v %V\n", argExp, argExp)
 					evalArgExp := ev.eval(argExp, e)
 					_, ok := evalArgExp.(primitive.Error)
 					if ok {
