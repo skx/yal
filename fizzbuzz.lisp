@@ -22,13 +22,13 @@
 ;;
 
 ;; Is the given number divisible by 3?
-(define divByThree (lambda (n) (zero? (% n 3))))
+(define divByThree (lambda (n:number) (zero? (% n 3))))
 
 ;; Is the given number divisible by 5?
-(define divByFive  (lambda (n) (zero? (% n 5))))
+(define divByFive  (lambda (n:number) (zero? (% n 5))))
 
 ;; Run the fizz-buzz test for the given number, N
-(define fizz (lambda (n)
+(define fizz (lambda (n:number)
   (cond
     (quote
       (and (divByThree n) (divByFive n))  (print "fizzbuzz")
