@@ -114,6 +114,7 @@ func FuzzYAL(f *testing.F) {
 		"deadline exceeded",               // context timeout
 		"unexpected type for eval",        // (eval
 		"type-validation failed",
+		"unknown type-specification",
 	}
 
 	f.Fuzz(func(t *testing.T, input []byte) {
