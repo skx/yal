@@ -463,21 +463,40 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment) primitive.Prim
 					return proc.F(args)
 				}
 
+				//
+				// Iterate over the arguments the
+				// lambda has and count those that
+				// are mandatory.
+				//
+				// i.e. If we see this we have two args:
+				//
+				// (define foo (lambda (a b) ...
+				//
+				// However for this we accept 1+
+				//
+				// (define bar (lambda (a &b) ..
+				//
+				min := 0
+				for _, x := range proc.Args {
+					if !strings.HasPrefix(x.ToString(), "&") {
+						min++
+					}
+				}
+
+				//
 				// Check that the arguments supplied
 				// match those that are expected.
 				//
-				// TODO: In the future we might support &rest
-				//
-				if len(args) != len(proc.Args) {
-					return primitive.Error(fmt.Sprintf("arity-error - function '%s' requires %d argument(s), %d provided", listExp[0].ToString(), len(proc.Args), len(args)))
-
+				if len(args) < min {
+					return primitive.Error(fmt.Sprintf("arity-error - function '%s' requires %d argument(s), %d provided", listExp[0].ToString(), min, len(args)))
 				}
-				// If not then it's a user-function,
-				// create a new environment/scope to set the
+
+				// Create a new environment/scope to set the
 				// parameter values, and evaluate the body.
 				e = env.NewEnvironment(proc.Env)
-				for i, x := range proc.Args {
-					e.Set(string(x), args[i])
+
+				for i, x := range args {
+					e.Set(string(proc.Args[i]), x)
 				}
 
 				// Here we go round the loop again.
