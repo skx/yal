@@ -4,7 +4,7 @@ import (
 	"fmt"
 )
 
-// Number type holds numbers
+// Number type holds numbers.
 type Number float64
 
 // ToString converts this object to a string.

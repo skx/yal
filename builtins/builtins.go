@@ -14,7 +14,7 @@ import (
 )
 
 // PrimitiveFn is the type which represents a function signature for
-// a lisp-usable function implemented in golang
+// a lisp-usable function implemented in golang.
 type PrimitiveFn func(args []primitive.Primitive) primitive.Primitive
 
 // PopulateEnvironment registers our default primitives
@@ -45,7 +45,10 @@ func PopulateEnvironment(env *env.Environment) {
 	// equality
 	env.Set("=", &primitive.Procedure{F: equalsFn})
 	env.Set("eq", &primitive.Procedure{F: eqFn})
+
+	// Types
 	env.Set("nil?", &primitive.Procedure{F: nilFn})
+	env.Set("type", &primitive.Procedure{F: typeFn})
 
 	// List
 	env.Set("car", &primitive.Procedure{F: carFn})
@@ -56,7 +59,6 @@ func PopulateEnvironment(env *env.Environment) {
 
 	// core
 	env.Set("error", &primitive.Procedure{F: errorFn})
-	env.Set("type", &primitive.Procedure{F: typeFn})
 	env.Set("sprintf", &primitive.Procedure{F: sprintfFn})
 	env.Set("print", &primitive.Procedure{F: printFn})
 	env.Set("sort", &primitive.Procedure{F: sortFn})
@@ -65,7 +67,7 @@ func PopulateEnvironment(env *env.Environment) {
 	env.Set("str", &primitive.Procedure{F: strFn})
 	env.Set("split", &primitive.Procedure{F: splitFn})
 
-	// logical: or + and
+	// logical
 	env.Set("and", &primitive.Procedure{F: andFn})
 	env.Set("or", &primitive.Procedure{F: orFn})
 }

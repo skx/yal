@@ -13,7 +13,7 @@ type Procedure struct {
 	// In this case the primitive is written in 100% pure lisp.
 	Body Primitive
 
-	// Env contains the environment within which this procedure is executed
+	// Env contains the environment within which this procedure is executed.
 	Env *env.Environment
 
 	// F contains a pointer to the golang implementation of this procedure,

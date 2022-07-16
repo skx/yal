@@ -36,6 +36,8 @@ type Eval struct {
 
 // New constructs a new evaluator.
 func New(src string) *Eval {
+
+	// Create with a default context.
 	e := &Eval{
 		context: context.Background(),
 	}
@@ -48,8 +50,8 @@ func New(src string) *Eval {
 
 // SetContext allows a context to be passed to the evaluator.
 //
-// The context is passed down to the virtual machine, which allows you to
-// setup a timeout/deadline for the execution of user-supplied scripts.
+// The context allows you to setup a timeout/deadline for the
+// execution of user-supplied scripts.
 func (ev *Eval) SetContext(ctx context.Context) {
 	ev.context = ctx
 }
@@ -84,6 +86,8 @@ func (ev *Eval) atom(token string) primitive.Primitive {
 	if token[0] == '"' {
 		return primitive.String(strings.ReplaceAll(strings.Trim(token, `"`), `\"`, `"`))
 	}
+
+	// if it isn't a number then it is a symbol
 	f, err := strconv.ParseFloat(token, 64)
 	if err == nil {
 		return primitive.Number(f)
@@ -227,6 +231,10 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment) primitive.Prim
 			// nop
 		}
 
+		//
+		// Behaviour depends on the type of the primitive/expression
+		// we've been given to execute.
+		//
 		switch exp.(type) {
 
 		// Numbers return themselves
@@ -313,6 +321,7 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment) primitive.Prim
 				default:
 					return primitive.Error(fmt.Sprintf("unexpected type for eval %V.", listExp[1]))
 				}
+
 			// (define
 			case primitive.Symbol("define"):
 				if len(listExp) < 3 {
@@ -347,6 +356,7 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment) primitive.Prim
 				if !ok {
 					return primitive.Error(fmt.Sprintf("argument is not a list, got %v", listExp[1]))
 				}
+
 				for _, binding := range bindingsList {
 
 					// ensure we got a list
@@ -370,6 +380,11 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment) primitive.Prim
 					// Finally set the parameter
 					newEnv.Set(string(set), bindingVal)
 				}
+
+				// Now we've populated the new
+				// environment with the pairs we received
+				// in the setup phase we can execute
+				// the body.
 				var ret primitive.Primitive
 				for _, x := range listExp[2:] {
 					ret = ev.eval(x, newEnv)
@@ -387,6 +402,7 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment) primitive.Prim
 
 				// Iterate over the list in pairs
 				for i := 0; i < len(l); i += 2 {
+
 					var section []primitive.Primitive
 					if i > len(l)-2 {
 						section = l[i:]
@@ -399,6 +415,7 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment) primitive.Prim
 						return primitive.Error("expected pairs of two items")
 					}
 
+					// The two parts of this section
 					test := section[0]
 					eval := section[1]
 
@@ -411,6 +428,7 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment) primitive.Prim
 					if eok {
 						return e
 					}
+
 					// Was it a success?  Then
 					// goto our exit.
 					//
@@ -418,6 +436,8 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment) primitive.Prim
 					// the evaluation of the rest of the
 					// list-pairs.
 					if b, ok := res.(primitive.Bool); ok && bool(b) {
+						// we'll execute this statement
+						// when we return
 						exp = eval
 						goto repeat_eval
 					}
@@ -438,6 +458,8 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment) primitive.Prim
 					return e
 				}
 
+				// if the test was false then we return
+				// the else-section
 				if b, ok := test.(primitive.Bool); (ok && !bool(b)) || primitive.IsNil(test) {
 					if len(listExp) < 4 {
 						return primitive.Nil{}
@@ -445,6 +467,8 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment) primitive.Prim
 					exp = listExp[3]
 					continue
 				}
+
+				// otherwise we handle the true-section.
 				exp = listExp[2]
 				continue
 
@@ -529,6 +553,10 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment) primitive.Prim
 				//
 				// (define bar (lambda (a &b) ..
 				//
+				// We didn't do this in the golang-implemented
+				// primitives as they handle argument counting
+				// themselves.
+				//
 				min := 0
 				for _, x := range proc.Args {
 					if !strings.HasPrefix(x.ToString(), "&") {
@@ -545,7 +573,7 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment) primitive.Prim
 				}
 
 				// Create a new environment/scope to set the
-				// parameter values, and evaluate the body.
+				// parameter values within.
 				e = env.NewEnvironment(proc.Env)
 
 				// For each of the arguments that have been
@@ -598,6 +626,8 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment) primitive.Prim
 
 							}
 
+							// strip off the ":foo"
+							// part.
 							tmp = string(before)
 						}
 
@@ -607,6 +637,9 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment) primitive.Prim
 				}
 
 				// Here we go round the loop again.
+				//
+				// Which will execute the body of the function
+				// this time.
 				exp = proc.Body
 			}
 		}
