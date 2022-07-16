@@ -237,10 +237,10 @@ func TestStandardLibrary(t *testing.T) {
 		// zero?/one?
 		{input: "(zero? 0)", output: "#t"},
 		{input: "(zero? 10)", output: "#f"},
-		// TODO- FIXMIE		{input: "(zero? \"steve\")", output: "#f"},
+		{input: "(zero? \"steve\")", output: "ERROR{argument was not a number}"},
 		{input: "(one? 0)", output: "#f"},
 		{input: "(one? 1)", output: "#t"},
-		// TODO - FIXME {input: "(one? \"steve\")", output: "#f"},
+		{input: "(one? \"steve\")", output: "ERROR{argument was not a number}"},
 
 		// map
 		{input: `

@@ -425,6 +425,13 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment) primitive.Prim
 				}
 
 				test := ev.eval(listExp[1], e)
+
+				// If we got an error inside the `if` then we return it
+				e, eok := test.(primitive.Error)
+				if eok {
+					return e
+				}
+
 				if b, ok := test.(primitive.Bool); (ok && !bool(b)) || primitive.IsNil(test) {
 					if len(listExp) < 4 {
 						return primitive.Nil{}
