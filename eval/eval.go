@@ -329,8 +329,14 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment) primitive.Prim
 					// get the value
 					bindingVal := ev.eval(bl[1], e)
 
-					// set the parameter
-					newEnv.Set(string(binding.(primitive.List)[0].(primitive.Symbol)), bindingVal)
+					// The thing to set
+					set, ok2 := bl[0].(primitive.Symbol)
+					if !ok2 {
+						return primitive.Error(fmt.Sprintf("binding name is not a symbol, got %v", bl[0]))
+					}
+
+					// Finally set the parameter
+					newEnv.Set(string(set), bindingVal)
 				}
 				var ret primitive.Primitive
 				for _, x := range listExp[2:] {
