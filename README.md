@@ -7,6 +7,38 @@
 Another trivial/toy Lisp implementation in Go.
 
 
+## Special Features
+
+Although this implementation is clearly derived from the [make a lisp](https://github.com/kanaka/mal/) series there are a couple of areas where we've implemented special/unusual things:
+
+* Type checking
+* Optional parameters
+
+Both of these are visible only in the definition of functions.
+
+Any parameter which is prefixed by `&` becomes optional, as you can see in this example:
+
+```lisp
+(define foo (lambda (a &b &c)  (print "A:%s B:%s C:%s\n", a b c)))
+
+(foo 1 2 3)  ; => "A:1 B:2 C:3"
+(foo 1 2)    ; => "A:1 B:2 C:nil"
+(foo 1)      ; => "A:1 B:nil C:nil"
+```
+
+Similarly any parameter may have an optional ":type" annotation, and at run-time a wrong type will cause an error:
+
+```lisp
+(define blah (lambda (a:list) (print "I received the list %s" a)))
+
+(blah '(1 2 3))    ; => "I received the list (1 2 3)"
+(blah #f)          ; => Error running: argument a to blah was supposed to be list, but got false
+(blah 3)           ; => Error running: argument a to blah was supposed to be list, but got 3
+```
+
+You may restrict the types to numbers (`:number`), lists (`:list`), strings (`:string`), or declare that any type is OK with `:any` (which is the same as not having an annotation at all!
+
+
 
 ## Building / Installing
 
@@ -162,4 +194,3 @@ If you find a crash then it is either a bug which needs to be fixed, or a false-
 
 * https://github.com/thesephist/klisp/blob/main/lib/klisp.klisp
   * Very helpful "inspiration" for writing primitives in Lisp.
-* [mal - Make a Lisp](https://github.com/kanaka/mal/)

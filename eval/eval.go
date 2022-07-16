@@ -469,26 +469,37 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment) primitive.Prim
 			// Anything else is either a built-in function,
 			// or a user-function.
 			default:
+
+				// Find the thing we're gonna call.
 				procExp := ev.eval(listExp[0], e)
+
+				// Is it really a procedure we can call?
 				proc, ok := procExp.(*primitive.Procedure)
 				if !ok {
 					return primitive.Error(fmt.Sprintf("argument '%s' not a function", listExp[0].ToString()))
 				}
 
-				// build up the arguments to pass to the function
+				// build up the arguments
 				args := []primitive.Primitive{}
 				for _, argExp := range listExp[1:] {
 
+					// Evaluate the arg
 					evalArgExp := ev.eval(argExp, e)
+
+					// Was it an error?  Then abort
 					_, ok := evalArgExp.(primitive.Error)
 					if ok {
 						return primitive.Error(fmt.Sprintf("error expanding argument %v", argExp))
 					}
+
+					// Otherwise collect to invoke
 					args = append(args, evalArgExp)
 				}
 
 				// Is this implemented in golang?
 				if proc.F != nil {
+
+					// Then call it.
 					return proc.F(args)
 				}
 
@@ -532,8 +543,47 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment) primitive.Prim
 					// proc accepts
 					if i < len(proc.Args) {
 
+						// Get the parameter name
 						tmp := proc.Args[i].ToString()
+
+						// Strip off any "&" prefix
 						tmp = strings.TrimPrefix(tmp, "&")
+
+						// Does the argument have
+						// a trailing type?
+						if strings.Contains(tmp, ":") {
+
+							before, after, found := strings.Cut(tmp, ":")
+
+							if found {
+								switch after {
+								case "string":
+									_, ok := x.(primitive.String)
+									if !ok {
+										return primitive.Error(fmt.Sprintf("type-validation failed: argument %s to %s was supposed to be %s, but got %v", before, listExp[0].ToString(), after, x))
+									}
+								case "number":
+									_, ok := x.(primitive.Number)
+									if !ok {
+										return primitive.Error(fmt.Sprintf("type-validation failed: argument %s to %s was supposed to be %s, but got %v", before, listExp[0].ToString(), after, x))
+									}
+								case "list":
+									_, ok := x.(primitive.List)
+									if !ok {
+										return primitive.Error(fmt.Sprintf("type-validation failed:argument %s to %s was supposed to be %s, but got %v", before, listExp[0].ToString(), after, x))
+									}
+								case "any":
+									// nop
+								default:
+									return primitive.Error(fmt.Sprintf("unknown type-specification %s", after))
+								}
+
+							}
+
+							tmp = string(before)
+						}
+
+						// And now set the value
 						e.Set(tmp, x)
 					}
 				}
