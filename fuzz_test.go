@@ -91,6 +91,13 @@ func FuzzYAL(f *testing.F) {
 	f.Add([]byte(`
 (define r (lambda () (r))) (r)`))
 
+	// Type checking
+	f.Add([]byte(`define blah (lambda (a:list) (print "I received the list %s" a)))`))
+	f.Add([]byte(`define blah (lambda (a:string) (print "I received the string %s" a)))`))
+	f.Add([]byte(`define blah (lambda (a:number) (print "I received the number %s" a)))`))
+	f.Add([]byte(`define blah (lambda (a:any) (print "I received the arg %s" a)))`))
+	f.Add([]byte(`define blah (lambda (a) (print "I received the arg %s" a)))`))
+
 	// Known errors are listed here.
 	//
 	// The purpose of fuzzing is to find panics, or unexpected errors.

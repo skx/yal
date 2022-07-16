@@ -567,6 +567,11 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment) primitive.Prim
 									if !ok {
 										return primitive.Error(fmt.Sprintf("type-validation failed: argument %s to %s was supposed to be %s, but got %v", before, listExp[0].ToString(), after, x))
 									}
+								case "function":
+									_, ok := x.(*primitive.Procedure)
+									if !ok {
+										return primitive.Error(fmt.Sprintf("type-validation failed: argument %s to %s was supposed to be %s, but got %v", before, listExp[0].ToString(), after, x))
+									}
 								case "list":
 									_, ok := x.(primitive.List)
 									if !ok {
