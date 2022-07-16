@@ -312,7 +312,14 @@ func carFn(args []primitive.Primitive) primitive.Primitive {
 		return primitive.Error("argument not a list")
 	}
 
-	return args[0].(primitive.List)[0]
+	// If we have at least one entry then return the first
+	lst := args[0].(primitive.List)
+	if len(lst) > 0 {
+		return lst[0]
+	}
+
+	// Otherwise return nil
+	return primitive.Nil{}
 }
 
 // cdrFn implements "cdr"
