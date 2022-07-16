@@ -113,6 +113,7 @@ func FuzzYAL(f *testing.F) {
 		"expected only a single argument", // (eval
 		"deadline exceeded",               // context timeout
 		"unexpected type for eval",        // (eval
+		"type-validation failed",
 	}
 
 	f.Fuzz(func(t *testing.T, input []byte) {
