@@ -43,6 +43,7 @@ func PopulateEnvironment(env *env.Environment) {
 	env.Set("<", &primitive.Procedure{F: ltFn})
 
 	// equality
+	env.Set("=", &primitive.Procedure{F: equalsFn})
 	env.Set("eq", &primitive.Procedure{F: eqFn})
 	env.Set("nil?", &primitive.Procedure{F: nilFn})
 
@@ -275,6 +276,27 @@ func ltFn(args []primitive.Primitive) primitive.Primitive {
 		return primitive.Error("argument not a number")
 	}
 	return primitive.Bool(args[0].(primitive.Number) < args[1].(primitive.Number))
+}
+
+// equalsFn implements "="
+func equalsFn(args []primitive.Primitive) primitive.Primitive {
+	if len(args) != 2 {
+		return primitive.Error("wrong number of arguments")
+	}
+
+	a := args[0]
+	b := args[1]
+
+	if a.Type() != "number" {
+		return primitive.Error("argument was not a number")
+	}
+	if b.Type() != "number" {
+		return primitive.Error("argument was not a number")
+	}
+	if a.(primitive.Number) == b.(primitive.Number) {
+		return primitive.Bool(true)
+	}
+	return primitive.Bool(false)
 }
 
 // eqFn implements "eq"

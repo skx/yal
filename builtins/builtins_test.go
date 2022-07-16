@@ -529,6 +529,89 @@ func TestEq(t *testing.T) {
 	}
 }
 
+// TestEquals tests "="
+func TestEquals(t *testing.T) {
+
+	// No arguments
+	out := equalsFn([]primitive.Primitive{})
+
+	// Will lead to an error
+	e, ok := out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if !strings.Contains(string(e), "number of arguments") {
+		t.Fatalf("got error, but wrong one %v", out)
+	}
+
+	//
+	// Now a real one: equal
+	//
+	out = equalsFn([]primitive.Primitive{
+		primitive.Number(9),
+		primitive.Number(9),
+	})
+
+	// Will work
+	n, ok2 := out.(primitive.Bool)
+	if !ok2 {
+		t.Fatalf("expected bool, got %v", out)
+	}
+	if n != true {
+		t.Fatalf("got wrong result")
+	}
+
+	//
+	// Now a real one: unequal values
+	//
+	out = eqFn([]primitive.Primitive{
+		primitive.String("99"),
+		primitive.String("9"),
+	})
+
+	// Will work
+	n, ok2 = out.(primitive.Bool)
+	if !ok2 {
+		t.Fatalf("expected bool, got %v", out)
+	}
+	if n != false {
+		t.Fatalf("got wrong result")
+	}
+
+	//
+	// Now with wrong types
+	//
+	out = equalsFn([]primitive.Primitive{
+		primitive.Number(9),
+		primitive.String("9"),
+	})
+
+	e, ok = out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if !strings.Contains(string(e), "was not a number") {
+		t.Fatalf("got error, but wrong one '%v'", e)
+	}
+
+	//
+	// Now with wrong types
+	//
+	out = equalsFn([]primitive.Primitive{
+		primitive.String("9"),
+		primitive.Number(9),
+	})
+
+	// Will work
+	e, ok = out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if !strings.Contains(string(e), "was not a number") {
+		t.Fatalf("got error, but wrong one %v", out)
+	}
+}
+
 // TestLt tests "<"
 func TestLt(t *testing.T) {
 
