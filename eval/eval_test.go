@@ -1,12 +1,53 @@
 package eval
 
 import (
+	"context"
+	"strings"
 	"testing"
+	"time"
 
 	"github.com/skx/yal/builtins"
 	"github.com/skx/yal/env"
 	"github.com/skx/yal/stdlib"
 )
+
+// This tests an infinite loop is handled
+func TestTimeout(t *testing.T) {
+
+	// Test code
+	tst := `
+(define r (lambda () (r)))
+
+(r)
+`
+	// Load our standard library
+	st := stdlib.Contents()
+	std := string(st)
+
+	// Timeout after a second
+	ctx, cancel := context.WithTimeout(context.Background(), 1000*time.Millisecond)
+	defer cancel()
+
+	// Create a new interpreter
+	l := New(std + "\n" + tst)
+
+	// Ensure we get a timeout
+	l.SetContext(ctx)
+
+	// With a new environment
+	env := env.New()
+
+	// Populate the default primitives
+	builtins.PopulateEnvironment(env)
+
+	// Run it
+	out := l.Evaluate(env)
+
+	if !strings.Contains(out.ToString(), "deadline exceeded") {
+		t.Fatalf("Didn't get the expected output:%s", out.ToString())
+	}
+
+}
 
 // This function contains a bunch of table-driven tests which are
 // designed to be simple.
@@ -108,6 +149,11 @@ func TestEvaluate(t *testing.T) {
 		{"(invalid)", "ERROR{argument 'invalid' not a function}"},
 		{"(eval 'foo 'bar)", "ERROR{Expected only a single argument}"},
 		{"(eval 3)", "ERROR{unexpected type for eval %!V(primitive.Number=3).}"},
+		{"(let 3)", "ERROR{argument is not a list, got 3}"},
+		{"(let ((0 0)) )", "ERROR{binding name is not a symbol, got 0}"},
+		{"(let ((0 )) )", "ERROR{arity-error: binding list had missing arguments}"},
+		{"(let (3 3) )", "ERROR{binding value is not a list, got 3}"},
+
 		{"(cond (quote 3))", "ERROR{expected pairs of two items}"},
 		{"(quote )", "ERROR{arity-error: not enough arguments for (quote}"},
 		{"(if )", "ERROR{arity-error: not enough arguments for (if ..)}"},
