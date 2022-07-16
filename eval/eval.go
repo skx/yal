@@ -157,8 +157,11 @@ func (ev *Eval) Evaluate(e *env.Environment) primitive.Primitive {
 	// multiple times
 	ev.offset = 0
 
-	// Out value
+	// Our output/return value
 	var out primitive.Primitive
+
+	// Default to "nil" not "<nil>"
+	out = primitive.Nil{}
 
 	// loop over all input
 	for {
@@ -215,10 +218,10 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment) primitive.Prim
 
 		// Symbols return the value they contain
 		case primitive.Symbol:
-			v, _ := e.Get(string(exp.(primitive.Symbol)))
+			v, ok := e.Get(string(exp.(primitive.Symbol)))
 
 			// If it wasn't found then return a nil value
-			if v == nil {
+			if !ok {
 				return primitive.Nil{}
 			}
 			// Otherwise cast it (our env. package stores "any")
@@ -446,17 +449,14 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment) primitive.Prim
 				// build up the arguments to pass to the function
 				args := []primitive.Primitive{}
 				for _, argExp := range listExp[1:] {
+
+					fmt.Printf("Expanding:%v %V\n", argExp, argExp)
 					evalArgExp := ev.eval(argExp, e)
 					_, ok := evalArgExp.(primitive.Error)
 					if ok {
 						return primitive.Error(fmt.Sprintf("error expanding argument %v", argExp))
 					}
-
-					if evalArgExp == nil {
-						args = append(args, primitive.Nil{})
-					} else {
-						args = append(args, evalArgExp)
-					}
+					args = append(args, evalArgExp)
 				}
 
 				// Is this implemented in golang?
