@@ -168,6 +168,16 @@ func TestEvaluate(t *testing.T) {
 		{"(lambda (x 3) (nil))}", "ERROR{expected a symbol for an argument, got 3}"},
 		{"(set! )", "ERROR{arity-error: not enough arguments for (set! ..)}"},
 		{"(let )", "ERROR{arity-error: not enough arguments for (let ..)}"},
+		{`
+(define fizz (lambda (n:number)
+  (cond
+    (quote
+      (/ n 0)  (print "fizzbuzz")
+      #t       (print n)))))
+
+(fizz 3)
+
+`, "ERROR{attempted division by zero}"},
 
 		{"))))", "nil"},
 		{"'", "nil"},

@@ -405,6 +405,12 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment) primitive.Prim
 					// need to eval test now.
 					res := ev.eval(test, e)
 
+					// If we got an error then we return
+					// it to our caller.
+					e, eok := res.(primitive.Error)
+					if eok {
+						return e
+					}
 					// Was it a success?  Then
 					// goto our exit.
 					//
