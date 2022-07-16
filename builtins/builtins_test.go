@@ -365,6 +365,23 @@ func TestMod(t *testing.T) {
 	}
 
 	//
+	// Mod 0
+	//
+	out = modFn([]primitive.Primitive{
+		primitive.Number(32),
+		primitive.Number(0),
+	})
+
+	// Will lead to an error
+	e, ok = out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if !strings.Contains(string(e), "division by zero") {
+		t.Fatalf("got error, but wrong one %v", out)
+	}
+
+	//
 	// Now a real one
 	//
 	out = modFn([]primitive.Primitive{
@@ -650,6 +667,18 @@ func TestCar(t *testing.T) {
 	if r.ToString() != "3" {
 		t.Fatalf("got wrong result : %v", r)
 	}
+
+	// Now a list which is empty
+	out = carFn([]primitive.Primitive{
+		primitive.List{},
+	})
+
+	// No error
+	_, ok3 := out.(primitive.Nil)
+	if !ok3 {
+		t.Fatalf("expected nil, got %v", out)
+	}
+
 }
 
 // Test (cdr
@@ -697,6 +726,17 @@ func TestCdr(t *testing.T) {
 	}
 	if r.ToString() != "(4 5)" {
 		t.Fatalf("got wrong result : %v", r)
+	}
+
+	// Now a list which is empty
+	out = cdrFn([]primitive.Primitive{
+		primitive.List{},
+	})
+
+	// No error
+	_, ok3 := out.(primitive.Nil)
+	if !ok3 {
+		t.Fatalf("expected nil, got %v", out)
 	}
 }
 

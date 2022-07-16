@@ -57,7 +57,7 @@
 ;; A useful helper to apply a given function to each element of a list.
 (define apply (lambda (lst fun)
   (if (nil? lst)
-    ()
+      ()
       (begin
          (fun (car lst))
          (apply (cdr lst) fun)))))
@@ -89,8 +89,14 @@
         ())))
 
 ;; Create sequences from 0/1 to N
-(define seq (lambda (n) (range 0 n 1)))
-(define nat (lambda (n) (range 1 n 1)))
+(define seq (lambda (n)
+  (if (number? n)
+    (range 0 n 1)
+      ())))
+(define nat (lambda (n)
+  (if (number? n)
+      (range 1 n 1)
+    ())))
 
 
 ;; Remove items from a list where the predicate function is not T

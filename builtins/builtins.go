@@ -239,7 +239,13 @@ func modFn(args []primitive.Primitive) primitive.Primitive {
 	if _, ok := args[1].(primitive.Number); !ok {
 		return primitive.Error("argument not a number")
 	}
-	return primitive.Number(int(args[0].(primitive.Number)) % int(args[1].(primitive.Number)))
+
+	a := int(args[0].(primitive.Number))
+	b := int(args[1].(primitive.Number))
+	if b == 0 {
+		return primitive.Error("attempted division by zero")
+	}
+	return primitive.Number(a % b)
 }
 
 // expnFn implements "#"
@@ -306,7 +312,14 @@ func carFn(args []primitive.Primitive) primitive.Primitive {
 		return primitive.Error("argument not a list")
 	}
 
-	return args[0].(primitive.List)[0]
+	// If we have at least one entry then return the first
+	lst := args[0].(primitive.List)
+	if len(lst) > 0 {
+		return lst[0]
+	}
+
+	// Otherwise return nil
+	return primitive.Nil{}
 }
 
 // cdrFn implements "cdr"
@@ -321,7 +334,11 @@ func cdrFn(args []primitive.Primitive) primitive.Primitive {
 		return primitive.Error("argument not a list")
 	}
 
-	return args[0].(primitive.List)[1:]
+	lst := args[0].(primitive.List)
+	if len(lst) > 0 {
+		return lst[1:]
+	}
+	return primitive.Nil{}
 }
 
 // errorFn implements "error"

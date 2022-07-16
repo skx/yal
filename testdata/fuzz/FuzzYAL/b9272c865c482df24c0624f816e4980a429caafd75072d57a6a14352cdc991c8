@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("\n; Split a string into a list, reverse it, and join it\n(let ((input \"Steve Kemp\"))\n  (begin\n   (print \"Starting string: %s\" input)\n   (print \"Reversed string: %s\" (join (reverse (split\x10\x00Steve Kemp\" \"\"))))))\n")

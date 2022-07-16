@@ -6,6 +6,7 @@
 package eval
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"regexp"
@@ -28,16 +29,29 @@ type Eval struct {
 	// offset records where in our list of tokens we're going to
 	// read from next.
 	offset int
+
+	// context for handling timeout
+	context context.Context
 }
 
 // New constructs a new evaluator.
 func New(src string) *Eval {
-	e := &Eval{}
+	e := &Eval{
+		context: context.Background(),
+	}
 
 	// tokenize our input program into a series of terms
 	e.tokenize(src)
 
 	return e
+}
+
+// SetContext allows a context to be passed to the evaluator.
+//
+// The context is passed down to the virtual machine, which allows you to
+// setup a timeout/deadline for the execution of user-supplied scripts.
+func (ev *Eval) SetContext(ctx context.Context) {
+	ev.context = ctx
 }
 
 // tokenize splits the input string into tokens, via a horrific regular
@@ -157,8 +171,11 @@ func (ev *Eval) Evaluate(e *env.Environment) primitive.Primitive {
 	// multiple times
 	ev.offset = 0
 
-	// Out value
+	// Our output/return value
 	var out primitive.Primitive
+
+	// Default to "nil" not "<nil>"
+	out = primitive.Nil{}
 
 	// loop over all input
 	for {
@@ -195,6 +212,21 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment) primitive.Prim
 	// confusion about scoping earlier..
 
 	for {
+
+		//
+		// We've been given a context, which we'll test at every
+		// iteration of our main-loop.
+		//
+		// This is a little slow and inefficient, but we need
+		// to allow our execution to be time-limited.
+		//
+		select {
+		case <-ev.context.Done():
+			return primitive.Error("context timeout - deadline exceeded")
+		default:
+			// nop
+		}
+
 		switch exp.(type) {
 
 		// Numbers return themselves
@@ -215,10 +247,10 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment) primitive.Prim
 
 		// Symbols return the value they contain
 		case primitive.Symbol:
-			v, _ := e.Get(string(exp.(primitive.Symbol)))
+			v, ok := e.Get(string(exp.(primitive.Symbol)))
 
 			// If it wasn't found then return a nil value
-			if v == nil {
+			if !ok {
 				return primitive.Nil{}
 			}
 			// Otherwise cast it (our env. package stores "any")
@@ -248,6 +280,9 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment) primitive.Prim
 
 			// (quote
 			case primitive.Symbol("quote"):
+				if len(listExp) < 2 {
+					return primitive.Error("arity-error: not enough arguments for (quote")
+				}
 				return listExp[1]
 
 			// (eval
@@ -280,23 +315,60 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment) primitive.Prim
 				}
 			// (define
 			case primitive.Symbol("define"):
-				val := ev.eval(listExp[2], e)
-				e.Set(string(listExp[1].(primitive.Symbol)), val)
-				return primitive.Nil{}
+				if len(listExp) < 3 {
+					return primitive.Error("arity-error: not enough arguments for (define ..)")
+				}
+				symb, ok := listExp[1].(primitive.Symbol)
+				if ok {
+
+					val := ev.eval(listExp[2], e)
+					e.Set(string(symb), val)
+					return primitive.Nil{}
+				}
+				return primitive.Error(fmt.Sprintf("Expected a symbol, got %v", listExp[1]))
 
 			// (set!
 			case primitive.Symbol("set!"):
+				if len(listExp) < 3 {
+					return primitive.Error("arity-error: not enough arguments for (set! ..)")
+				}
 				val := ev.eval(listExp[2], e)
 				e.Set(string(listExp[1].(primitive.Symbol)), val)
 				return primitive.Nil{}
 
 			// (let
 			case primitive.Symbol("let"):
+				if len(listExp) < 2 {
+					return primitive.Error("arity-error: not enough arguments for (let ..)")
+				}
+
 				newEnv := env.NewEnvironment(e)
-				bindingsList := listExp[1].(primitive.List)
+				bindingsList, ok := listExp[1].(primitive.List)
+				if !ok {
+					return primitive.Error(fmt.Sprintf("argument is not a list, got %v", listExp[1]))
+				}
 				for _, binding := range bindingsList {
-					bindingVal := ev.eval(binding.(primitive.List)[1], e)
-					newEnv.Set(string(binding.(primitive.List)[0].(primitive.Symbol)), bindingVal)
+
+					// ensure we got a list
+					bl, ok := binding.(primitive.List)
+					if !ok {
+						return primitive.Error(fmt.Sprintf("binding value is not a list, got %v", binding))
+					}
+
+					if len(bl) < 2 {
+						return primitive.Error("arity-error: binding list had missing arguments")
+					}
+					// get the value
+					bindingVal := ev.eval(bl[1], e)
+
+					// The thing to set
+					set, ok2 := bl[0].(primitive.Symbol)
+					if !ok2 {
+						return primitive.Error(fmt.Sprintf("binding name is not a symbol, got %v", bl[0]))
+					}
+
+					// Finally set the parameter
+					newEnv.Set(string(set), bindingVal)
 				}
 				var ret primitive.Primitive
 				for _, x := range listExp[2:] {
@@ -348,6 +420,10 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment) primitive.Prim
 
 			// (if
 			case primitive.Symbol("if"):
+				if len(listExp) < 3 {
+					return primitive.Error("arity-error: not enough arguments for (if ..)")
+				}
+
 				test := ev.eval(listExp[1], e)
 				if b, ok := test.(primitive.Bool); (ok && !bool(b)) || primitive.IsNil(test) {
 					if len(listExp) < 4 {
@@ -361,9 +437,27 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment) primitive.Prim
 
 			// (lambda
 			case primitive.Symbol("lambda"):
+
+				// ensure we have arguments
+				if len(listExp) < 3 {
+					return primitive.Error("wrong number of arguments")
+				}
+
+				// ensure that our arguments are a list
+				argMarkers, ok := listExp[1].(primitive.List)
+				if !ok {
+					return primitive.Error(fmt.Sprintf("expected a list for arguments, got %v", listExp[1]))
+				}
+
+				// Collect arguments
 				args := []primitive.Symbol{}
-				for _, x := range listExp[1].(primitive.List) {
-					args = append(args, x.(primitive.Symbol))
+				for _, x := range argMarkers {
+
+					xs, ok := x.(primitive.Symbol)
+					if !ok {
+						return primitive.Error(fmt.Sprintf("expected a symbol for an argument, got %v", x))
+					}
+					args = append(args, xs)
 				}
 
 				return &primitive.Procedure{
@@ -384,7 +478,12 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment) primitive.Prim
 				// build up the arguments to pass to the function
 				args := []primitive.Primitive{}
 				for _, argExp := range listExp[1:] {
+
 					evalArgExp := ev.eval(argExp, e)
+					_, ok := evalArgExp.(primitive.Error)
+					if ok {
+						return primitive.Error(fmt.Sprintf("error expanding argument %v", argExp))
+					}
 					args = append(args, evalArgExp)
 				}
 
@@ -393,12 +492,50 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment) primitive.Prim
 					return proc.F(args)
 				}
 
-				// If not then it's a user-function,
-				// create a new environment/scope to set the
+				//
+				// Iterate over the arguments the
+				// lambda has and count those that
+				// are mandatory.
+				//
+				// i.e. If we see this we have two args:
+				//
+				// (define foo (lambda (a b) ...
+				//
+				// However for this we accept 1+
+				//
+				// (define bar (lambda (a &b) ..
+				//
+				min := 0
+				for _, x := range proc.Args {
+					if !strings.HasPrefix(x.ToString(), "&") {
+						min++
+					}
+				}
+
+				//
+				// Check that the arguments supplied
+				// match those that are expected.
+				//
+				if len(args) < min {
+					return primitive.Error(fmt.Sprintf("arity-error - function '%s' requires %d argument(s), %d provided", listExp[0].ToString(), min, len(args)))
+				}
+
+				// Create a new environment/scope to set the
 				// parameter values, and evaluate the body.
 				e = env.NewEnvironment(proc.Env)
-				for i, x := range proc.Args {
-					e.Set(string(x), args[i])
+
+				// For each of the arguments that have been
+				// supplied
+				for i, x := range args {
+
+					// If this is not more than the
+					// proc accepts
+					if i < len(proc.Args) {
+
+						tmp := proc.Args[i].ToString()
+						tmp = strings.TrimPrefix(tmp, "&")
+						e.Set(tmp, x)
+					}
 				}
 
 				// Here we go round the loop again.
