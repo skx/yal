@@ -495,8 +495,20 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment) primitive.Prim
 				// parameter values, and evaluate the body.
 				e = env.NewEnvironment(proc.Env)
 
+				// For each of the arguments that have been
+				// supplied
 				for i, x := range args {
-					e.Set(string(proc.Args[i]), x)
+
+					// If this is not more than the
+					// proc accepts
+					if i < len(proc.Args) {
+
+						tmp := proc.Args[i].ToString()
+						if strings.HasPrefix(tmp, "&") {
+							tmp = strings.TrimPrefix(tmp, "&")
+						}
+						e.Set(tmp, x)
+					}
 				}
 
 				// Here we go round the loop again.
