@@ -6,6 +6,7 @@
 package eval
 
 import (
+	"context"
 	"errors"
 	"fmt"
 	"regexp"
@@ -28,16 +29,29 @@ type Eval struct {
 	// offset records where in our list of tokens we're going to
 	// read from next.
 	offset int
+
+	// context for handling timeout
+	context context.Context
 }
 
 // New constructs a new evaluator.
 func New(src string) *Eval {
-	e := &Eval{}
+	e := &Eval{
+		context: context.Background(),
+	}
 
 	// tokenize our input program into a series of terms
 	e.tokenize(src)
 
 	return e
+}
+
+// SetContext allows a context to be passed to the evaluator.
+//
+// The context is passed down to the virtual machine, which allows you to
+// setup a timeout/deadline for the execution of user-supplied scripts.
+func (ev *Eval) SetContext(ctx context.Context) {
+	ev.context = ctx
 }
 
 // tokenize splits the input string into tokens, via a horrific regular
@@ -198,6 +212,21 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment) primitive.Prim
 	// confusion about scoping earlier..
 
 	for {
+
+		//
+		// We've been given a context, which we'll test at every
+		// iteration of our main-loop.
+		//
+		// This is a little slow and inefficient, but we need
+		// to allow our execution to be time-limited.
+		//
+		select {
+		case <-ev.context.Done():
+			return primitive.Error("context timeout - deadline exceeded")
+		default:
+			// nop
+		}
+
 		switch exp.(type) {
 
 		// Numbers return themselves

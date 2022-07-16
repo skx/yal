@@ -4,8 +4,10 @@
 package main
 
 import (
+	"context"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/skx/yal/builtins"
 	"github.com/skx/yal/env"
@@ -85,6 +87,10 @@ func FuzzYAL(f *testing.F) {
 (print "Eval of '%s' resulted in %s" e (eval e))
 `))
 
+	// Recurse forever
+	f.Add([]byte(`
+(define r (lambda () (r))) (r)`))
+
 	// Known errors are listed here.
 	//
 	// The purpose of fuzzing is to find panics, or unexpected errors.
@@ -105,9 +111,14 @@ func FuzzYAL(f *testing.F) {
 		"error expanding argument",
 		"is not a symbol",
 		"expected only a single argument", // (eval
+		"deadline exceeded",
 	}
 
 	f.Fuzz(func(t *testing.T, input []byte) {
+
+		// Timeout after a second
+		ctx, cancel := context.WithTimeout(context.Background(), 1000*time.Millisecond)
+		defer cancel()
 
 		// Create a new environment
 		environment := env.New()
@@ -123,6 +134,9 @@ func FuzzYAL(f *testing.F) {
 
 		// Create a new interpreter with that source
 		interpreter := eval.New(src)
+
+		// Ensure we timeout after 1 second
+		interpreter.SetContext(ctx)
 
 		// Now evaluate the input using the specified environment
 		out := interpreter.Evaluate(environment)
