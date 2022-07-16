@@ -667,6 +667,18 @@ func TestCar(t *testing.T) {
 	if r.ToString() != "3" {
 		t.Fatalf("got wrong result : %v", r)
 	}
+
+	// Now a list which is empty
+	out = carFn([]primitive.Primitive{
+		primitive.List{},
+	})
+
+	// No error
+	_, ok3 := out.(primitive.Nil)
+	if !ok3 {
+		t.Fatalf("expected nil, got %v", out)
+	}
+
 }
 
 // Test (cdr
@@ -714,6 +726,17 @@ func TestCdr(t *testing.T) {
 	}
 	if r.ToString() != "(4 5)" {
 		t.Fatalf("got wrong result : %v", r)
+	}
+
+	// Now a list which is empty
+	out = cdrFn([]primitive.Primitive{
+		primitive.List{},
+	})
+
+	// No error
+	_, ok3 := out.(primitive.Nil)
+	if !ok3 {
+		t.Fatalf("expected nil, got %v", out)
 	}
 }
 
