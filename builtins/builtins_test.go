@@ -564,9 +564,9 @@ func TestEquals(t *testing.T) {
 	//
 	// Now a real one: unequal values
 	//
-	out = eqFn([]primitive.Primitive{
-		primitive.String("99"),
-		primitive.String("9"),
+	out = equalsFn([]primitive.Primitive{
+		primitive.Number(99),
+		primitive.Number(9),
 	})
 
 	// Will work

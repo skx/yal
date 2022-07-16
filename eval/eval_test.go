@@ -178,6 +178,7 @@ func TestEvaluate(t *testing.T) {
 		{input: "(define blah (lambda (a:list) (print a))) (blah 3)", output: "ERROR{type-validation failed:argument a to blah was supposed to be list, but got 3}"},
 		{input: "(define blah (lambda (a:string) (print a))) (blah 3)", output: "ERROR{type-validation failed: argument a to blah was supposed to be string, but got 3}"},
 		{input: "(define blah (lambda (a:number) (print a))) (blah '(3))", output: "ERROR{type-validation failed: argument a to blah was supposed to be number, but got [3]}"},
+		{input: "(define blah (lambda (a:function) (print a))) (blah '(3))", output: "ERROR{type-validation failed: argument a to blah was supposed to be function, but got [3]}"},
 		{input: "(define blah (lambda (a:any) (print a))) (blah '(3))", output: "(3)"},
 		{input: "(define blah (lambda (a:bob) (print a))) (blah 3)", output: "ERROR{unknown type-specification bob}"},
 	}
