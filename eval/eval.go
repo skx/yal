@@ -451,7 +451,12 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment) primitive.Prim
 					if ok {
 						return primitive.Error(fmt.Sprintf("error expanding argument %v", argExp))
 					}
-					args = append(args, evalArgExp)
+
+					if evalArgExp == nil {
+						args = append(args, primitive.Nil{})
+					} else {
+						args = append(args, evalArgExp)
+					}
 				}
 
 				// Is this implemented in golang?
