@@ -111,7 +111,8 @@ func FuzzYAL(f *testing.F) {
 		"error expanding argument",
 		"is not a symbol",
 		"expected only a single argument", // (eval
-		"deadline exceeded",
+		"deadline exceeded",               // context timeout
+		"unexpected type for eval",        // (eval
 	}
 
 	f.Fuzz(func(t *testing.T, input []byte) {
