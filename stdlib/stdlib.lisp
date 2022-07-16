@@ -90,11 +90,11 @@
 
 ;; Create sequences from 0/1 to N
 (define seq (lambda (n)
-  (if n
+  (if (number? n)
     (range 0 n 1)
       ())))
 (define nat (lambda (n)
-  (if n
+  (if (number? n)
       (range 1 n 1)
     ())))
 

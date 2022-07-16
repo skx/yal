@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte(";\n(define sq(lambda(x)(*x x)));\n(apply(nat()))a")
