@@ -104,6 +104,7 @@ func FuzzYAL(f *testing.F) {
 		"expected a list",
 		"error expanding argument",
 		"is not a symbol",
+		"expected only a single argument", // (eval
 	}
 
 	f.Fuzz(func(t *testing.T, input []byte) {
