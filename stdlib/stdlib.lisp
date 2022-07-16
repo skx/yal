@@ -89,8 +89,14 @@
         ())))
 
 ;; Create sequences from 0/1 to N
-(define seq (lambda (n) (range 0 n 1)))
-(define nat (lambda (n) (range 1 n 1)))
+(define seq (lambda (n)
+  (if n
+    (range 0 n 1)
+      ())))
+(define nat (lambda (n)
+  (if n
+      (range 1 n 1)
+    ())))
 
 
 ;; Remove items from a list where the predicate function is not T
