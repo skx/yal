@@ -327,7 +327,11 @@ func cdrFn(args []primitive.Primitive) primitive.Primitive {
 		return primitive.Error("argument not a list")
 	}
 
-	return args[0].(primitive.List)[1:]
+	lst := args[0].(primitive.List)
+	if len(lst) > 0 {
+		return lst[1:]
+	}
+	return primitive.Nil{}
 }
 
 // errorFn implements "error"
