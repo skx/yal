@@ -70,7 +70,7 @@ A reasonable amount of sample code can be found in [test.lisp](test.lisp), but a
 
 ```lisp
 ;;
-;; This is a simple example of the YAL interpreter
+;; This is a simple FizzBuzz example, which we can execute.
 ;;
 ;; You'll see here that we can define functions, that we have
 ;; primitives such as "zero?" and that we have a built-in "cond"
@@ -80,26 +80,38 @@ A reasonable amount of sample code can be found in [test.lisp](test.lisp), but a
 ;;
 ;;  (cond
 ;;    (quote
-;;      EVAL1  ACTION1
-;;      EVAL2  ACTION2
+;;      TEST1  ACTION1
+;;      TEST2  ACTION2
 ;;    )
 ;;  )
 ;;
-;; We take each pair "EVAL1 ACTION1", or "EVAL2 ACTION2", and if the
-;; result of evaluating the first part is true we run the action.
+;; For each pair (e.g. `TEST1 ACTION1`) we run the first statement, and if
+;; the result is `true` we evaluate the action, and stop.
 ;;
-;; If not we continue down the list.  Quote is used to ensure we don't
-;; evaluate the list in advance.
+;; When the test returns nil/false/similar then we continue running until
+;; we do get success.  That means it is important to end with something that
+;; will always succeed.
+;;
+;; `(quote) is used to ensure we don't evaluate the list in advance of the
+;; statement.
 ;;
 
 ;; Is the given number divisible by 3?
-(define divByThree (lambda (n) (zero? (% n 3))))
+;;
+;; Note that we add ":number" to the end of the argument, which means
+;; a fatal error will be raised if we invoke this function with a non-number,
+;; for example:
+;;
+;;   (divByThree "Steve")
+;;   (divByThree true)
+;;
+(define divByThree (lambda (n:number) (zero? (% n 3))))
 
 ;; Is the given number divisible by 5?
-(define divByFive  (lambda (n) (zero? (% n 5))))
+(define divByFive  (lambda (n:number) (zero? (% n 5))))
 
 ;; Run the fizz-buzz test for the given number, N
-(define fizz (lambda (n)
+(define fizz (lambda (n:number)
   (cond
     (quote
       (and (divByThree n) (divByFive n))  (print "fizzbuzz")
@@ -109,7 +121,7 @@ A reasonable amount of sample code can be found in [test.lisp](test.lisp), but a
 
 
 ;; Apply the function fizz, for each number 1-50
-(apply (nat 50) fizz)
+(apply (nat 51) fizz)
 ```
 
 

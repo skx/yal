@@ -42,9 +42,9 @@
 (define !     (lambda (x) (if x #f #t)))
 
 ;; Some simple tests of numbers
-(define zero? (lambda (n) (if (= n 0) #t #f)))
-(define one?  (lambda (n) (if (= n 1) #t #f)))
-(define even? (lambda (n) (if (zero? (% n 2)) #t #f)))
+(define zero? (lambda (n) (= n 0)))
+(define one?  (lambda (n) (= n 1)))
+(define even? (lambda (n) (zero? (% n 2))))
 (define odd?  (lambda (n) (! (even? n))))
 
 

@@ -75,14 +75,12 @@
 ;;
 ;; Show even numbers via the filter-function.
 ;;
-(print "Even numbers from 0-10: %s"
-       (filter (nat 11) (lambda (x) (even? x))))
+(print "Even numbers from 0-10: %s" (filter (nat 11) even?))
 
 ;;
 ;; And again with square numbers.
 ;;
-(print "Squared numbers from 0-10: %s"
-       (map (nat 11) (lambda (x) (sq x))))
+(print "Squared numbers from 0-10: %s" (map (nat 11) sq))
 
 
 ;;
