@@ -504,9 +504,7 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment) primitive.Prim
 					if i < len(proc.Args) {
 
 						tmp := proc.Args[i].ToString()
-						if strings.HasPrefix(tmp, "&") {
-							tmp = strings.TrimPrefix(tmp, "&")
-						}
+						tmp = strings.TrimPrefix(tmp, "&")
 						e.Set(tmp, x)
 					}
 				}
