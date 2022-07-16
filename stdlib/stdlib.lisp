@@ -17,6 +17,17 @@
 (define string?   (lambda (x) (eq (type x) "string")))
 (define symbol?   (lambda (x) (eq (type x) "symbol")))
 
+;; We've defined "<" in golang, we can now implement the missing
+;; functions in terms of that:
+;;
+;; >
+;; <=
+;; >=
+;;
+(define >  (lambda (a b) (< b a)))
+(define >= (lambda (a b) (! (< a b))))
+(define <= (lambda (a b) (! (> a b))))
+
 
 ;; Traditionally we use `car` and `cdr` for accessing the first and rest
 ;; elements of a list.  For readability it might be nice to vary that
@@ -40,19 +51,6 @@
 ;; Square root
 (define sqrt (lambda (x:number) (# x 0.5)))
 
-;; We've defined "<" in golang, we can now implement
-;;
-;; >
-;; <=
-;; >=
-;; =
-;;
-;; In terms of other things
-;;
-(define >  (lambda (a b) (< b a)))
-(define >= (lambda (a b) (! (< a b))))
-(define <= (lambda (a b) (! (> a b))))
-(define =  (lambda (a b) (eq (- a b) 0)))
 
 ;; A useful helper to apply a given function to each element of a list.
 (define apply (lambda (lst:list fun)
