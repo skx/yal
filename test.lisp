@@ -155,7 +155,6 @@
 ))
 
 ;
-; all done
+; All done! -> In red :)
 ;
-(print "All done")
-(print (sprintf "One:%s TWO:%s" "one" (/ 3 4)))
+(print "\e[31;1mAll done!\e[0m")

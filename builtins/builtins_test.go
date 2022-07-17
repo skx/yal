@@ -46,6 +46,7 @@ func TestExpandString(t *testing.T) {
 		{in: "steve\"kemp", out: "steve\"kemp"},
 		{in: "steve\\\\kemp", out: "steve\\kemp"},
 		{in: "steve\\bkemp", out: "steve\\bkemp"},
+		{in: "steve\\ekemp", out: "steve" + string(rune(033)) + "kemp"},
 	}
 
 	for i, test := range tests {

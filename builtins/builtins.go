@@ -90,6 +90,8 @@ func expandStr(input string) string {
 
 			next := input[i+1]
 			switch next {
+			case 'e':
+				out += string(rune(033))
 			case 't':
 				out += "\t"
 			case 'n':
