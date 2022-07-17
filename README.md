@@ -2,6 +2,16 @@
 [![Go Report Card](https://goreportcard.com/badge/github.com/skx/yal)](https://goreportcard.com/report/github.com/skx/yal)
 [![license](https://img.shields.io/github/license/skx/yal.svg)](https://github.com/skx/yal/blob/master/LICENSE)
 
+* [yet another lisp](#yet-another-lisp)
+* [Special Features](#special-features)
+* [Building / Installing](#building--installing)
+* [Examples](#examples)
+* [Features](#features)
+* [Omissions](#omissions)
+* [Fuzz Testing](#fuzz-testing)
+* [References](#references)
+
+
 # yet another lisp
 
 Another trivial/toy Lisp implementation in Go.
@@ -11,12 +21,13 @@ Another trivial/toy Lisp implementation in Go.
 
 Although this implementation is clearly derived from the [make a lisp](https://github.com/kanaka/mal/) series there are a couple of areas where we've implemented special/unusual things:
 
-* Type checking
-* Optional parameters
+* Type checking for function parameters
+  * Via a `:type` suffix.  For example `(lambda (a:string b:number) ..`.
+* Optional parameters for functions.
+  * Any parameter which is prefixed by `&` is optional.
+  * If not specified then `nil` is assumed.
 
-Both of these are visible only in the definition of functions.
-
-Any parameter which is prefixed by `&` becomes optional, as you can see in this example:
+Here's what the optional parameters look like in practice:
 
 ```lisp
 (define foo (lambda (a &b &c)  (print "A:%s B:%s C:%s\n", a b c)))
@@ -26,7 +37,7 @@ Any parameter which is prefixed by `&` becomes optional, as you can see in this 
 (foo 1)      ; => "A:1 B:nil C:nil"
 ```
 
-Similarly any parameter may have an optional ":type" annotation, and at run-time a wrong type will cause an error:
+Here's an example of type-checking on a parameter value, in this case a list is required, via the `:list` suffix:
 
 ```lisp
 (define blah (lambda (a:list) (print "I received the list %s" a)))
@@ -36,7 +47,15 @@ Similarly any parameter may have an optional ":type" annotation, and at run-time
 (blah 3)           ; => Error running: argument a to blah was supposed to be list, but got 3
 ```
 
-You may restrict the types to numbers (`:number`), lists (`:list`), strings (`:string`), or declare that any type is OK with `:any` (which is the same as not having an annotation at all!
+The following type suffixes are permitted and do as you'd expect:
+
+* `:any`
+* `:function`
+* `:list`
+* `:number`
+* `:string`
+
+Currently it isn't possible to permit multiple valid values (for example _either_ a string or a number), but that could be added in the future if a need arises.
 
 
 
@@ -126,7 +145,7 @@ A reasonable amount of sample code can be found in [test.lisp](test.lisp), but a
 
 
 
-# Features
+## Features
 
 We have a reasonable number of functions implemented in our golang core:
 
@@ -172,9 +191,15 @@ Notable omissions here:
 
 ## Fuzz Testing
 
-If you're working with go 1.18+ you'll be able to run a fuzz-test of the interpreter, without the need for any external tools.
+The project has 100% test-coverage of all the internal packages, using the standard facilities you can run those test-cases:
 
-Run the included driver like so:
+```sh
+go test ./...
+```
+
+In addition to that there is support for the integrated fuzz-testing which is available with go 1.18+, which essentially feeds the interpreter random input and hopes to discover crashes.
+
+You can launch the fuzz-testing like so:
 
 ```sh
 go test -fuzztime=300s -parallel=1 -fuzz=FuzzYAL -v
