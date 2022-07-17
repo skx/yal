@@ -159,6 +159,7 @@ func TestEvaluate(t *testing.T) {
 		{"(cond (quote 3))", "ERROR{expected pairs of two items}"},
 		{"(quote )", "ERROR{arity-error: not enough arguments for (quote}"},
 		{"(if )", "ERROR{arity-error: not enough arguments for (if ..)}"},
+		{"(if (/ 1 0) #t #f)", "ERROR{attempted division by zero}"},
 		{"(define )", "ERROR{arity-error: not enough arguments for (define ..)}"},
 		{"(define \"steve\" 3)}", "ERROR{Expected a symbol, got steve}"},
 		{"(lambda )}", "ERROR{wrong number of arguments}"},
