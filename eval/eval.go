@@ -526,14 +526,14 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment) primitive.Prim
 					// Was it an error?  Then abort
 					_, ok := evalArgExp.(primitive.Error)
 					if ok {
-						return primitive.Error(fmt.Sprintf("error expanding argument %v", argExp))
+						return primitive.Error(fmt.Sprintf("error expanding argument %v for call to (%s ..)", argExp, listExp[0]))
 					}
 
-					// Otherwise collect to invoke
+					// Otherwise append it to the list we'll supply
 					args = append(args, evalArgExp)
 				}
 
-				// Is this implemented in golang?
+				// Is this function implemented in golang?
 				if proc.F != nil {
 
 					// Then call it.
@@ -576,12 +576,10 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment) primitive.Prim
 				// parameter values within.
 				e = env.NewEnvironment(proc.Env)
 
-				// For each of the arguments that have been
-				// supplied
+				// For each of the arguments that have been supplied
 				for i, x := range args {
 
-					// If this is not more than the
-					// proc accepts
+					// If this is not more than the proc accepts
 					if i < len(proc.Args) {
 
 						// Get the parameter name
@@ -596,38 +594,43 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment) primitive.Prim
 
 							before, after, found := strings.Cut(tmp, ":")
 
+							// Did we find it?
 							if found {
-								switch after {
-								case "string":
-									_, ok := x.(primitive.String)
-									if !ok {
-										return primitive.Error(fmt.Sprintf("type-validation failed: argument %s to %s was supposed to be %s, but got %v", before, listExp[0].ToString(), after, x))
+
+								// types that are allowed
+								valid := make(map[string]bool)
+
+								// Is anything possible?
+								any := false
+
+								// Record each one
+								for _, typ := range strings.Split(after, ":") {
+
+									// Any is special
+									if typ == "any" {
+										any = true
 									}
-								case "number":
-									_, ok := x.(primitive.Number)
-									if !ok {
-										return primitive.Error(fmt.Sprintf("type-validation failed: argument %s to %s was supposed to be %s, but got %v", before, listExp[0].ToString(), after, x))
+
+									// Since we're calling `type` we need to
+									// do some rewriting for those two unusual cases
+									if typ == "function" {
+										valid["procedure(lisp)"] = true
+										valid["procedure(golang)"] = true
+										continue
 									}
-								case "function":
-									_, ok := x.(*primitive.Procedure)
-									if !ok {
-										return primitive.Error(fmt.Sprintf("type-validation failed: argument %s to %s was supposed to be %s, but got %v", before, listExp[0].ToString(), after, x))
-									}
-								case "list":
-									_, ok := x.(primitive.List)
-									if !ok {
-										return primitive.Error(fmt.Sprintf("type-validation failed:argument %s to %s was supposed to be %s, but got %v", before, listExp[0].ToString(), after, x))
-									}
-								case "any":
-									// nop
-								default:
-									return primitive.Error(fmt.Sprintf("unknown type-specification %s", after))
+
+									valid[typ] = true
 								}
 
+								// See if the type matches
+								_, ok := valid[x.Type()]
+
+								if !ok && !any {
+									return primitive.Error(fmt.Sprintf("type-validation failed: argument %s to %s was supposed to be %s, got %s", before, listExp[0].ToString(), after, x.Type()))
+								}
 							}
 
-							// strip off the ":foo"
-							// part.
+							// strip off the ":foo" part.
 							tmp = string(before)
 						}
 

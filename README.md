@@ -47,15 +47,22 @@ Here's an example of type-checking on a parameter value, in this case a list is 
 (blah 3)           ; => Error running: argument a to blah was supposed to be list, but got 3
 ```
 
-The following type suffixes are permitted and do as you'd expect:
+The following type suffixes are permitted and match what you'd expect:
 
 * `:any`
+* `:boolean`
+* `:error`
 * `:function`
 * `:list`
+* `:nil`
 * `:number`
 * `:string`
+* `:symbol`
 
-Currently it isn't possible to permit multiple valid values (for example _either_ a string or a number), but that could be added in the future if a need arises.
+If multiple types are permitted then just keep appending things, for example:
+
+* `(define blah (lambda (a:list:number)  (print "I was given a list OR a number: %s" a)))`
+  * Allows either a list, or a number.
 
 
 
@@ -209,17 +216,12 @@ Sample output will look like this:
 
 ```
 === FUZZ  FuzzYAL
-fuzz: elapsed: 0s, gathering baseline coverage: 0/38 completed
-fuzz: elapsed: 0s, gathering baseline coverage: 38/38 completed, now fuzzing with 1 workers
-fuzz: elapsed: 3s, execs: 39 (13/sec), new interesting: 0 (total: 38)
-fuzz: elapsed: 6s, execs: 39 (0/sec), new interesting: 0 (total: 38)
-fuzz: elapsed: 9s, execs: 39 (0/sec), new interesting: 0 (total: 38)
-fuzz: elapsed: 12s, execs: 39 (0/sec), new interesting: 0 (total: 38)
-fuzz: elapsed: 15s, execs: 39 (0/sec), new interesting: 0 (total: 38)
-fuzz: elapsed: 18s, execs: 39 (0/sec), new interesting: 0 (total: 38)
-fuzz: elapsed: 21s, execs: 39 (0/sec), new interesting: 0 (total: 38)
-fuzz: elapsed: 24s, execs: 39 (0/sec), new interesting: 0 (total: 38)
-fuzz: elapsed: 27s, execs: 39 (0/sec), new interesting: 0 (total: 38)
+...
+fuzz: elapsed: 56m54s, execs: 163176 (0/sec), new interesting: 108 (total: 658)
+fuzz: elapsed: 56m57s, execs: 163176 (0/sec), new interesting: 108 (total: 658)
+fuzz: elapsed: 57m0s, execs: 163183 (2/sec), new interesting: 109 (total: 659)
+fuzz: elapsed: 57m3s, execs: 163433 (83/sec), new interesting: 110 (total: 660)
+..
 ```
 
 If you find a crash then it is either a bug which needs to be fixed, or a false-positive (i.e. a function reports an error which is expected) in which case the fuzz-test should be updated to add it to the list of known-OK results.  (For example "division by zero" is a fatal error, so that's a known-OK result).
