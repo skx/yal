@@ -157,4 +157,6 @@
 ;
 ; All done! -> In red :)
 ;
-(print "\e[31;1mAll done!\e[0m")
+(define red (lambda (msg) (sprintf "\e[0;31m%s\e[0m" msg)))
+
+(print (red "All done!"))
