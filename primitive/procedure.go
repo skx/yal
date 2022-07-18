@@ -5,7 +5,7 @@ import "github.com/skx/yal/env"
 // Procedure holds a user-defined function.
 type Procedure struct {
 
-	// Arguments to this procedure
+	// Arguments to this procedure.
 	Args []Symbol
 
 	// Body is the body to execute, in the case where F is nil.

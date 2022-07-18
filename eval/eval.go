@@ -65,10 +65,21 @@ func (ev *Eval) tokenize(str string) {
 
 	for _, match := range re.FindAllStringSubmatch(str, -1) {
 
-		// skip empty terms, or comments (which begin with ";").
-		if (match[1] == "") || (match[1][0] == ';') {
+		// skip empty terms
+		if match[1] == "" {
 			continue
 		}
+
+		// skip comments
+		if len(match[1]) > 1 && match[1][0] == ';' {
+			continue
+		}
+
+		// skip shebang
+		if len(match[1]) > 2 && match[1][0] == '#' && match[1][1] == '!' {
+			continue
+		}
+
 		ev.toks = append(ev.toks, match[1])
 	}
 }

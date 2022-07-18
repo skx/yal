@@ -64,6 +64,8 @@ If multiple types are permitted then just keep appending things, for example:
 * `(define blah (lambda (a:list:number)  (print "I was given a list OR a number: %s" a)))`
   * Allows either a list, or a number.
 
+Command line arguments passed to a script, such as [args.lisp](args.lisp), will be available in the list `os.args`.
+
 
 
 ## Building / Installing

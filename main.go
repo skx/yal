@@ -37,6 +37,20 @@ func main() {
 	// Create a new environment
 	environment := env.New()
 
+	// If we got any command-line arguments then save them
+	if len(os.Args) > 2 {
+
+		x := primitive.List{}
+		for _, arg := range os.Args[2:] {
+			x = append(x, primitive.String(arg))
+		}
+
+		environment.Set("os.args", x)
+	} else {
+		// Otherwise we'll set an empty list.
+		environment.Set("os.args", primitive.List{})
+	}
+
 	// Populate the default primitives
 	builtins.PopulateEnvironment(environment)
 
