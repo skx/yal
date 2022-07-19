@@ -61,6 +61,13 @@ func TestEvaluate(t *testing.T) {
 	}
 
 	tests := []TC{
+		// comment
+		{"; Foo\n;Bar\n", "nil"},
+		{"; Foo\n;Bar\n#f", "#f"},
+		{"#!/usr/bin/yal\n;Bar\n", "nil"},
+		{"#!/usr/bin/yal\n", "nil"},
+		{"#!/usr/bin/yal\n#t", "#t"},
+
 		// bools
 		{"#t", "#t"},
 		{"true", "#t"},
@@ -104,6 +111,8 @@ func TestEvaluate(t *testing.T) {
 		{"(eval \"(+ 1 2)\")", "3"},
 		{"(let ((a \"(+ 1 23)\")) (eval a))", "24"},
 		{"(eval c)", "nil"},
+		{"(read \"(+ 3 4)\")", "(+ 3 4)"},
+		{"(eval (read \"(+ 3 4)\"))", "7"},
 
 		// cond
 		{`(define a 44)
@@ -180,6 +189,8 @@ func TestEvaluate(t *testing.T) {
 
 `, "ERROR{attempted division by zero}"},
 
+		{"(read foo bar)", "ERROR{Expected only a single argument}"},
+		{"(read \")\")", "ERROR{failed to read ):unexpected ')'}"},
 		{"))))", "nil"},
 		{"'", "nil"},
 		{"(3 3 ", "nil"},

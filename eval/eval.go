@@ -304,6 +304,32 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment) primitive.Prim
 				}
 				return listExp[1]
 
+			// (read
+			case primitive.Symbol("read"):
+				if len(listExp) != 2 {
+					return primitive.Error("Expected only a single argument")
+				}
+
+				arg := listExp[1].ToString()
+
+				// Create a new evaluator with the list
+				tmp := New(arg)
+
+				// Read an expression with it.
+				//
+				// Note here we just _read_ the expression,
+				// we don't evaluate it.
+				//
+				// So we don't need an environment, etc.
+				//
+				out, err := tmp.readExpression()
+				if err != nil {
+					return primitive.Error(fmt.Sprintf("failed to read %s:%s", arg, err.Error()))
+				}
+
+				// Return it.
+				return out
+
 			// (eval
 			case primitive.Symbol("eval"):
 
@@ -312,6 +338,22 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment) primitive.Prim
 				}
 
 				switch val := listExp[1].(type) {
+
+				// Evaluate
+				case primitive.List:
+					// Evaluate the list
+					res := ev.eval(listExp[1], e)
+
+					// Create a new evaluator with
+					// the result as a string
+					tmp := New(res.ToString())
+
+					// Ensure that we have a suitable
+					// child-environment.
+					nEnv := env.NewEnvironment(e)
+
+					// Now evaluate it.
+					return tmp.Evaluate(nEnv)
 
 				// symbol solely so we can do env. lookup
 				case primitive.Symbol:
