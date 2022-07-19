@@ -154,9 +154,14 @@
     true     (print "A is %s" a)
 ))
 
+;;
+;; Trivial Read/Eval pair
+;;
+(print "The answer to life, the universe, and everything is %s!\n"
+  (eval (read "(* 6 7)")))
+
 ;
 ; All done! -> In red :)
 ;
 (define red (lambda (msg) (sprintf "\e[0;31m%s\e[0m" msg)))
-
 (print (red "All done!"))
