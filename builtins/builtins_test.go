@@ -1,6 +1,7 @@
 package builtins
 
 import (
+	"os"
 	"strings"
 	"testing"
 
@@ -1466,4 +1467,46 @@ func TestAnd(t *testing.T) {
 				test.out, out)
 		}
 	}
+}
+
+func TestGetenv(t *testing.T) {
+
+	// No arguments
+	out := getenvFn([]primitive.Primitive{})
+
+	// Will lead to an error
+	e, ok := out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if !strings.Contains(string(e), "invalid argument count") {
+		t.Fatalf("got error, but wrong one %v", out)
+	}
+
+	// Argument that isn't a string
+	out = getenvFn([]primitive.Primitive{
+		primitive.Number(3),
+	})
+
+	// Will lead to an error
+	e, ok = out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if !strings.Contains(string(e), "not a string") {
+		t.Fatalf("got error, but wrong one %v", out)
+	}
+
+	// Valid result
+	x := os.Getenv("USER")
+	y := getenvFn([]primitive.Primitive{
+		primitive.String("USER"),
+	})
+
+	yStr := string(y.(primitive.String))
+
+	if yStr != x {
+		t.Fatalf("getenv USER mismatch")
+	}
+
 }

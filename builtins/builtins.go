@@ -5,6 +5,7 @@ package builtins
 import (
 	"fmt"
 	"math"
+	"os"
 	"sort"
 	"strconv"
 	"strings"
@@ -54,14 +55,15 @@ func PopulateEnvironment(env *env.Environment) {
 	env.Set("car", &primitive.Procedure{F: carFn})
 	env.Set("cdr", &primitive.Procedure{F: cdrFn})
 	env.Set("cons", &primitive.Procedure{F: consFn})
-	env.Set("list", &primitive.Procedure{F: listFn})
 	env.Set("join", &primitive.Procedure{F: joinFn})
+	env.Set("list", &primitive.Procedure{F: listFn})
 
 	// core
 	env.Set("error", &primitive.Procedure{F: errorFn})
-	env.Set("sprintf", &primitive.Procedure{F: sprintfFn})
+	env.Set("getenv", &primitive.Procedure{F: getenvFn})
 	env.Set("print", &primitive.Procedure{F: printFn})
 	env.Set("sort", &primitive.Procedure{F: sortFn})
+	env.Set("sprintf", &primitive.Procedure{F: sprintfFn})
 
 	// string
 	env.Set("str", &primitive.Procedure{F: strFn})
@@ -646,4 +648,22 @@ func orFn(args []primitive.Primitive) primitive.Primitive {
 		}
 	}
 	return primitive.Bool(false)
+}
+
+// getenvFn is the implementation of `(getenv "PATH")`
+func getenvFn(args []primitive.Primitive) primitive.Primitive {
+
+	// If we have only a single argument
+	if len(args) != 1 {
+		return primitive.Error("invalid argument count")
+	}
+
+	// Which is a string
+	if _, ok := args[0].(primitive.String); !ok {
+		return primitive.Error("argument not a string")
+	}
+
+	// Return the value
+	str := args[0].(primitive.String)
+	return primitive.String(os.Getenv(string(str)))
 }
