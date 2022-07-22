@@ -181,7 +181,7 @@ We have a reasonable number of functions implemented in our golang core:
 
 Building upon those primitives we have a larger standard-library of functions written in Lisp such as:
 
-* `abs`, `apply`, `append`, `filter`, `getenv`, `map`, `min`, `max`, `nat`, `neg`, `nth`, `reduce`, `reverse`, `seq`, etc.
+* `abs`, `apply`, `append`, `filter`, `getenv`, `map`, `min`, `max`, `nat`, `neg`, `now`, `nth`, `reduce`, `reverse`, `seq`, etc.
 
 Although the lists above should be up to date you can check the definitions to see what is currently available:
 

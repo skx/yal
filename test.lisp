@@ -18,9 +18,13 @@
       (* n (fact (- n 1))))))
 
 ;; Invoke the factorial function, using apply
-(apply (list 1 2 3 4 5 6 7 8 9 10)
-  (lambda (x)
-    (print "%s! => %s" x (fact x))))
+;;
+;; Calculate the factorial of "big numbers" mostly as a test of the
+;; `now` function which times how long it took.
+(apply (list 1 10 100 1000 10000 100000)
+       (lambda (x)
+         (let ((start (now)))
+           (print "%s! => %s [%s seconds]" x (fact x) (- (now) start)))))
 
 
 ; Split a string into a list, reverse it, and join it

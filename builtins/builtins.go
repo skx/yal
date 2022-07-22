@@ -7,6 +7,7 @@ import (
 	"math"
 	"os"
 	"sort"
+	"time"
 	"strconv"
 	"strings"
 
@@ -61,6 +62,7 @@ func PopulateEnvironment(env *env.Environment) {
 	// core
 	env.Set("error", &primitive.Procedure{F: errorFn})
 	env.Set("getenv", &primitive.Procedure{F: getenvFn})
+	env.Set("now", &primitive.Procedure{F:nowFn})
 	env.Set("print", &primitive.Procedure{F: printFn})
 	env.Set("sort", &primitive.Procedure{F: sortFn})
 	env.Set("sprintf", &primitive.Procedure{F: sprintfFn})
@@ -666,4 +668,11 @@ func getenvFn(args []primitive.Primitive) primitive.Primitive {
 	// Return the value
 	str := args[0].(primitive.String)
 	return primitive.String(os.Getenv(string(str)))
+}
+
+
+// nowFn is the implementation of `(now)`
+func nowFn(args []primitive.Primitive) primitive.Primitive {
+
+	return primitive.Number(time.Now().Unix())
 }

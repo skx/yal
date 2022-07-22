@@ -4,6 +4,8 @@ import (
 	"os"
 	"strings"
 	"testing"
+	"time"
+	"math"
 
 	"github.com/skx/yal/env"
 	"github.com/skx/yal/primitive"
@@ -1507,6 +1509,26 @@ func TestGetenv(t *testing.T) {
 
 	if yStr != x {
 		t.Fatalf("getenv USER mismatch")
+	}
+
+}
+
+func TestNow(t *testing.T) {
+
+	// No arguments
+	out := nowFn([]primitive.Primitive{})
+
+	// Will lead to a number
+	e, ok := out.(primitive.Number)
+	if !ok {
+		t.Fatalf("expected number, got %v", out)
+	}
+
+	// Get the current time
+	tm := time.Now().Unix()
+
+	if math.Abs( float64(tm - int64(e)) ) > 10 {
+		t.Fatalf("weird result; (now) != now - outside our bound of ten seconds inaccuracy")
 	}
 
 }
