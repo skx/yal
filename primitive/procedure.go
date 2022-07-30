@@ -19,6 +19,10 @@ type Procedure struct {
 	// F contains a pointer to the golang implementation of this procedure,
 	// if it is a native one.
 	F func(args []Primitive) Primitive
+
+	// Macro is true is this function should have arguments passed literally, and
+	// not evaluated.
+	Macro bool
 }
 
 // ToString converts this object to a string.
@@ -30,11 +34,21 @@ func (p *Procedure) ToString() string {
 	for _, x := range p.Args {
 		args = append(args, x)
 	}
-	return "(lambda " + args.ToString() + " " + p.Body.ToString() + ")"
+
+	// might be a macro
+	first := "lambda"
+	if p.Macro {
+		first = "macro"
+	}
+
+	return "(" + first + " " + args.ToString() + " " + p.Body.ToString() + ")"
 }
 
 // Type returns the type of this primitive object.
 func (p *Procedure) Type() string {
+	if p.Macro {
+		return "macro"
+	}
 	if p.F != nil {
 		return "procedure(golang)"
 	}

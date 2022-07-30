@@ -526,7 +526,7 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment) primitive.Prim
 				continue
 
 			// (lambda
-			case primitive.Symbol("lambda"):
+			case primitive.Symbol("lambda"), primitive.Symbol("macro"):
 
 				// ensure we have arguments
 				if len(listExp) < 3 {
@@ -550,10 +550,17 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment) primitive.Prim
 					args = append(args, xs)
 				}
 
+				// Macro?
+				macro := false
+				if listExp[0].ToString() == "macro" {
+					macro = true
+				}
+
 				return &primitive.Procedure{
 					Args: args,
 					Body: listExp[2],
 					Env:  e,
+					Macro: macro,
 				}
 
 			// Anything else is either a built-in function,
@@ -571,19 +578,30 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment) primitive.Prim
 
 				// build up the arguments
 				args := []primitive.Primitive{}
-				for _, argExp := range listExp[1:] {
 
-					// Evaluate the arg
-					evalArgExp := ev.eval(argExp, e)
+				// Is this a macro?
+				if proc.Macro {
 
-					// Was it an error?  Then abort
-					_, ok := evalArgExp.(primitive.Error)
-					if ok {
-						return primitive.Error(fmt.Sprintf("error expanding argument %v for call to (%s ..)", argExp, listExp[0]))
+					// Then the arguments are NOT evaluated
+					args = listExp[1:]
+
+				} else {
+
+					// Otherwise we evaluate them.
+					for _, argExp := range listExp[1:] {
+
+						// Evaluate the arg
+						evalArgExp := ev.eval(argExp, e)
+
+						// Was it an error?  Then abort
+						_, ok := evalArgExp.(primitive.Error)
+						if ok {
+							return primitive.Error(fmt.Sprintf("error expanding argument %v for call to (%s ..)", argExp, listExp[0]))
+						}
+
+						// Otherwise append it to the list we'll supply
+						args = append(args, evalArgExp)
 					}
-
-					// Otherwise append it to the list we'll supply
-					args = append(args, evalArgExp)
 				}
 
 				// Is this function implemented in golang?

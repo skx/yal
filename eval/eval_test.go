@@ -80,6 +80,9 @@ func TestEvaluate(t *testing.T) {
 		{`(if false "false" "true")`, "true"},
 		{"(if false false)", "nil"},
 
+		// macro - args are not evaluated
+		{`(define foo (macro (x) x)) (foo (+ 1 2))`, "(+ 1 2)"},
+
 		// lambda
 		{`(define sq (lambda (x) (* x x)))
                  ; comment

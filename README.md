@@ -191,13 +191,15 @@ Although the lists above should be up to date you can check the definitions to s
   * [stdlib/stdlib.lisp](stdlib/stdlib.lisp)
   * The code in this file is essentially **prepended** to any script that is supplied upon the command-line.
 
+We do not support the traditional form of macros, instead inspired by [bass](https://github.com/vito/bass), there is the facility to define functions which do not have their arguments evaluated:
+
+> Bass is a descendant of the [Kernel programming language](https://web.cs.wpi.edu/~jshutt/kernel.html). Kernel is the tiniest Lisp dialect I know of - it has a primitive form beneath lambda called `$vau` ([op](https://bass-lang.org/stdlib.html#binding-op) in Bass) which it leverages to replace the macro system found in most other Lisp dialects.
 
 
 ## Omissions
 
-Notable omissions here:
+Notable omissions are listed here:
 
-* No macros.
 * No vectors/hashes/records.
 
 
