@@ -266,6 +266,11 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment) primitive.Prim
 
 		// Symbols return the value they contain
 		case primitive.Symbol:
+			// A symbol with ":" is treated as a literal.
+			if strings.HasPrefix(exp.ToString(), ":") {
+				return exp
+			}
+
 			v, ok := e.Get(string(exp.(primitive.Symbol)))
 
 			// If it wasn't found then return a nil value
