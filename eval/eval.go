@@ -497,6 +497,23 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment) primitive.Prim
 
 				}
 
+			// (env
+			case primitive.Symbol("env"):
+
+				// create a new list
+				var c primitive.List
+
+				for key, val := range e.Items() {
+
+					v := val.(primitive.Primitive)
+
+					var tmp primitive.List
+					tmp = append(tmp, primitive.String(key))
+					tmp = append(tmp, v)
+					c = append(c, tmp)
+				}
+
+				return c
 			// (if
 			case primitive.Symbol("if"):
 				if len(listExp) < 3 {
@@ -557,9 +574,9 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment) primitive.Prim
 				}
 
 				return &primitive.Procedure{
-					Args: args,
-					Body: listExp[2],
-					Env:  e,
+					Args:  args,
+					Body:  listExp[2],
+					Env:   e,
 					Macro: macro,
 				}
 

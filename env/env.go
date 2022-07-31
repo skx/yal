@@ -49,6 +49,29 @@ func (env *Environment) Get(key string) (any, bool) {
 	return env.parent.Get(key)
 }
 
+// Items returns the items of our environment
+func (env *Environment) Items() map[string]any {
+
+	// The return value
+	x := make(map[string]any)
+
+	// If we have a parent scope then set the values from that.
+	if env.parent != nil {
+		for pk, pv := range env.parent.Items() {
+			x[pk] = pv
+		}
+	}
+
+	// Add the items in our scope after those of the parent,
+	// in case we have a shadowed/more-specific value.
+	for k, v := range env.values {
+		x[k] = v
+	}
+
+	// all done
+	return x
+}
+
 // Set updates the contents of the current environment.
 func (env *Environment) Set(key string, value any) {
 	env.values[key] = value

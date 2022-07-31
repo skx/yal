@@ -159,6 +159,11 @@ func TestEvaluate(t *testing.T) {
 		{"(= 10 10)", "#t"},
 		{"(= -1 -1)", "#t"},
 
+		// we have a LOT of built ins, but not 100
+		{"(> (length (env))  10)", "#t"},
+		{"(> (length (env))  50)", "#t"},
+		{"(< (length (env)) 100)", "#t"},
+
 		// errors
 		{"(invalid)", "ERROR{argument 'invalid' not a function}"},
 		{"(eval 'foo 'bar)", "ERROR{Expected only a single argument}"},
