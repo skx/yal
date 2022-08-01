@@ -4,7 +4,7 @@
 ;; Given the (string) name of a function to be called, and some
 ;; arguments .. call it.
 ;;
-;; (env) returns lists of lists, so we can find the function with
+;; (env) returns a lists of hashes, so we can find the function with
 ;; a given name via `filter`.  Assuming only one response then we're
 ;; able to find it by name, and execute it.
 ;;
@@ -15,14 +15,14 @@
           (fn  nil)) ; fn is the function of the result
 
       ;; find the entry in the list with the right name
-      (set! out (filter (env) (lambda (x) (eq (car x) name))))
+      (set! out (filter (env) (lambda (x) (eq (get x :name) name))))
 
       ;; there should be only one matching entry
       (if (= (length out) 1)
           (begin
-           (set! nm (car (car out)))        ;; nm == name
-           (set! fn (car (cdr (car out))))  ;; fn is the function to call
-           (if fn (fn args)))))))           ;; if we got it, invoke it
+           (set! nm (get (car out) :name))   ;; nm == name
+           (set! fn (get (car out) :value))  ;; fn is the function to call
+           (if fn (fn args)))))))            ;; if we got it, invoke it
 
 
 ;; Print a string
