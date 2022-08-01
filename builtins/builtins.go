@@ -7,9 +7,9 @@ import (
 	"math"
 	"os"
 	"sort"
-	"time"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/skx/yal/env"
 	"github.com/skx/yal/primitive"
@@ -61,9 +61,11 @@ func PopulateEnvironment(env *env.Environment) {
 
 	// core
 	env.Set("error", &primitive.Procedure{F: errorFn})
+	env.Set("get", &primitive.Procedure{F: getFn})
 	env.Set("getenv", &primitive.Procedure{F: getenvFn})
-	env.Set("now", &primitive.Procedure{F:nowFn})
+	env.Set("now", &primitive.Procedure{F: nowFn})
 	env.Set("print", &primitive.Procedure{F: printFn})
+	env.Set("set", &primitive.Procedure{F: setFn})
 	env.Set("sort", &primitive.Procedure{F: sortFn})
 	env.Set("sprintf", &primitive.Procedure{F: sprintfFn})
 
@@ -652,6 +654,41 @@ func orFn(args []primitive.Primitive) primitive.Primitive {
 	return primitive.Bool(false)
 }
 
+// getFn is the implementation of `(get hash key)`
+func getFn(args []primitive.Primitive) primitive.Primitive {
+
+	// We need two arguments
+	if len(args) != 2 {
+		return primitive.Error("invalid argument count")
+	}
+
+	// First is a Hash
+	if _, ok := args[0].(primitive.Hash); !ok {
+		return primitive.Error("argument not a hash")
+	}
+
+	tmp := args[0].(primitive.Hash)
+	return tmp.Get(args[1].ToString())
+}
+
+// setFn is the implementation of `(set hash key val)`
+func setFn(args []primitive.Primitive) primitive.Primitive {
+
+	// We need three arguments
+	if len(args) != 3 {
+		return primitive.Error("invalid argument count")
+	}
+
+	// First is a Hash
+	if _, ok := args[0].(primitive.Hash); !ok {
+		return primitive.Error("argument not a hash")
+	}
+
+	tmp := args[0].(primitive.Hash)
+	tmp.Set(args[1].ToString(), args[2])
+	return args[2]
+}
+
 // getenvFn is the implementation of `(getenv "PATH")`
 func getenvFn(args []primitive.Primitive) primitive.Primitive {
 
@@ -669,7 +706,6 @@ func getenvFn(args []primitive.Primitive) primitive.Primitive {
 	str := args[0].(primitive.String)
 	return primitive.String(os.Getenv(string(str)))
 }
-
 
 // nowFn is the implementation of `(now)`
 func nowFn(args []primitive.Primitive) primitive.Primitive {

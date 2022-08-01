@@ -1,11 +1,11 @@
 package builtins
 
 import (
+	"math"
 	"os"
 	"strings"
 	"testing"
 	"time"
-	"math"
 
 	"github.com/skx/yal/env"
 	"github.com/skx/yal/primitive"
@@ -1527,8 +1527,113 @@ func TestNow(t *testing.T) {
 	// Get the current time
 	tm := time.Now().Unix()
 
-	if math.Abs( float64(tm - int64(e)) ) > 10 {
+	if math.Abs(float64(tm-int64(e))) > 10 {
 		t.Fatalf("weird result; (now) != now - outside our bound of ten seconds inaccuracy")
 	}
 
+}
+
+func TestGet(t *testing.T) {
+
+	// no arguments
+	out := getFn([]primitive.Primitive{})
+
+	// Will lead to an error
+	e, ok := out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if !strings.Contains(string(e), "argument") {
+		t.Fatalf("got error, but wrong one")
+	}
+
+	// First argument must be a hash
+	out = getFn([]primitive.Primitive{
+		primitive.String("foo"),
+		primitive.String("foo"),
+	})
+
+	// Will lead to an error
+	e, ok = out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if !strings.Contains(string(e), "not a hash") {
+		t.Fatalf("got error, but wrong one %v", out)
+	}
+
+	// create a hash
+	h := primitive.Hash{}
+	h.Entries = make(map[string]primitive.Primitive)
+	h.Set("Name", primitive.String("STEVE"))
+
+	out2 := getFn([]primitive.Primitive{
+		h,
+		primitive.String("Name"),
+	})
+
+	// Will lead to a string
+	s, ok2 := out2.(primitive.String)
+	if !ok2 {
+		t.Fatalf("expected string, got %v", out2)
+	}
+	if !strings.Contains(string(s), "STEVE") {
+		t.Fatalf("got string, but wrong one %v", s)
+	}
+}
+
+func TestSet(t *testing.T) {
+
+	// no arguments
+	out := setFn([]primitive.Primitive{})
+
+	// Will lead to an error
+	e, ok := out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if !strings.Contains(string(e), "argument") {
+		t.Fatalf("got error, but wrong one")
+	}
+
+	// First argument must be a hash
+	out = setFn([]primitive.Primitive{
+		primitive.String("foo"),
+		primitive.String("foo"),
+		primitive.String("foo"),
+	})
+
+	// Will lead to an error
+	e, ok = out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if !strings.Contains(string(e), "not a hash") {
+		t.Fatalf("got error, but wrong one %v", out)
+	}
+
+	// create a hash
+	h := primitive.Hash{}
+	h.Entries = make(map[string]primitive.Primitive)
+
+	out2 := setFn([]primitive.Primitive{
+		h,
+		primitive.String("Name"),
+		primitive.String("Steve"),
+	})
+
+	// Will lead to a string
+	s, ok2 := out2.(primitive.String)
+	if !ok2 {
+		t.Fatalf("expected string, got %v", out2)
+	}
+	if !strings.Contains(string(s), "Steve") {
+		t.Fatalf("got string, but wrong one %v", s)
+	}
+
+	// Now ensure the hash value was set
+	v := h.Get("Name")
+	if v.ToString() != "Steve" {
+		t.Fatalf("The value wasn't set?")
+	}
 }

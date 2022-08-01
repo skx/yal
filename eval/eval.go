@@ -160,12 +160,56 @@ func (ev *Eval) readExpression() (primitive.Primitive, error) {
 		ev.offset++
 
 		return list, nil
-	case ")":
+	case "{":
+		// Are we at the end of our program?
+		if ev.offset >= len(ev.toks) {
+			return nil, ErrEOF
+		}
+
+		// Create a hash, which we'll populate with items
+		// until we reach the matching ")" statement
+		hash := primitive.Hash{}
+		hash.Entries = make(map[string]primitive.Primitive)
+
+		// Loop until we hit the closing bracket
+		for ev.toks[ev.offset] != "}" {
+
+			// Read the sub-expressions, recursively.
+			key, err := ev.readExpression()
+			if err != nil {
+				return nil, err
+			}
+
+			// Check again we've not hit the end of the program
+			if ev.offset >= len(ev.toks) {
+				return nil, ErrEOF
+			}
+
+			// Read the sub-expressions, recursively.
+			val, err2 := ev.readExpression()
+			if err2 != nil {
+				return nil, err2
+			}
+
+			// Check again we've not hit the end of the program
+			if ev.offset >= len(ev.toks) {
+				return nil, ErrEOF
+			}
+
+			hash.Set(key.ToString(), val)
+		}
+
+		// We bump the current read-position one more here,
+		// which means we skip over the closing "}" character.
+		ev.offset++
+
+		return hash, nil
+	case ")", "}":
 		// We shouldn't ever hit this, because we skip over
 		// the closing ")" when we handle "(".
 		//
 		// If a program is malformed we'll see it though
-		return nil, errors.New("unexpected ')'")
+		return nil, errors.New("unexpected '" + token + "'")
 	default:
 
 		// Return just a single atom/primitive.
@@ -258,6 +302,10 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment) primitive.Prim
 
 		// Strings return themselves
 		case primitive.String:
+			return exp
+
+		// Hashes return themselves
+		case primitive.Hash:
 			return exp
 
 		// Nil returns itself
@@ -512,9 +560,12 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment) primitive.Prim
 
 					v := val.(primitive.Primitive)
 
-					var tmp primitive.List
-					tmp = append(tmp, primitive.String(key))
-					tmp = append(tmp, v)
+					var tmp primitive.Hash
+					tmp.Entries = make(map[string]primitive.Primitive)
+
+					tmp.Set(":name", primitive.String(key))
+					tmp.Set(":value", v)
+
 					c = append(c, tmp)
 				}
 
@@ -616,9 +667,9 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment) primitive.Prim
 						evalArgExp := ev.eval(argExp, e)
 
 						// Was it an error?  Then abort
-						_, ok := evalArgExp.(primitive.Error)
+						x, ok := evalArgExp.(primitive.Error)
 						if ok {
-							return primitive.Error(fmt.Sprintf("error expanding argument %v for call to (%s ..)", argExp, listExp[0]))
+							return primitive.Error(fmt.Sprintf("error expanding argument %v for call to (%s ..): %s", argExp, listExp[0], x.ToString()))
 						}
 
 						// Otherwise append it to the list we'll supply
@@ -705,10 +756,12 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment) primitive.Prim
 									}
 
 									// Since we're calling `type` we need to
-									// do some rewriting for those two unusual cases
+									// do some rewriting for the function-case,
+									// which has distinct types.
 									if typ == "function" {
 										valid["procedure(lisp)"] = true
 										valid["procedure(golang)"] = true
+										valid["macro"] = true
 										continue
 									}
 

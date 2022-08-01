@@ -74,6 +74,13 @@ func TestEvaluate(t *testing.T) {
 		{"#f", "#f"},
 		{"false", "#f"},
 
+		// literals
+		{":foo", ":foo"},
+
+		// hashes
+		{"{:age 34}", "{\n\t:age => 34\n}"},
+		{"(get {:age 34, :alive true} :alive)", "#t"},
+
 		// if
 		{"(if true true false)", "#t"},
 		{"(if true true)", "#t"},
@@ -182,7 +189,7 @@ func TestEvaluate(t *testing.T) {
 		{"(lambda )}", "ERROR{wrong number of arguments}"},
 		{"(lambda 3 4)}", "ERROR{expected a list for arguments, got 3}"},
 		{"(define sq (lambda (x) (* x x))) (sq)", "ERROR{arity-error - function 'sq' requires 1 argument(s), 0 provided}"},
-		{"(print (/ 3 0))", "ERROR{error expanding argument [/ 3 0] for call to (print ..)}"},
+		{"(print (/ 3 0))", "ERROR{error expanding argument [/ 3 0] for call to (print ..): ERROR{attempted division by zero}}"},
 		{"(lambda (x 3) (nil))}", "ERROR{expected a symbol for an argument, got 3}"},
 		{"(set! )", "ERROR{arity-error: not enough arguments for (set! ..)}"},
 		{"(let )", "ERROR{arity-error: not enough arguments for (let ..)}"},
@@ -199,10 +206,17 @@ func TestEvaluate(t *testing.T) {
 
 		{"(read foo bar)", "ERROR{Expected only a single argument}"},
 		{"(read \")\")", "ERROR{failed to read ):unexpected ')'}"},
-		{"))))", "nil"},
+		{"(read \"}\")", "ERROR{failed to read }:unexpected '}'}"},
 		{"'", "nil"},
 		{"(3 3 ", "nil"},
 		{"(((((", "nil"},
+		{"))))", "nil"},
+		{"{{{{{{", "nil"},
+		{"{ ", "nil"},
+		{"{ :name ", "nil"},
+		{"{ :name { ", "nil"},
+		{"{ :age 333  ", "nil"},
+		{"}}}}}}", "nil"},
 
 		// type failures
 		{input: "(define blah (lambda (a:list) (print a))) (blah 3)", output: "ERROR{type-validation failed: argument a to blah was supposed to be list, got number}"},
