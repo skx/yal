@@ -21,13 +21,18 @@ Another trivial/toy Lisp implementation in Go.
 
 Although this implementation is clearly derived from the [make a lisp](https://github.com/kanaka/mal/) series there are a couple of areas where we've implemented special/unusual things:
 
-* Type checking for function parameters
-  * Via a `:type` suffix.  For example `(lambda (a:string b:number) ..`.
+* Access to command-line arguments, when used via a shebang.
+  * See [args.lisp](args.lisp) for an example.
+* Introspection via the `(env)` function, which will return details of all variables/functions in the environment.
+  * Allowing dynamic invocation shown in [dynamic.lisp](dynamic.lisp) and other neat things.
 * Optional parameters for functions.
   * Any parameter which is prefixed by `&` is optional.
   * If not specified then `nil` is assumed.
-* Access to command-line arguments, when used via a shebang.
-  * See [args.lisp](args.lisp) for an example.
+* Support for hashes as well as lists.
+  * A hash looks like this `{ :name "Steve" :location "Helsinki" }`
+  * `(print (type { :foo "bar" } ))` -> "hash"
+* Type checking for function parameters.
+  * Via a `:type` suffix.  For example `(lambda (a:string b:number) ..`.
 
 
 Here's what the optional parameters look like in practice:
@@ -163,6 +168,9 @@ We have a reasonable number of functions implemented in our golang core:
 
 * Support for strings, numbers, errors, lists, etc.
   * `#t` is the true symbol, `#f` is false, though `true` and `false` are synonyms.
+* Hash operations:
+  * Hashes are literals like this `{ :name "Steve" :location "Helsinki" }`
+  * Keys can be retrieved/updated via `get`, & `set`.
 * List operations:
   * `car`, `cdr`, `list`, & `sort`.
 * Logical operations
@@ -176,7 +184,7 @@ We have a reasonable number of functions implemented in our golang core:
 * Misc features
   * `error`, `str`, `print`, & `type`
 * Special forms
-  * `begin`, `cond`, `define`, `eval`, `if`, `lambda`, `let`, `read`, `set!`, `quote`,
+  * `begin`, `cond`, `define`, `env`, `eval`, `if`, `lambda`, `let`, `read`, `set!`, `quote`,
 * Tail recursion optimization.
 
 Building upon those primitives we have a larger standard-library of functions written in Lisp such as:
