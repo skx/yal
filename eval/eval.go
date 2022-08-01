@@ -756,10 +756,12 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment) primitive.Prim
 									}
 
 									// Since we're calling `type` we need to
-									// do some rewriting for those two unusual cases
+									// do some rewriting for the function-case,
+									// which has distinct types.
 									if typ == "function" {
 										valid["procedure(lisp)"] = true
 										valid["procedure(golang)"] = true
+										valid["macro"] = true
 										continue
 									}
 
