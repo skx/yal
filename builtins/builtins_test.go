@@ -1543,6 +1543,9 @@ func TestGet(t *testing.T) {
 	if !ok {
 		t.Fatalf("expected error, got %v", out)
 	}
+	if !strings.Contains(string(e), "argument") {
+		t.Fatalf("got error, but wrong one")
+	}
 
 	// First argument must be a hash
 	out = getFn([]primitive.Primitive{
@@ -1588,6 +1591,9 @@ func TestSet(t *testing.T) {
 	e, ok := out.(primitive.Error)
 	if !ok {
 		t.Fatalf("expected error, got %v", out)
+	}
+	if !strings.Contains(string(e), "argument") {
+		t.Fatalf("got error, but wrong one")
 	}
 
 	// First argument must be a hash
