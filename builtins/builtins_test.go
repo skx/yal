@@ -1584,6 +1584,68 @@ func TestGet(t *testing.T) {
 	}
 }
 
+func TestKeys(t *testing.T) {
+
+	// no arguments
+	out := keysFn([]primitive.Primitive{})
+
+	// Will lead to an error
+	e, ok := out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if !strings.Contains(string(e), "argument") {
+		t.Fatalf("got error, but wrong one")
+	}
+
+	// First argument must be a hash
+	out = keysFn([]primitive.Primitive{
+		primitive.String("foo"),
+	})
+
+	// Will lead to an error
+	e, ok = out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if !strings.Contains(string(e), "not a hash") {
+		t.Fatalf("got error, but wrong one %v", out)
+	}
+
+	// create a hash
+	h := primitive.NewHash()
+	h.Set("XXX", primitive.String("Last"))
+	h.Set("Name", primitive.String("Steve"))
+	h.Set("Age", primitive.Number(43))
+	h.Set("Location", primitive.String("Helsinki"))
+
+	// Get the keys
+	res := keysFn([]primitive.Primitive{
+		h,
+	})
+
+	// Will lead to a string
+	_, ok2 := res.(primitive.List)
+	if !ok2 {
+		t.Fatalf("expected list, got %v", res)
+	}
+
+	// Sorted
+	lst := res.(primitive.List)
+	if lst[0].ToString() != "Age" {
+		t.Fatalf("not a sorted list?")
+	}
+	if lst[1].ToString() != "Location" {
+		t.Fatalf("not a sorted list?")
+	}
+	if lst[2].ToString() != "Name" {
+		t.Fatalf("not a sorted list?")
+	}
+	if lst[3].ToString() != "XXX" {
+		t.Fatalf("not a sorted list?")
+	}
+}
+
 func TestSet(t *testing.T) {
 
 	// no arguments

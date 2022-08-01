@@ -170,7 +170,7 @@ We have a reasonable number of functions implemented in our golang core:
   * `#t` is the true symbol, `#f` is false, though `true` and `false` are synonyms.
 * Hash operations:
   * Hashes are literals like this `{ :name "Steve" :location "Helsinki" }`
-  * Keys can be retrieved/updated via `get`, & `set`.
+  * Hash functions are `get`, `keys`, & `set`.
 * List operations:
   * `car`, `cdr`, `list`, & `sort`.
 * Logical operations
