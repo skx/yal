@@ -1563,10 +1563,12 @@ func TestGet(t *testing.T) {
 	}
 
 	// create a hash
-	h := primitive.Hash{}
-	h.Entries = make(map[string]primitive.Primitive)
+	h := primitive.NewHash()
+
+	// Set a value
 	h.Set("Name", primitive.String("STEVE"))
 
+	// Now get it
 	out2 := getFn([]primitive.Primitive{
 		h,
 		primitive.String("Name"),
@@ -1613,8 +1615,7 @@ func TestSet(t *testing.T) {
 	}
 
 	// create a hash
-	h := primitive.Hash{}
-	h.Entries = make(map[string]primitive.Primitive)
+	h := primitive.NewHash()
 
 	out2 := setFn([]primitive.Primitive{
 		h,

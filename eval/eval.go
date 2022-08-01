@@ -168,8 +168,7 @@ func (ev *Eval) readExpression() (primitive.Primitive, error) {
 
 		// Create a hash, which we'll populate with items
 		// until we reach the matching ")" statement
-		hash := primitive.Hash{}
-		hash.Entries = make(map[string]primitive.Primitive)
+		hash := primitive.NewHash()
 
 		// Loop until we hit the closing bracket
 		for ev.toks[ev.offset] != "}" {
@@ -560,9 +559,7 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment) primitive.Prim
 
 					v := val.(primitive.Primitive)
 
-					var tmp primitive.Hash
-					tmp.Entries = make(map[string]primitive.Primitive)
-
+					tmp := primitive.NewHash()
 					tmp.Set(":name", primitive.String(key))
 					tmp.Set(":value", v)
 

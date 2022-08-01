@@ -5,8 +5,7 @@ import "testing"
 func TestHash(t *testing.T) {
 
 	// Create a hash
-	h := Hash{}
-	h.Entries = make(map[string]Primitive)
+	h := NewHash()
 
 	out := h.Get("NAME")
 	if out != nil {
