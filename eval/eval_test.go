@@ -78,7 +78,7 @@ func TestEvaluate(t *testing.T) {
 		{":foo", ":foo"},
 
 		// hashes
-		{"{:age 34}", "{ :age:34}"},
+		{"{:age 34}", "{\n\t:age => 34\n}"},
 		{"(get {:age 34, :alive true} :alive)", "#t"},
 
 		// if

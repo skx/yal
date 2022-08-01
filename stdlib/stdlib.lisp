@@ -13,6 +13,7 @@
 (define function? (lambda (x) (or (eq (type x) "procedure(lisp)")
                                   (eq (type x) "macro")
                                   (eq (type x) "procedure(golang)"))))
+(define hash?     (lambda (x) (eq (type x) "hash")))
 (define macro?    (lambda (x) (eq (type x) "macro")))
 (define list?     (lambda (x) (eq (type x) "list")))
 (define number?   (lambda (x) (eq (type x) "number")))

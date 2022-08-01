@@ -18,9 +18,9 @@ func (h Hash) Set(key string, val Primitive) {
 // ToString converts this object to a string.
 func (h Hash) ToString() string {
 
-	out := "{"
+	out := "{\n"
 	for k, v := range h.Entries {
-		out += " " + k + ":" + v.ToString()
+		out += "\t" + k + " => " + v.ToString() + "\n"
 	}
 	out += "}"
 	return out
