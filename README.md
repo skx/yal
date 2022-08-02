@@ -25,12 +25,10 @@ Although this implementation is clearly derived from the [make a lisp](https://g
   * See [args.lisp](args.lisp) for an example.
 * Introspection via the `(env)` function, which will return details of all variables/functions in the environment.
   * Allowing dynamic invocation shown in [dynamic.lisp](dynamic.lisp) and other neat things.
-* Optional parameters for functions.
-  * Any parameter which is prefixed by `&` is optional.
-  * If not specified then `nil` is assumed.
-* Support for hashes as well as lists.
+* Support for hashes as well as lists/strings/numbers/etc.
   * A hash looks like this `{ :name "Steve" :location "Helsinki" }`
-  * `(print (type { :foo "bar" } ))` -> "hash"
+* Optional parameters for functions.
+  * Any parameter which is prefixed by `&` is optional, and if not specified then `nil` is assumed.
 * Type checking for function parameters.
   * Via a `:type` suffix.  For example `(lambda (a:string b:number) ..`.
 
@@ -61,6 +59,7 @@ The following type suffixes are permitted and match what you'd expect:
 * `:boolean`
 * `:error`
 * `:function`
+* `:hash`
 * `:list`
 * `:nil`
 * `:number`
@@ -71,8 +70,6 @@ If multiple types are permitted then just keep appending things, for example:
 
 * `(define blah (lambda (a:list:number)  (print "I was given a list OR a number: %s" a)))`
   * Allows either a list, or a number.
-
-Command line arguments passed to a script, such as [args.lisp](args.lisp), will be available in the list `os.args`.
 
 
 
@@ -164,10 +161,11 @@ A reasonable amount of sample code can be found in [test.lisp](test.lisp), but a
 
 ## Features
 
-We have a reasonable number of functions implemented in our golang core:
+We have a reasonable number of functions implemented, either in our golang core or in our standard-library (which is implemented in yal itself):
 
-* Support for strings, numbers, errors, lists, etc.
-  * `#t` is the true symbol, `#f` is false, though `true` and `false` are synonyms.
+* Support for strings, numbers, errors, lists, hashes, etc.
+  * `#t` is the true symbol, `#f` is false.
+  * `true` and `false` are available as synonyms.
 * Hash operations:
   * Hashes are literals like this `{ :name "Steve" :location "Helsinki" }`
   * Hash functions are `get`, `keys`, & `set`.
@@ -182,14 +180,14 @@ We have a reasonable number of functions implemented in our golang core:
 * Comparison functions:
   * `<`, `<=`, `>`, `>=`, `=`, & `eq`.
 * Misc features
-  * `error`, `str`, `print`, & `type`
+  * `error`, `getenv`, `str`, `print`, & `type`
 * Special forms
   * `begin`, `cond`, `define`, `env`, `eval`, `if`, `lambda`, `let`, `read`, `set!`, `quote`,
 * Tail recursion optimization.
 
 Building upon those primitives we have a larger standard-library of functions written in Lisp such as:
 
-* `abs`, `apply`, `append`, `filter`, `getenv`, `map`, `min`, `max`, `nat`, `neg`, `now`, `nth`, `reduce`, `reverse`, `seq`, etc.
+* `abs`, `apply`, `append`, `filter`,  `map`, `min`, `max`, `nat`, `neg`, `now`, `nth`, `reduce`, `reverse`, `seq`, etc.
 
 Although the lists above should be up to date you can check the definitions to see what is currently available:
 
@@ -204,11 +202,6 @@ We do not support the traditional form of macros, instead inspired by [bass](htt
 > Bass is a descendant of the [Kernel programming language](https://web.cs.wpi.edu/~jshutt/kernel.html). Kernel is the tiniest Lisp dialect I know of - it has a primitive form beneath lambda called `$vau` ([op](https://bass-lang.org/stdlib.html#binding-op) in Bass) which it leverages to replace the macro system found in most other Lisp dialects.
 
 
-## Omissions
-
-Notable omissions are listed here:
-
-* No vectors/hashes/records.
 
 
 ## Fuzz Testing
