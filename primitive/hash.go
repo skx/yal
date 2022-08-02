@@ -15,7 +15,11 @@ func NewHash() Hash {
 
 // Get returns the value of a given index
 func (h Hash) Get(key string) Primitive {
-	return h.Entries[key]
+	x, ok := h.Entries[key]
+	if ok {
+		return x
+	}
+	return Nil{}
 }
 
 // Set stores a value in the hash

@@ -8,8 +8,9 @@ func TestHash(t *testing.T) {
 	h := NewHash()
 
 	out := h.Get("NAME")
-	if out != nil {
-		t.Fatalf("expected error getting hash value that is absent")
+	_, ok := out.(Nil)
+	if !ok {
+		t.Fatalf("expected nil getting hash value that is absent")
 	}
 
 	h.Set("NAME", String("ME"))
