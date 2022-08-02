@@ -56,13 +56,17 @@
 
 
 ;; A useful helper to apply a given function to each element of a list.
-(define apply (lambda (lst:list fun)
+(define apply (lambda (lst:list fun:function)
   (if (nil? lst)
       ()
       (begin
          (fun (car lst))
          (apply (cdr lst) fun)))))
 
+;; A helper to apply a function to each key/value pair of a hash
+(define apply-hash (lambda (hs:hash fun:function)
+  (let ((lst (keys hs)))
+    (apply lst (lambda (x) (fun x (get hs x)))))))
 
 ;; Return the length of the given list
 (define length (lambda (arg:list)
@@ -145,3 +149,81 @@
   (if (nil? x)
     x
       (append (reverse (cdr x)) (car x)))))
+
+;;
+;; This is either gross or cool.
+;;
+;; Define a hash which has literal characters and their upper-case, and
+;; lower-cased versions
+;;
+(define upper-table {
+  a "A"
+  b "B"
+  c "C"
+  d "D"
+  e "E"
+  f "F"
+  g "G"
+  h "H"
+  i "I"
+  j "J"
+  k "K"
+  l "L"
+  m "M"
+  n "N"
+  o "O"
+  p "P"
+  q "Q"
+  r "R"
+  s "S"
+  t "T"
+  u "U"
+  v "V"
+  w "W"
+  x "X"
+  y "Y"
+  z "Z"
+  } )
+
+(define lower-table {
+  A "a"
+  B "b"
+  C "c"
+  D "d"
+  E "e"
+  F "f"
+  G "g"
+  H "h"
+  I "i"
+  J "j"
+  K "k"
+  L "l"
+  M "m"
+  N "n"
+  O "o"
+  P "p"
+  Q "q"
+  R "r"
+  S "s"
+  T "t"
+  U "u"
+  V "v"
+  W "w"
+  X "x"
+  Y "y"
+  Z "z"
+  } )
+
+(define upper (lambda (x:string)
+  (let ((chrs (split x "")))
+    (join (map chrs (lambda (x)
+                  (if (get upper-table x)
+                      (get upper-table x)
+                    x)))))))
+
+(define lower (lambda (x:string)
+  (let ((chrs (split x "")))
+    (join (map chrs (lambda (x)
+                  (if (get lower-table x)
+                      (get lower-table x)
+                    x)))))))
