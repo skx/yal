@@ -32,6 +32,9 @@ type Eval struct {
 
 	// context for handling timeout
 	context context.Context
+
+	// Recurse keeps track of how many times we've recursed
+	recurse int
 }
 
 // New constructs a new evaluator.
@@ -262,6 +265,19 @@ func (ev *Eval) Evaluate(e *env.Environment) primitive.Primitive {
 
 // eval evaluates a single expression appropriately.
 func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment) primitive.Primitive {
+
+	// Bump our recursion count
+	ev.recurse++
+
+	// Ensure that when we exit we drop back down again
+	defer func() {
+		ev.recurse--
+	}()
+
+	// Arbitrary limit here.
+	if ev.recurse > (1024 * 8) {
+		return primitive.Error("hit recursion limit")
+	}
 
 	// Run in a loop - even though everything will be done
 	// in one-shot, except for the case of evaluating a user-function.

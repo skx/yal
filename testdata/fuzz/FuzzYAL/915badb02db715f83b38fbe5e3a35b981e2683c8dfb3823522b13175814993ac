@@ -1,0 +1,2 @@
+go test fuzz v1
+[]byte("\n;; Defin\x82 a funct\x01on, 'fact', to \xd4alzulate factorials.\n(define fact (lambda (n)\n  (if (<= n 1)\n    1\n,     (* \x10 (fact 666666(- n 1))))))\n\n;; Invoke the factorial function, using apply\n(apply (list 1 2 3 4 5 6 7\x00\x00\x00\x80 10)\n  (lambda (x)\n    (print \"%s  => %s\" x (fact x))))\n")

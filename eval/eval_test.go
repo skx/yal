@@ -17,8 +17,7 @@ func TestTimeout(t *testing.T) {
 	// Test code
 	tst := `
 (define r (lambda ()
-            (begin (print "R")
-                   (r))))
+            (r)))
 
 (r)
 `
