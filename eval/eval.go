@@ -133,7 +133,10 @@ func (ev *Eval) readExpression() (primitive.Primitive, error) {
 			return nil, err
 		}
 		return primitive.List{ev.atom("quote"), quoted}, nil
+
 	case "(":
+		// ( .. => (list ...)
+
 		// Are we at the end of our program?
 		if ev.offset >= len(ev.toks) {
 			return nil, ErrEOF
@@ -164,7 +167,10 @@ func (ev *Eval) readExpression() (primitive.Primitive, error) {
 		ev.offset++
 
 		return list, nil
+
 	case "{":
+		// { .. => (hash ...)
+
 		// Are we at the end of our program?
 		if ev.offset >= len(ev.toks) {
 			return nil, ErrEOF
@@ -207,17 +213,16 @@ func (ev *Eval) readExpression() (primitive.Primitive, error) {
 		ev.offset++
 
 		return hash, nil
+
 	case ")", "}":
-		// We shouldn't ever hit this, because we skip over
-		// the closing ")" when we handle "(".
-		//
-		// If a program is malformed we'll see it though
+		// We shouldn't ever hit these, because we skip over
+		// the closing characters ")" and "}" when we handle
+		// the corresponding opening character.
 		return nil, errors.New("unexpected '" + token + "'")
+
 	default:
 
-		// Return just a single atom/primitive.
-		//
-		// (i.e. A non-list, non-quote, and non-string).
+		// Return a single atom/primitive.
 		return ev.atom(token), nil
 	}
 }
@@ -332,18 +337,20 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment) primitive.Prim
 
 		// Symbols return the value they contain
 		case primitive.Symbol:
-			// A symbol with ":" is treated as a literal.
+			// A symbol with a ":" prefix is treated as a literal.
 			if strings.HasPrefix(exp.ToString(), ":") {
 				return exp
 			}
 
+			// Otherwise it's looked up in the environment.
 			v, ok := e.Get(string(exp.(primitive.Symbol)))
 
-			// If it wasn't found then return a nil value
+			// If it wasn't found there, return a nil value
 			if !ok {
 				return primitive.Nil{}
 			}
-			// Otherwise cast it (our env. package stores "any")
+
+			// We need to cast it (our env. package stores "any")
 			return v.(primitive.Primitive)
 
 		// Lists return the result of applying the operation
@@ -586,6 +593,7 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment) primitive.Prim
 				}
 
 				return c
+
 			// (if
 			case primitive.Symbol("if"):
 				if len(listExp) < 3 {
