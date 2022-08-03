@@ -9,7 +9,6 @@ package main
 
 import (
 	"fmt"
-	"io/ioutil"
 	"os"
 
 	"github.com/skx/yal/builtins"
@@ -28,7 +27,7 @@ func main() {
 	}
 
 	// Read the specified file.
-	content, err := ioutil.ReadFile(os.Args[1])
+	content, err := os.ReadFile(os.Args[1])
 	if err != nil {
 		fmt.Printf("Error reading %s:%s\n", os.Args[1], err)
 		return

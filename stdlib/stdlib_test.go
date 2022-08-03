@@ -1,14 +1,14 @@
 package stdlib
 
 import (
-	"io/ioutil"
+	"os"
 	"testing"
 )
 
 func TestStdlib(t *testing.T) {
 	x := Contents()
 
-	data, err := ioutil.ReadFile("stdlib.lisp")
+	data, err := os.ReadFile("stdlib.lisp")
 	if err != nil {
 		t.Fatalf("failed to read: %s", err)
 	}
