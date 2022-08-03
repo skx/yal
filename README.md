@@ -144,13 +144,16 @@ A reasonable amount of sample code can be found in [test.lisp](test.lisp), but a
 (define divByFive  (lambda (n:number) (zero? (% n 5))))
 
 ;; Run the fizz-buzz test for the given number, N
+;;
+;; NOTE: `and` takes a list here.
+;;
 (define fizz (lambda (n:number)
   (cond
     (quote
-      (and (divByThree n) (divByFive n))  (print "fizzbuzz")
-      (divByThree n)                      (print "fizz")
-      (divByFive  n)                      (print "buzz")
-      #t                                  (print n)))))
+      (and (list (divByThree n) (divByFive n)))  (print "fizzbuzz")
+      (divByThree n)                             (print "fizz")
+      (divByFive  n)                             (print "buzz")
+      #t                                         (print n)))))
 
 
 ;; Apply the function fizz, for each number 1-50

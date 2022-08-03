@@ -5,14 +5,17 @@
 ;; This implements behaviour which is useful for users.
 ;;
 
+
 ;; There is a built in `type` function which returns the type of an object.
 ;;
 ;; Use this to define some simple methods to test argument-types
 (define boolean?  (lambda (x) (eq (type x) "boolean")))
 (define error?    (lambda (x) (eq (type x) "error")))
-(define function? (lambda (x) (or (eq (type x) "procedure(lisp)")
-                                  (eq (type x) "macro")
-                                  (eq (type x) "procedure(golang)"))))
+(define function? (lambda (x) (or
+                                (list
+                                   (eq (type x) "procedure(lisp)")
+                                   (eq (type x) "macro")
+                                   (eq (type x) "procedure(golang)")))))
 (define hash?     (lambda (x) (eq (type x) "hash")))
 (define macro?    (lambda (x) (eq (type x) "macro")))
 (define list?     (lambda (x) (eq (type x) "list")))
@@ -30,6 +33,36 @@
 (define >  (lambda (a b) (< b a)))
 (define >= (lambda (a b) (! (< a b))))
 (define <= (lambda (a b) (! (> a b))))
+
+;;
+;; This is a bit sneaky.  NOTE there is no short-circuiting here.
+;;
+;; Given a list use `filter` to return those items which are "true".
+;;
+;: If the length of the input list, and the length of the filtered list
+;; are the same then EVERY element was true so our AND result is true.
+;;
+(define and (lambda (xs:list)
+  (let ((res nil))
+    (set! res (filter xs (lambda (x) (if x true false))))
+    (if (= (length res) (length xs))
+        true
+      false))))
+
+;;
+;; This is also a bit sneaky.  NOTE there is no short-circuiting here.
+;;
+;; Given a list use `filter` to return those items which are "true".
+;;
+;; If the output list has at least one element that was true then the
+;; OR result is true.
+;;
+(define or (lambda (xs:list)
+  (let ((res nil))
+    (set! res (filter xs (lambda (x) (if x true false))))
+    (if (> (length res) 0)
+        true
+      false))))
 
 
 ;; Traditionally we use `car` and `cdr` for accessing the first and rest
@@ -105,6 +138,7 @@
      (if (f (car xs))
         (cons (car xs)(filter (cdr xs) f))
            (filter (cdr xs) f)))))
+
 
 ;; Replace a list with the contents of evaluating the given function on
 ;; every item of the list
