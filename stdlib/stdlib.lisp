@@ -181,7 +181,7 @@
 
 (define reverse (lambda (x:list)
   (if (nil? x)
-    x
+    ()
       (append (reverse (cdr x)) (car x)))))
 
 ;;
