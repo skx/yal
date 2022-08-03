@@ -176,7 +176,7 @@ We have a reasonable number of functions implemented, either in our golang core 
 * Mathematical operations:
   * `+`, `-`, `*`, `/`, `#`, & `%`.
 * String operations:
-  * `split` and `join`.
+  * `join`, `match` (regular-expression matching), & `split`.
 * Comparison functions:
   * `<`, `<=`, `>`, `>=`, `=`, & `eq`.
 * Misc features

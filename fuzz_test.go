@@ -122,6 +122,7 @@ func FuzzYAL(f *testing.F) {
 		"unexpected type for eval",        // (eval
 		"type-validation failed",
 		"unknown type-specification",
+		"recursion limit",
 	}
 
 	f.Fuzz(func(t *testing.T, input []byte) {

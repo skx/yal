@@ -8,6 +8,7 @@ package eval
 import (
 	"context"
 	"errors"
+	"flag"
 	"fmt"
 	"regexp"
 	"strconv"
@@ -276,7 +277,9 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment) primitive.Prim
 
 	// Arbitrary limit here.
 	if ev.recurse > (1024 * 8) {
-		return primitive.Error("hit recursion limit")
+		if flag.Lookup("test.v") != nil {
+			return primitive.Error("hit recursion limit")
+		}
 	}
 
 	// Run in a loop - even though everything will be done

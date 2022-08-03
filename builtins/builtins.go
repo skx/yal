@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"math"
 	"os"
+	"regexp"
 	"sort"
 	"strconv"
 	"strings"
@@ -18,6 +19,16 @@ import (
 // PrimitiveFn is the type which represents a function signature for
 // a lisp-usable function implemented in golang.
 type PrimitiveFn func(args []primitive.Primitive) primitive.Primitive
+
+// regCache is a cache of compiled regular expression objects.
+// These may persist between runs because a regular expression object
+// is essentially constant.
+var regCache map[string]*regexp.Regexp
+
+// init ensures that our regexp cache is populated
+func init() {
+	regCache = make(map[string]*regexp.Regexp)
+}
 
 // PopulateEnvironment registers our default primitives
 func PopulateEnvironment(env *env.Environment) {
@@ -73,6 +84,7 @@ func PopulateEnvironment(env *env.Environment) {
 	env.Set("sprintf", &primitive.Procedure{F: sprintfFn})
 
 	// string
+	env.Set("match", &primitive.Procedure{F: matchFn})
 	env.Set("str", &primitive.Procedure{F: strFn})
 	env.Set("split", &primitive.Procedure{F: splitFn})
 
@@ -752,4 +764,59 @@ func getenvFn(args []primitive.Primitive) primitive.Primitive {
 func nowFn(args []primitive.Primitive) primitive.Primitive {
 
 	return primitive.Number(time.Now().Unix())
+}
+
+// matchFn is the implementation of (match ..)
+func matchFn(args []primitive.Primitive) primitive.Primitive {
+
+	// We need two arguments
+	if len(args) != 2 {
+		return primitive.Error("invalid argument count")
+	}
+
+	// First argument is a string (which is a regexp)
+	if _, ok := args[0].(primitive.String); !ok {
+		return primitive.Error("argument not a string")
+	}
+
+	// Second is what we'll match
+	pat := args[0].ToString()
+	txt := args[1].ToString()
+
+	// Look for a cached regexp
+	r, ok := regCache[pat]
+	if !ok {
+		// OK it wasn't found, so compile it.
+		var err error
+		r, err = regexp.Compile(pat)
+
+		// Ensure it compiled
+		if err != nil {
+			return primitive.Error(fmt.Sprintf("failed to compile regexp '%s':%s", pat, err.Error()))
+		}
+
+		// store in the cache for next time
+		regCache[pat] = r
+	}
+
+	res := r.FindStringSubmatch(txt)
+
+	if len(res) > 0 {
+
+		// Return the items in a list
+		var tmp primitive.List
+
+		if len(res) > 0 {
+			for i := 0; i < len(res); i++ {
+
+				tmp = append(tmp, primitive.String(res[i]))
+			}
+		}
+
+		return tmp
+	}
+
+	// No match
+	return primitive.Nil{}
+
 }

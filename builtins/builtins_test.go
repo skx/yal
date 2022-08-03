@@ -1700,3 +1700,99 @@ func TestSet(t *testing.T) {
 		t.Fatalf("The value wasn't set?")
 	}
 }
+
+func TestMatches(t *testing.T) {
+
+	// no arguments
+	out := matchFn([]primitive.Primitive{})
+
+	// Will lead to an error
+	e, ok := out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if !strings.Contains(string(e), "invalid argument count") {
+		t.Fatalf("got error, but wrong one")
+	}
+
+	// First argument must be a string
+	out = matchFn([]primitive.Primitive{
+		primitive.Number(3),
+		primitive.Number(4),
+	})
+
+	// Will lead to an error
+	e, ok = out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if !strings.Contains(string(e), "not a string") {
+		t.Fatalf("got error, but wrong one %v", out)
+	}
+
+	// Regexp must be valid
+	out = matchFn([]primitive.Primitive{
+		primitive.String("+"),
+		primitive.Number(4),
+	})
+
+	// Will lead to an error
+	e, ok = out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if !strings.Contains(string(e), "error parsing regexp") {
+		t.Fatalf("got error, but wrong one %v", out)
+	}
+
+	// Now we have a valid call: no match
+	fail := matchFn([]primitive.Primitive{
+		primitive.String("foo"),
+		primitive.String("bar"),
+	})
+
+	_, ok = fail.(primitive.Nil)
+	if !ok {
+		t.Fatalf("expected nil, got %v", out)
+	}
+
+	// Now we have a valid call: a match
+	res := matchFn([]primitive.Primitive{
+		primitive.String("[Ff]ood"),
+		primitive.String("Food"),
+	})
+
+	// The list should have one entry
+	lst, ok2 := res.(primitive.List)
+	if !ok2 {
+		t.Fatalf("expected a list, got %v", out)
+	}
+	if len(lst) != 1 {
+		t.Fatalf("unexpected list size")
+	}
+
+	// Now we have a valid call: a match with capture group
+	res = matchFn([]primitive.Primitive{
+		primitive.String("([a-z]+)\\s*=\\s*([a-z]+)"),
+		primitive.String("key = value"),
+	})
+
+	// The list should have three entries
+	lst, ok2 = res.(primitive.List)
+	if !ok2 {
+		t.Fatalf("expected a list, got %v", out)
+	}
+	if len(lst) != 3 {
+		t.Fatalf("unexpected list size")
+	}
+
+	if lst[0].ToString() != "key = value" {
+		t.Fatalf("bogus match result")
+	}
+	if lst[1].ToString() != "key" {
+		t.Fatalf("bogus match result")
+	}
+	if lst[2].ToString() != "value" {
+		t.Fatalf("bogus match result")
+	}
+}
