@@ -14,7 +14,6 @@
 (define function? (lambda (x) (or
                                 (list
                                    (eq (type x) "procedure(lisp)")
-                                   (eq (type x) "macro")
                                    (eq (type x) "procedure(golang)")))))
 (define hash?     (lambda (x) (eq (type x) "hash")))
 (define macro?    (lambda (x) (eq (type x) "macro")))
