@@ -27,6 +27,7 @@ Although this implementation is clearly derived from the [make a lisp](https://g
   * Allowing dynamic invocation shown in [dynamic.lisp](dynamic.lisp) and other neat things.
 * Support for hashes as well as lists/strings/numbers/etc.
   * A hash looks like this `{ :name "Steve" :location "Helsinki" }`
+  * Sample code is visible in [hash.lisp](hash.lisp).
 * Optional parameters for functions.
   * Any parameter which is prefixed by `&` is optional, and if not specified then `nil` is assumed.
 * Type checking for function parameters.
