@@ -164,8 +164,10 @@
 (print "The answer to life, the universe, and everything is %s!\n"
   (eval (read "(* 6 7)")))
 
-;
-; All done! -> In red :)
-;
+;; Upper-case and lower-casing of strings
+(print "%s" (upper "hello, world"))
+(print "%s" (lower "Hello, World; in LOWER-case."))
+
+;; All done! -> In red :)
 (define red (lambda (msg) (sprintf "\e[0;31m%s\e[0m" msg)))
 (print (red "All done!"))

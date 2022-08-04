@@ -247,16 +247,17 @@
   Z "z"
   } )
 
-(define upper (lambda (x:string)
+
+;; Translate the elements of the string using the specified hash
+(define translate (lambda (x:string hsh:hash)
   (let ((chrs (split x "")))
     (join (map chrs (lambda (x)
-                  (if (get upper-table x)
-                      (get upper-table x)
+                  (if (get hsh x)
+                      (get hsh x)
                     x)))))))
 
+(define upper (lambda (x:string)
+                (translate x upper-table)))
+
 (define lower (lambda (x:string)
-  (let ((chrs (split x "")))
-    (join (map chrs (lambda (x)
-                  (if (get lower-table x)
-                      (get lower-table x)
-                    x)))))))
+                (translate x lower-table)))
