@@ -1612,3 +1612,101 @@ func TestMatches(t *testing.T) {
 		t.Fatalf("bogus match result")
 	}
 }
+
+func TestOrd(t *testing.T) {
+
+	// no arguments
+	out := ordFn([]primitive.Primitive{})
+
+	// Will lead to an error
+	e, ok := out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if !strings.Contains(string(e), "wrong number of arguments") {
+		t.Fatalf("got error, but wrong one:%s", out)
+	}
+
+	// First argument must be a string
+	out = ordFn([]primitive.Primitive{
+		primitive.Number(4),
+	})
+
+	// Will lead to an error
+	e, ok = out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if !strings.Contains(string(e), "not a string") {
+		t.Fatalf("got error, but wrong one %v", out)
+	}
+
+	// Now a valid call: * => 42
+	val := ordFn([]primitive.Primitive{
+		primitive.String("*"),
+	})
+
+	r, ok2 := val.(primitive.Number)
+	if !ok2 {
+		t.Fatalf("expected number, got %v", val)
+	}
+	if r.ToString() != "42" {
+		t.Fatalf("got wrong result %v", r)
+	}
+
+	// Now a valid call: empty string => 0
+	val = ordFn([]primitive.Primitive{
+		primitive.String(""),
+	})
+
+	r, ok2 = val.(primitive.Number)
+	if !ok2 {
+		t.Fatalf("expected number, got %v", val)
+	}
+	if r.ToString() != "0" {
+		t.Fatalf("got wrong result %v", r)
+	}
+}
+
+func TestChr(t *testing.T) {
+
+	// no arguments
+	out := chrFn([]primitive.Primitive{})
+
+	// Will lead to an error
+	e, ok := out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if !strings.Contains(string(e), "wrong number of arguments") {
+		t.Fatalf("got error, but wrong one:%s", out)
+	}
+
+	// First argument must be a number
+	out = chrFn([]primitive.Primitive{
+		primitive.String("4"),
+	})
+
+	// Will lead to an error
+	e, ok = out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if !strings.Contains(string(e), "not a number") {
+		t.Fatalf("got error, but wrong one %v", out)
+	}
+
+	// Now a valid call 42 => "*"
+	val := chrFn([]primitive.Primitive{
+		primitive.Number(42),
+	})
+
+	r, ok2 := val.(primitive.String)
+	if !ok2 {
+		t.Fatalf("expected string, got %v", val)
+	}
+	if r.ToString() != "*" {
+		t.Fatalf("got wrong result %v", r)
+	}
+
+}

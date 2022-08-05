@@ -87,6 +87,8 @@ func PopulateEnvironment(env *env.Environment) {
 	env.Set("match", &primitive.Procedure{F: matchFn})
 	env.Set("str", &primitive.Procedure{F: strFn})
 	env.Set("split", &primitive.Procedure{F: splitFn})
+	env.Set("ord", &primitive.Procedure{F: ordFn})
+	env.Set("chr", &primitive.Procedure{F: chrFn})
 }
 
 // Convert a string such as "steve\tkemp" into "steve<TAB>kemp"
@@ -739,4 +741,43 @@ func matchFn(args []primitive.Primitive) primitive.Primitive {
 	// No match
 	return primitive.Nil{}
 
+}
+
+// chrFn is the implementation of (chr ..)
+func chrFn(args []primitive.Primitive) primitive.Primitive {
+
+	if len(args) != 1 {
+		return primitive.Error("wrong number of arguments")
+	}
+
+	if _, ok := args[0].(primitive.Number); !ok {
+		return primitive.Error("argument not a number")
+	}
+
+	i := args[0].(primitive.Number)
+	rune := rune(i)
+
+	return primitive.String(rune)
+}
+
+// ordFn is the implementation of (ord ..)
+func ordFn(args []primitive.Primitive) primitive.Primitive {
+
+	if len(args) != 1 {
+		return primitive.Error("wrong number of arguments")
+	}
+
+	if _, ok := args[0].(primitive.String); !ok {
+		return primitive.Error("argument not a string")
+	}
+
+	// We convert this to an array of runes because we
+	// want to handle unicode strings.
+	i := []rune(args[0].ToString())
+
+	if len(i) > 0 {
+		s := rune(i[0])
+		return primitive.Number(float64(rune(s)))
+	}
+	return primitive.Number(0)
 }
