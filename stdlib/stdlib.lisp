@@ -100,10 +100,14 @@
   (let ((lst (keys hs)))
     (apply lst (lambda (x) (fun x (get hs x)))))))
 
-;; Return the length of the given list
-(define length (lambda (arg:list)
-   (if (nil? arg) 0
-      (inc (length (cdr arg))))))
+;; Return the length of the given string or list.
+(define length (lambda (arg:list:string)
+  (if (string? arg)
+     (length (split arg ""))
+       (if (list? arg)
+         (begin
+           (if (nil? arg) 0
+              (inc (length (cdr arg)))))))))
 
 ;; Find the Nth item of a list
 (define nth (lambda (lst:list i:number)
@@ -256,8 +260,10 @@
                       (get hsh x)
                     x)))))))
 
+;; Convert the given string to upper-case, via the lookup table.
 (define upper (lambda (x:string)
                 (translate x upper-table)))
 
+;; Convert the given string to upper-case, via the lookup table.
 (define lower (lambda (x:string)
                 (translate x lower-table)))
