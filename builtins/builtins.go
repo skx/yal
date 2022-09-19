@@ -166,7 +166,7 @@ func plusFn(args []primitive.Primitive) primitive.Primitive {
 	return primitive.Number(v)
 }
 
-// minusFn implements "+"
+// minusFn implements "-"
 func minusFn(args []primitive.Primitive) primitive.Primitive {
 
 	// ensure we have at least one argument
