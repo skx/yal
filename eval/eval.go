@@ -134,6 +134,30 @@ func (ev *Eval) readExpression() (primitive.Primitive, error) {
 		}
 		return primitive.List{ev.atom("quote"), quoted}, nil
 
+	case "`":
+		// `... => (quasiquote ...)
+		quoted, err := ev.readExpression()
+		if err != nil {
+			return nil, err
+		}
+		return primitive.List{ev.atom("quasiquote"), quoted}, nil
+
+	case "~":
+		// ~... => (unquote ...)
+		quoted, err := ev.readExpression()
+		if err != nil {
+			return nil, err
+		}
+		return primitive.List{ev.atom("unquote"), quoted}, nil
+
+	case "~@":
+		// ~@... => (splice-unquote ...)
+		quoted, err := ev.readExpression()
+		if err != nil {
+			return nil, err
+		}
+		return primitive.List{ev.atom("splice-unquote"), quoted}, nil
+
 	case "(":
 		// ( .. => (list ...)
 
@@ -269,6 +293,64 @@ func (ev *Eval) Evaluate(e *env.Environment) primitive.Primitive {
 	return out
 }
 
+func starts_with(l primitive.List, val string) bool {
+	if len(l) < 1 {
+		return false
+	}
+
+	arg := l[0]
+	if arg.ToString() == val {
+		return true
+	}
+	return false
+}
+
+func qq_loop(xs primitive.List) primitive.List {
+	var acc primitive.List
+
+	for i := len(xs) - 1; 0 <= i; i -= 1 {
+		elt := xs[i]
+		switch e := elt.(type) {
+		case primitive.List:
+			if starts_with(e, "splice-unquote") {
+				tmp := primitive.List{}
+				tmp = append(tmp, primitive.Symbol("concat"))
+				tmp = append(tmp, e[1])
+				tmp = append(tmp, acc)
+				acc = tmp
+				continue
+			}
+		default:
+		}
+
+		tmp := primitive.List{}
+		tmp = append(tmp, primitive.Symbol("cons"))
+		tmp = append(tmp, quasiquote(elt))
+		tmp = append(tmp, acc)
+		acc = tmp
+	}
+	return acc
+}
+
+func quasiquote(exp primitive.Primitive) primitive.Primitive {
+	switch a := exp.(type) {
+	case primitive.Symbol:
+
+		var c primitive.List
+		c = append(c, primitive.Symbol("quote"))
+		c = append(c, exp)
+		return c
+	case primitive.List:
+		if starts_with(a, "unquote") {
+			return a[1]
+		} else {
+			return qq_loop(a)
+		}
+	default:
+		return exp
+	}
+}
+
 // eval evaluates a single expression appropriately.
 func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment) primitive.Primitive {
 
@@ -375,13 +457,6 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment) primitive.Prim
 				}
 				return ret
 
-			// (quote
-			case primitive.Symbol("quote"):
-				if len(listExp) < 2 {
-					return primitive.Error("arity-error: not enough arguments for (quote")
-				}
-				return listExp[1]
-
 			// (read
 			case primitive.Symbol("read"):
 				if len(listExp) != 2 {
@@ -475,6 +550,21 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment) primitive.Prim
 				val := ev.eval(listExp[2], e)
 				e.Set(string(listExp[1].(primitive.Symbol)), val)
 				return primitive.Nil{}
+
+			// (quote ..)
+			case primitive.Symbol("quote"):
+				if len(listExp) < 2 {
+					return primitive.Error("arity-error: not enough arguments for (quote")
+				}
+				return listExp[1]
+
+			// (quasiquote ..)
+			case primitive.Symbol("quasiquote"):
+				if len(listExp) < 2 {
+					return primitive.Error("arity-error: not enough arguments for (quasiquote")
+				}
+				exp = quasiquote(listExp[1])
+				goto repeat_eval
 
 			// (let
 			case primitive.Symbol("let"):

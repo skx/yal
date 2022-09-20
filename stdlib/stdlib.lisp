@@ -267,3 +267,18 @@
 ;; Convert the given string to upper-case, via the lookup table.
 (define lower (lambda (x:string)
                 (translate x lower-table)))
+
+
+;; This is required for our quote/quasiquote/unquote/splice-unquote handling
+;;
+;; Testing is hard, but
+;;
+;; (define lst (quote (b c)))                      ; b c
+;; (print (quasiquote (a lst d)))                  ; (a lst d)
+;; (print (quasiquote (a (unquote lst) d)))        ; (a (b c) d)
+;; (print (quasiquote (a (splice-unquote lst) d))) ; (a b c d)
+;;
+(define concat (lambda (seq1 seq2)
+  (if (nil? seq1)
+      seq2
+      (cons (car seq1) (concat (cdr seq1) seq2)))))
