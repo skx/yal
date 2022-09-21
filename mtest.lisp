@@ -183,7 +183,19 @@
 (unless true (print "FAIL") (print "OK - (unless ..) is good"))
 (unless false (print "OK - (unless ..) is good.") (print "FAIL"))
 
+
+
+;;
+;; Make sure that our type-checking understands what a macro is,
+;; and that it is different from a (user) function and a builtin
+;; function.
+;;
+
+
+;; Type of a macro is "macro"
 (define truthy (macro () true))
 (print (type truthy))
+
+;; The macro? predicate will recognize one too.
 (if (macro? truthy)
     (print "macro? works"))
