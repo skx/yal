@@ -87,7 +87,21 @@ func TestEvaluate(t *testing.T) {
 		{"(if false false)", "nil"},
 
 		// macro - args are not evaluated
-		{`(define foo (macro (x) x)) (foo (+ 1 2))`, "(+ 1 2)"},
+		//		{`(define foo (macro (x) x)) (foo (+ 1 2))`, "(+ 1 2)"},
+
+		// quote
+		{`(define lst (quote (b c)))
+                  '(a lst d)`, "(a lst d)"},
+
+		// quasiquote
+		{`(define lst (quote (b c)))
+                  (quasiquote (a (unquote lst) d))`,
+			"(a (b c) d)"},
+
+		// splice-unquote
+		{`(define lst (quote (b c)))
+                  (quasiquote (a (splice-unquote lst) d))`,
+			"(a b c d)"},
 
 		// lambda
 		{`(define sq (lambda (x) (* x x)))
