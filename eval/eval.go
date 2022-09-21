@@ -142,7 +142,7 @@ func (ev *Eval) readExpression() (primitive.Primitive, error) {
 		}
 		return primitive.List{ev.atom("quasiquote"), quoted}, nil
 
-	case "~":
+	case "~", ",":
 		// ~... => (unquote ...)
 		quoted, err := ev.readExpression()
 		if err != nil {
@@ -150,7 +150,7 @@ func (ev *Eval) readExpression() (primitive.Primitive, error) {
 		}
 		return primitive.List{ev.atom("unquote"), quoted}, nil
 
-	case "~@":
+	case "~@", "`,":
 		// ~@... => (splice-unquote ...)
 		quoted, err := ev.readExpression()
 		if err != nil {
@@ -821,20 +821,28 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 				// build up the arguments
 				args := []primitive.Primitive{}
 
-				// We evaluate the arguments
-				for _, argExp := range listExp[1:] {
+				// Is this a macro?
+				if proc.Macro {
 
-					// Evaluate the arg
-					evalArgExp := ev.eval(argExp, e, expandMacro)
+					// Then the arguments are NOT evaluated
+					args = listExp[1:]
 
-					// Was it an error?  Then abort
-					x, ok := evalArgExp.(primitive.Error)
-					if ok {
-						return primitive.Error(fmt.Sprintf("error expanding argument %v for call to (%s ..): %s", argExp, listExp[0], x.ToString()))
+				} else {
+					// We evaluate the arguments
+					for _, argExp := range listExp[1:] {
+
+						// Evaluate the arg
+						evalArgExp := ev.eval(argExp, e, expandMacro)
+
+						// Was it an error?  Then abort
+						x, ok := evalArgExp.(primitive.Error)
+						if ok {
+							return primitive.Error(fmt.Sprintf("error expanding argument %v for call to (%s ..): %s", argExp, listExp[0], x.ToString()))
+						}
+
+						// Otherwise append it to the list we'll supply
+						args = append(args, evalArgExp)
 					}
-
-					// Otherwise append it to the list we'll supply
-					args = append(args, evalArgExp)
 				}
 
 				// Is this function implemented in golang?

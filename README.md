@@ -33,8 +33,9 @@ Although this implementation is clearly derived from the [make a lisp](https://g
 * Type checking for function parameters.
   * Via a `:type` suffix.  For example `(lambda (a:string b:number) ..`.
 * Support for macros.
+  * See [mtest.lisp](mtest.lisp) for some simple tests/usage examples.
 
-Here's what the optional parameters look like in practice:
+Here's what optional parameters, inspired by Emacs, look like in practice:
 
 ```lisp
 (define foo (lambda (a &b &c)  (print "A:%s B:%s C:%s\n", a b c)))

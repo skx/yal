@@ -1,4 +1,4 @@
-;; This file contains some simple examples of working with hashes.
+;;; hash.lisp - Demonstrate working with hashes.
 
 
 
