@@ -91,6 +91,12 @@ func FuzzYAL(f *testing.F) {
 	f.Add([]byte(`
 (define r (lambda () (r))) (r)`))
 
+	// Macros
+	f.Add([]byte(`
+(define unless (macro (pred a &b) ` + "`" + `(if (! ~pred) ~a ~b)))
+(unless false (print "OK")
+`))
+
 	// Type checking
 	f.Add([]byte(`define blah (lambda (a:list) (print "I received the list %s" a)))`))
 	f.Add([]byte(`define blah (lambda (a:string) (print "I received the string %s" a)))`))

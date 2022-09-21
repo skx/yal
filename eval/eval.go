@@ -10,9 +10,11 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"math/rand"
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/skx/yal/env"
 	"github.com/skx/yal/primitive"
@@ -36,10 +38,16 @@ type Eval struct {
 
 	// Recurse keeps track of how many times we've recursed
 	recurse int
+
+	// Count of generated symbols
+	symCount int
 }
 
 // New constructs a new evaluator.
 func New(src string) *Eval {
+
+	// (gensym) needs a decent random seed
+	rand.Seed(time.Now().UnixNano())
 
 	// Create with a default context.
 	e := &Eval{
@@ -142,7 +150,7 @@ func (ev *Eval) readExpression() (primitive.Primitive, error) {
 		}
 		return primitive.List{ev.atom("quasiquote"), quoted}, nil
 
-	case "~":
+	case "~", ",":
 		// ~... => (unquote ...)
 		quoted, err := ev.readExpression()
 		if err != nil {
@@ -150,7 +158,7 @@ func (ev *Eval) readExpression() (primitive.Primitive, error) {
 		}
 		return primitive.List{ev.atom("unquote"), quoted}, nil
 
-	case "~@":
+	case "~@", "`,", ",@":
 		// ~@... => (splice-unquote ...)
 		quoted, err := ev.readExpression()
 		if err != nil {
@@ -282,7 +290,7 @@ func (ev *Eval) Evaluate(e *env.Environment) primitive.Primitive {
 		}
 
 		// Evaluate, and save the result
-		out = ev.eval(expr, e)
+		out = ev.eval(expr, e, true)
 
 		// If this is an error then return that immediately
 		switch out.(type) {
@@ -293,26 +301,26 @@ func (ev *Eval) Evaluate(e *env.Environment) primitive.Primitive {
 	return out
 }
 
-func starts_with(l primitive.List, val string) bool {
+// Does the given list start with a call to the given function?
+func (ev *Eval) startsWith(l primitive.List, val string) bool {
+	// list must have one entry
 	if len(l) < 1 {
 		return false
 	}
 
-	arg := l[0]
-	if arg.ToString() == val {
-		return true
-	}
-	return false
+	// entry should match
+	return l[0].ToString() == val
 }
 
-func qq_loop(xs primitive.List) primitive.List {
+// quote/quote loop
+func (ev *Eval) qqLoop(xs primitive.List) primitive.List {
 	var acc primitive.List
 
-	for i := len(xs) - 1; 0 <= i; i -= 1 {
+	for i := len(xs) - 1; 0 <= i; i-- {
 		elt := xs[i]
 		switch e := elt.(type) {
 		case primitive.List:
-			if starts_with(e, "splice-unquote") {
+			if ev.startsWith(e, "splice-unquote") {
 				tmp := primitive.List{}
 				tmp = append(tmp, primitive.Symbol("concat"))
 				tmp = append(tmp, e[1])
@@ -325,14 +333,14 @@ func qq_loop(xs primitive.List) primitive.List {
 
 		tmp := primitive.List{}
 		tmp = append(tmp, primitive.Symbol("cons"))
-		tmp = append(tmp, quasiquote(elt))
+		tmp = append(tmp, ev.quasiquote(elt))
 		tmp = append(tmp, acc)
 		acc = tmp
 	}
 	return acc
 }
 
-func quasiquote(exp primitive.Primitive) primitive.Primitive {
+func (ev *Eval) quasiquote(exp primitive.Primitive) primitive.Primitive {
 	switch a := exp.(type) {
 	case primitive.Symbol:
 
@@ -341,18 +349,52 @@ func quasiquote(exp primitive.Primitive) primitive.Primitive {
 		c = append(c, exp)
 		return c
 	case primitive.List:
-		if starts_with(a, "unquote") {
+		if ev.startsWith(a, "unquote") {
 			return a[1]
-		} else {
-			return qq_loop(a)
 		}
+		return ev.qqLoop(a)
+
 	default:
 		return exp
 	}
 }
 
+// isMacro tests if a given thing is a macro
+func (ev *Eval) isMacro(exp primitive.Primitive, e *env.Environment) bool {
+
+	// If we're not being called with a list then there's nothing to do
+	l, ok := exp.(primitive.List)
+	if !ok {
+		return false
+	}
+
+	// If the list doesn't have a size it is not a macro.
+	if len(l) < 1 {
+		return false
+	}
+
+	// Find the thing we're gonna call.
+	procExp := ev.eval(l[0], e, false)
+
+	// Is it really a procedure we can call?
+	proc, ok2 := procExp.(*primitive.Procedure)
+	if !ok2 {
+		return false
+	}
+	return proc.Macro
+}
+
+func (ev *Eval) macroExpand(exp primitive.Primitive, e *env.Environment) primitive.Primitive {
+
+	// is this a macro?
+	for ev.isMacro(exp, e) {
+		exp = ev.eval(exp, e, false)
+	}
+	return exp
+}
+
 // eval evaluates a single expression appropriately.
-func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment) primitive.Primitive {
+func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bool) primitive.Primitive {
 
 	// Bump our recursion count
 	ev.recurse++
@@ -389,6 +431,13 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment) primitive.Prim
 			return primitive.Error("context timeout - deadline exceeded")
 		default:
 			// nop
+		}
+
+		//
+		// Expand any macro we might be dealing with
+		//
+		if expandMacro {
+			exp = ev.macroExpand(exp, e)
 		}
 
 		//
@@ -453,7 +502,7 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment) primitive.Prim
 			case primitive.Symbol("begin"):
 				var ret primitive.Primitive
 				for _, x := range listExp[1:] {
-					ret = ev.eval(x, e)
+					ret = ev.eval(x, e, expandMacro)
 				}
 				return ret
 
@@ -483,6 +532,24 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment) primitive.Prim
 				// Return it.
 				return out
 
+			// (gensym
+			case primitive.Symbol("gensym"):
+
+				// symbol characters
+				var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+
+				// generate prefix
+				b := make([]rune, 5)
+				for i := range b {
+					b[i] = letters[rand.Intn(len(letters))]
+				}
+
+				// generate with count
+				ev.symCount++
+				str := fmt.Sprintf("%s%06d", string(b), ev.symCount)
+				sym := primitive.Symbol(str)
+				return sym
+
 			// (eval
 			case primitive.Symbol("eval"):
 
@@ -495,7 +562,7 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment) primitive.Prim
 				// Evaluate
 				case primitive.List:
 					// Evaluate the list
-					res := ev.eval(listExp[1], e)
+					res := ev.eval(listExp[1], e, expandMacro)
 
 					// Create a new evaluator with
 					// the result as a string
@@ -536,7 +603,7 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment) primitive.Prim
 				symb, ok := listExp[1].(primitive.Symbol)
 				if ok {
 
-					val := ev.eval(listExp[2], e)
+					val := ev.eval(listExp[2], e, expandMacro)
 					e.Set(string(symb), val)
 					return primitive.Nil{}
 				}
@@ -547,8 +614,12 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment) primitive.Prim
 				if len(listExp) < 3 {
 					return primitive.Error("arity-error: not enough arguments for (set! ..)")
 				}
-				val := ev.eval(listExp[2], e)
-				e.Set(string(listExp[1].(primitive.Symbol)), val)
+				val := ev.eval(listExp[2], e, expandMacro)
+				if len(listExp) == 4 {
+					e.SetOuter(string(listExp[1].(primitive.Symbol)), val)
+				} else {
+					e.Set(string(listExp[1].(primitive.Symbol)), val)
+				}
 				return primitive.Nil{}
 
 			// (quote ..)
@@ -563,8 +634,22 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment) primitive.Prim
 				if len(listExp) < 2 {
 					return primitive.Error("arity-error: not enough arguments for (quasiquote")
 				}
-				exp = quasiquote(listExp[1])
+				exp = ev.quasiquote(listExp[1])
 				goto repeat_eval
+
+			// (macroexpand ..)
+			case primitive.Symbol("macroexpand"):
+				if len(listExp) < 2 {
+					return primitive.Error("arity-error: not enough arguments for (macroexpand")
+				}
+				return ev.macroExpand(listExp[1], e)
+
+			// (error ..)
+			case primitive.Symbol("error"):
+				if len(listExp) < 2 {
+					return primitive.Error("arity-error: not enough arguments for (error")
+				}
+				return primitive.Error(listExp[1].ToString())
 
 			// (let
 			case primitive.Symbol("let"):
@@ -590,7 +675,7 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment) primitive.Prim
 						return primitive.Error("arity-error: binding list had missing arguments")
 					}
 					// get the value
-					bindingVal := ev.eval(bl[1], e)
+					bindingVal := ev.eval(bl[1], e, expandMacro)
 
 					// The thing to set
 					set, ok2 := bl[0].(primitive.Symbol)
@@ -608,7 +693,7 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment) primitive.Prim
 				// the body.
 				var ret primitive.Primitive
 				for _, x := range listExp[2:] {
-					ret = ev.eval(x, newEnv)
+					ret = ev.eval(x, newEnv, expandMacro)
 				}
 				return ret
 
@@ -641,7 +726,7 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment) primitive.Prim
 					eval := section[1]
 
 					// need to eval test now.
-					res := ev.eval(test, e)
+					res := ev.eval(test, e, expandMacro)
 
 					// If we got an error then we return
 					// it to our caller.
@@ -690,7 +775,7 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment) primitive.Prim
 					return primitive.Error("arity-error: not enough arguments for (if ..)")
 				}
 
-				test := ev.eval(listExp[1], e)
+				test := ev.eval(listExp[1], e, expandMacro)
 
 				// If we got an error inside the `if` then we return it
 				e, eok := test.(primitive.Error)
@@ -755,7 +840,7 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment) primitive.Prim
 			default:
 
 				// Find the thing we're gonna call.
-				procExp := ev.eval(listExp[0], e)
+				procExp := ev.eval(listExp[0], e, expandMacro)
 
 				// Is it really a procedure we can call?
 				proc, ok := procExp.(*primitive.Procedure)
@@ -773,12 +858,11 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment) primitive.Prim
 					args = listExp[1:]
 
 				} else {
-
-					// Otherwise we evaluate them.
+					// We evaluate the arguments
 					for _, argExp := range listExp[1:] {
 
 						// Evaluate the arg
-						evalArgExp := ev.eval(argExp, e)
+						evalArgExp := ev.eval(argExp, e, expandMacro)
 
 						// Was it an error?  Then abort
 						x, ok := evalArgExp.(primitive.Error)

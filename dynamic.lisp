@@ -1,3 +1,5 @@
+;;; dynamic.lisp - Execute code by name, via introspection.
+
 ;;
 ;; I'm not sure whether to be pleased with this or not.
 ;;

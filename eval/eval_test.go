@@ -87,7 +87,26 @@ func TestEvaluate(t *testing.T) {
 		{"(if false false)", "nil"},
 
 		// macro - args are not evaluated
-		{`(define foo (macro (x) x)) (foo (+ 1 2))`, "(+ 1 2)"},
+		//		{`(define foo (macro (x) x)) (foo (+ 1 2))`, "(+ 1 2)"},
+
+		// quote
+		{`(define lst (quote (b c)))
+                  '(a lst d)`, "(a lst d)"},
+
+		// quasiquote
+		{`(define lst (quote (b c)))
+                  (quasiquote (a (unquote lst) d))`,
+			"(a (b c) d)"},
+
+		// splice-unquote
+		{`(define lst (quote (b c)))
+                  (quasiquote (a (splice-unquote lst) d))`,
+			"(a b c d)"},
+
+		// expand a macro
+		{`(define steve (macro () "steve"))
+                  (macroexpand (steve))`,
+			"steve"},
 
 		// lambda
 		{`(define sq (lambda (x) (* x x)))
@@ -180,7 +199,10 @@ func TestEvaluate(t *testing.T) {
 		{"(let (3 3) )", "ERROR{binding value is not a list, got 3}"},
 
 		{"(cond (quote 3))", "ERROR{expected pairs of two items}"},
+		{"(error )", "ERROR{arity-error: not enough arguments for (error}"},
 		{"(quote )", "ERROR{arity-error: not enough arguments for (quote}"},
+		{"(quasiquote )", "ERROR{arity-error: not enough arguments for (quasiquote}"},
+		{"(macroexpand )", "ERROR{arity-error: not enough arguments for (macroexpand}"},
 		{"(if )", "ERROR{arity-error: not enough arguments for (if ..)}"},
 		{"(if (/ 1 0) #t #f)", "ERROR{attempted division by zero}"},
 		{"(define )", "ERROR{arity-error: not enough arguments for (define ..)}"},
@@ -202,6 +224,7 @@ func TestEvaluate(t *testing.T) {
 (fizz 3)
 
 `, "ERROR{attempted division by zero}"},
+		{"(error \"CAKE-FAIL\")", "ERROR{CAKE-FAIL}"},
 
 		{"(read foo bar)", "ERROR{Expected only a single argument}"},
 		{"(read \")\")", "ERROR{failed to read ):unexpected ')'}"},

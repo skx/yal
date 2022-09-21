@@ -1,3 +1,5 @@
+;;; test.lisp - Simple feature-tests/demonstrations of our system.
+
 ;;
 ;; This is a sample input file for our minimal lisp interpreter.
 ;;

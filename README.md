@@ -32,9 +32,10 @@ Although this implementation is clearly derived from the [make a lisp](https://g
   * Any parameter which is prefixed by `&` is optional, and if not specified then `nil` is assumed.
 * Type checking for function parameters.
   * Via a `:type` suffix.  For example `(lambda (a:string b:number) ..`.
+* Support for macros.
+  * See [mtest.lisp](mtest.lisp) for some simple tests/usage examples.
 
-
-Here's what the optional parameters look like in practice:
+Here's what optional parameters, inspired by Emacs, look like in practice:
 
 ```lisp
 (define foo (lambda (a &b &c)  (print "A:%s B:%s C:%s\n", a b c)))
@@ -201,10 +202,6 @@ Although the lists above should be up to date you can check the definitions to s
   * [stdlib/stdlib.lisp](stdlib/stdlib.lisp)
   * The code in this file is essentially **prepended** to any script that is supplied upon the command-line.
 
-We do not support the traditional form of macros, instead inspired by [bass](https://github.com/vito/bass), there is the facility to define functions which do not have their arguments evaluated:
-
-> Bass is a descendant of the [Kernel programming language](https://web.cs.wpi.edu/~jshutt/kernel.html). Kernel is the tiniest Lisp dialect I know of - it has a primitive form beneath lambda called `$vau` ([op](https://bass-lang.org/stdlib.html#binding-op) in Bass) which it leverages to replace the macro system found in most other Lisp dialects.
-
 
 
 
@@ -245,3 +242,5 @@ If you find a crash then it is either a bug which needs to be fixed, or a false-
 
 * https://github.com/thesephist/klisp/blob/main/lib/klisp.klisp
   * Very helpful "inspiration" for writing primitives in Lisp.
+* https://github.com/kanaka/mal/
+  * Make A Lisp, very helpful for the quoting, unquoting, and macro magic.

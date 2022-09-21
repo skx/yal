@@ -1,5 +1,5 @@
-;;
-;; This is a simple FizzBuzz example, which we can execute.
+;;; fizzbuzz.lisp - A simple FizzBuzz implementation.
+
 ;;
 ;; You'll see here that we can define functions, that we have
 ;; primitives such as "zero?" and that we have a built-in "cond"

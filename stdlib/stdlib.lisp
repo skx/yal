@@ -101,13 +101,13 @@
     (apply lst (lambda (x) (fun x (get hs x)))))))
 
 ;; Return the length of the given string or list.
-(define length (lambda (arg:list:string)
-  (if (string? arg)
-     (length (split arg ""))
-       (if (list? arg)
-         (begin
-           (if (nil? arg) 0
-              (inc (length (cdr arg)))))))))
+(define length (lambda (arg)
+  (if (list? arg)
+    (begin
+      (if (nil? arg) 0
+        (inc (length (cdr arg)))))
+    0
+    )))
 
 ;; Find the Nth item of a list
 (define nth (lambda (lst:list i:number)
