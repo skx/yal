@@ -158,7 +158,7 @@ func (ev *Eval) readExpression() (primitive.Primitive, error) {
 		}
 		return primitive.List{ev.atom("unquote"), quoted}, nil
 
-	case "~@", "`,":
+	case "~@", "`,", ",@":
 		// ~@... => (splice-unquote ...)
 		quoted, err := ev.readExpression()
 		if err != nil {
