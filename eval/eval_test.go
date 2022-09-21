@@ -216,6 +216,7 @@ func TestEvaluate(t *testing.T) {
 (fizz 3)
 
 `, "ERROR{attempted division by zero}"},
+		{"(error \"CAKE-FAIL\")", "ERROR{CAKE-FAIL}"},
 
 		{"(read foo bar)", "ERROR{Expected only a single argument}"},
 		{"(read \")\")", "ERROR{failed to read ):unexpected ')'}"},
