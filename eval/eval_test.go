@@ -103,6 +103,11 @@ func TestEvaluate(t *testing.T) {
                   (quasiquote (a (splice-unquote lst) d))`,
 			"(a b c d)"},
 
+		// expand a macro
+		{`(define steve (macro () "steve"))
+                  (macroexpand (steve))`,
+			"steve"},
+
 		// lambda
 		{`(define sq (lambda (x) (* x x)))
                  ; comment
@@ -194,7 +199,10 @@ func TestEvaluate(t *testing.T) {
 		{"(let (3 3) )", "ERROR{binding value is not a list, got 3}"},
 
 		{"(cond (quote 3))", "ERROR{expected pairs of two items}"},
+		{"(error )", "ERROR{arity-error: not enough arguments for (error}"},
 		{"(quote )", "ERROR{arity-error: not enough arguments for (quote}"},
+		{"(quasiquote )", "ERROR{arity-error: not enough arguments for (quasiquote}"},
+		{"(macroexpand )", "ERROR{arity-error: not enough arguments for (macroexpand}"},
 		{"(if )", "ERROR{arity-error: not enough arguments for (if ..)}"},
 		{"(if (/ 1 0) #t #f)", "ERROR{attempted division by zero}"},
 		{"(define )", "ERROR{arity-error: not enough arguments for (define ..)}"},
