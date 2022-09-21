@@ -10,9 +10,11 @@ import (
 	"errors"
 	"flag"
 	"fmt"
+	"math/rand"
 	"regexp"
 	"strconv"
 	"strings"
+	"time"
 
 	"github.com/skx/yal/env"
 	"github.com/skx/yal/primitive"
@@ -36,10 +38,16 @@ type Eval struct {
 
 	// Recurse keeps track of how many times we've recursed
 	recurse int
+
+	// Count of generated symbols
+	symCount int
 }
 
 // New constructs a new evaluator.
 func New(src string) *Eval {
+
+	// (gensym) needs a decent random seed
+	rand.Seed(time.Now().UnixNano())
 
 	// Create with a default context.
 	e := &Eval{
@@ -524,6 +532,24 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 				// Return it.
 				return out
 
+			// (gensym
+			case primitive.Symbol("gensym"):
+
+				// symbol characters
+				var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+
+				// generate prefix
+				b := make([]rune, 5)
+				for i := range b {
+					b[i] = letters[rand.Intn(len(letters))]
+				}
+
+				// generate with count
+				ev.symCount++
+				str := fmt.Sprintf("%s%06d", string(b), ev.symCount)
+				sym := primitive.Symbol(str)
+				return sym
+
 			// (eval
 			case primitive.Symbol("eval"):
 
@@ -589,7 +615,11 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 					return primitive.Error("arity-error: not enough arguments for (set! ..)")
 				}
 				val := ev.eval(listExp[2], e, expandMacro)
-				e.Set(string(listExp[1].(primitive.Symbol)), val)
+				if len(listExp) == 4 {
+					e.SetOuter(string(listExp[1].(primitive.Symbol)), val)
+				} else {
+					e.Set(string(listExp[1].(primitive.Symbol)), val)
+				}
 				return primitive.Nil{}
 
 			// (quote ..)

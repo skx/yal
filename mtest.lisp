@@ -64,14 +64,57 @@
 ;:
 ;;    (begin
 ;;      (set! v1 e)
-;;      (set! v2 e))
+;;      (set! v2 e)
+;;    )
 ;:
 ;; Something like this should work:
-;:
+;;
+;; NOTE:  This has a short-coming, that the "e" parameter is executed
+;;        or evaluated twice.
+;;
+;;        We'll refine to fix this
+;;
 (define set2! (macro (v1 v2 e)
                      `(begin
                        (set! ~v1 ~e)
                        (set! ~v2 ~e))))
+
+
+;;
+;; You can see this in the following code:
+;;
+;;   (set2! a c (begin (print "EXECUTED TWICE!") (+ 32 23)))
+
+;;
+;; The second attempt would use a temporary variable to store the new
+;; value, so that the evaluation of the argument only occurs once.
+;;
+;; This looks like it should work:
+;;
+;; NOTE: This does not work.
+;;
+;;       The "(set!..)" calls operate in a new scope.  So they can't modify
+;;       the global environment.
+;;
+(define set2! (macro (v1 v2 e)
+                     (let ((tmp (gensym)))
+                       `(begin (let ((~tmp ~e))
+                           (set! ~v1 ~tmp)
+                           (set! ~v2 ~tmp))))))
+
+
+;;
+;; The third/final attempt uses a temporary variable to store the new
+;; value, so that the evaluation of the argument only occurs once.
+;;
+;; The difference here is we use the three-argument form of the (set!..)
+;; form, to update the global/parent scope.
+;;
+(define set2! (macro (v1 v2 e)
+                     (let ((tmp (gensym)))
+                       `(begin (let ((~tmp ~e))
+                           (set! ~v1 ~tmp t)
+                           (set! ~v2 ~tmp t))))))
 
 ;;
 ;; Lets test it out.
@@ -101,8 +144,12 @@
 (assert (= b 33))
 (assert (= c 3))
 
+
 ;; Confirm it works with an expression too.
-(set2! a c (+ 32 23))
+;;
+;; NOTE This expression is only evaluated once.
+;;
+(set2! a c (begin (print "ONLY ONE TIME EXECUTED!!") (+ 32 23)))
 
 ;;
 ;; So the values will be changed, again.
