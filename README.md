@@ -9,6 +9,7 @@
 * [Features](#features)
 * [Omissions](#omissions)
 * [Fuzz Testing](#fuzz-testing)
+* [Benchmark](#benchmark)
 * [References](#references)
 
 
@@ -235,6 +236,29 @@ fuzz: elapsed: 57m3s, execs: 163433 (83/sec), new interesting: 110 (total: 660)
 
 If you find a crash then it is either a bug which needs to be fixed, or a false-positive (i.e. a function reports an error which is expected) in which case the fuzz-test should be updated to add it to the list of known-OK results.  (For example "division by zero" is a fatal error, so that's a known-OK result).
 
+
+
+## Benchmark
+
+There is a simple benchmark included, comparing the time taken to run 100! in pure golang, and in our interpreted lisp.
+
+To run this:
+
+```sh
+$ go test -run=Bench -bench=.
+goos: linux
+goarch: amd64
+pkg: github.com/skx/yal
+cpu: AMD A10-6800K APU with Radeon(tm) HD Graphics
+BenchmarkGoFactorial-4    	 4752786	       248.1 ns/op
+BenchmarkYALFactorial-4   	    1250	    908525 ns/op
+PASS
+ok  	github.com/skx/yal	2.679s
+```
+
+Here you see that the lisp version is approximately 3000% slower than the pure golang implementation.
+
+For longer runs add `-benchtime=30s`, or similar, to the command-line.
 
 
 
