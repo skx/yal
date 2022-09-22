@@ -45,7 +45,7 @@ func TestTimeout(t *testing.T) {
 	out := l.Evaluate(env)
 
 	if !strings.Contains(out.ToString(), "deadline exceeded") {
-		t.Fatalf("Didn't get the expected output:%s", out.ToString())
+		t.Fatalf("Didn't get the expected output.  Got: %s", out.ToString())
 	}
 
 }
@@ -115,12 +115,33 @@ func TestEvaluate(t *testing.T) {
 		{`(define sqrt (lambda (x) (# x 0.5))) (sqrt 9)`, "3"},
 		{`(define sqrt (lambda (x) (# x 0.5))) (sqrt 100)`, "10"},
 
+		// gensym - just test that there's an 11 character return
+		{"(length (split (str (gensym)) \"\"))", "11"},
+
 		// Let
 		{"(let ((a 5)) (nil? a))", "#f"},
 		{"(let ((a 5)) a)", "5"},
 		{"(let ((a 5) (b 6)) a (* a b))", "30"},
 		{"(let ((a 5)) (set! a 44) a)", "44"},
 		{"(let ((a 5)) c)", "nil"},
+
+		// (set!) inside (let) will only modify the local scope
+		{`
+(set! a 3)
+(let ((b 33))
+  (set! a 4321))
+a
+`,
+			"3"},
+
+		// (set! a b TRUE) inside (let) will modify the parent scope
+		{`
+(define a 3)
+(let ((b 33))
+  (set! a 4321 true))
+a
+`,
+			"4321"},
 
 		// lists
 		{"'()", "()"},
@@ -141,6 +162,19 @@ func TestEvaluate(t *testing.T) {
 		{"(eval c)", "nil"},
 		{"(read \"(+ 3 4)\")", "(+ 3 4)"},
 		{"(eval (read \"(+ 3 4)\"))", "7"},
+
+		// quoting options
+		// quasiquote
+		{"`1", "1"},
+		{"`(", "nil"},
+
+		// unquote
+		{"~`1", "ERROR{argument 'unquote' not a function}"},
+		{"~`\"", "nil"},
+
+		// splice-unquote
+		{"~@1", "ERROR{argument 'splice-unquote' not a function}"},
+		{"~@\"", "nil"},
 
 		// cond
 		{`(define a 44)
