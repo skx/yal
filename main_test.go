@@ -17,7 +17,6 @@ var interpreter *eval.Eval
 // The environment contains the primitives the interpreter uses.
 var environment *env.Environment
 
-
 // Create the interpreter, and parse the source of our benchmark script.
 //
 // Only do this once, at startup.
@@ -52,9 +51,8 @@ func init() {
 func fact(n int64) int64 {
 	if n == 0 {
 		return 1
-	} else {
-		return n * fact(n-1)
 	}
+	return n * fact(n-1)
 }
 
 // BenchmarkGoFactorial allows running the golang benchmark.
