@@ -797,6 +797,53 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 				exp = listExp[2]
 				continue
 
+			// (try
+			case primitive.Symbol("try"):
+				if len(listExp) < 3 {
+					return primitive.Error("arity-error: not enough arguments for (try ..)")
+				}
+
+				// first expression is what to execute: a list
+				exp := listExp[1]
+
+				// Cast the argument to a list
+				expLst, ok1 := exp.(primitive.List)
+				if !ok1 {
+					return primitive.Error(fmt.Sprintf("expected a list for argument, got %v", listExp[1]))
+				}
+
+				// second expression is the catch: a list
+				blk := listExp[2]
+				blkLst, ok2 := blk.(primitive.List)
+				if !ok2 {
+					return primitive.Error(fmt.Sprintf("expected a list for argument, got %v", listExp[2]))
+				}
+				if len(blkLst) != 3 {
+					return primitive.Error(fmt.Sprintf("list should have three elements, got %v", blkLst))
+				}
+				if !ev.startsWith(blkLst, "catch") {
+					return primitive.Error(fmt.Sprintf("catch list should begin with 'catch', got %v", blkLst))
+				}
+
+				// Evaluate the expression
+				out := ev.eval(expLst, e, expandMacro)
+
+				// Evaluating the expression didn't return an error.
+				//
+				// Nothing to catch, all OK
+				_, ok3 := out.(primitive.Error)
+				if !ok3 {
+					return primitive.Nil{}
+				}
+
+				// The catch statement is blkLst[0] - we tested for that already
+				// The variable to bind is blkLst[1]
+				// The form to execute with that is blkLst[2]
+				tmpEnv := env.NewEnvironment(e)
+				tmpEnv.Set(blkLst[1].ToString(), primitive.String(out.ToString()))
+
+				return ev.eval(blkLst[2], tmpEnv, expandMacro)
+
 			// (lambda
 			case primitive.Symbol("lambda"), primitive.Symbol("macro"):
 
