@@ -35,6 +35,7 @@ Although this implementation is clearly derived from the [make a lisp](https://g
   * Via a `:type` suffix.  For example `(lambda (a:string b:number) ..`.
 * Support for macros.
   * See [mtest.lisp](mtest.lisp) for some simple tests/usage examples.
+  * The standard library uses macros, sparingly, for example to implement the `(while)` function.
 
 Here's what optional parameters, inspired by Emacs, look like in practice:
 
@@ -193,7 +194,7 @@ We have a reasonable number of functions implemented, either in our golang core 
 
 Building upon those primitives we have a larger standard-library of functions written in Lisp such as:
 
-* `abs`, `apply`, `append`, `filter`, `lower`, `map`, `min`, `max`, `nat`, `neg`, `now`, `nth`, `reduce`, `reverse`, `seq`, `upper`, etc.
+* `abs`, `apply`, `append`, `filter`, `lower`, `map`, `min`, `max`, `nat`, `neg`, `now`, `nth`, `reduce`, `repeat`, `reverse`, `seq`, `upper`, `while`, etc.
 
 Although the lists above should be up to date you can check the definitions to see what is currently available:
 
@@ -268,3 +269,5 @@ For longer runs add `-benchtime=30s`, or similar, to the command-line.
   * Very helpful "inspiration" for writing primitives in Lisp.
 * https://github.com/kanaka/mal/
   * Make A Lisp, very helpful for the quoting, unquoting, and macro magic.
+* http://soft.vub.ac.be/~pcostanz/documents/08/macros.pdf
+  * The source of the cute "while" macro, and a good read beyond that.

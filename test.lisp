@@ -16,9 +16,20 @@
 
 ;;
 ;; Use our "repeat" function, from the standard library, to run a block
-;; N times.  The number of the attempt is given as a parameter.
+;; N/10 times.  The number of the attempt is given as a parameter.
 ;;
 (repeat 10 (lambda (n) (print "I'm in a loop %s" n)))
+
+;;
+;; Use our "while" function, from the standard library, to run a block
+;; of code N/5 times.
+;;
+(let ((a 5))
+  (while (> a 0)
+    (begin
+     (print "(while) loop - iteration %s" a)
+     (set! a (- a 1) true))))
+
 
 ;; Define a function, `fact`, to calculate factorials.
 (define fact (lambda (n)

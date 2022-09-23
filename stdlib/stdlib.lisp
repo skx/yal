@@ -89,14 +89,57 @@
 
 
 ;;
+;; if2 is a simple macro which allows you to run two actions if an
+;; (if ..) test succeeds.
+;;
+;; This means you can write:
+;;
+;;   (if2 true (print "1") (print "2"))
+;;
+;; Instead of having to use (begin), like so:
+;;
+;;   (if true (begin (print "1") (print "2")))
+;;
+;; The downside here is that you don't get a negative branch, but running
+;; two things is very common - see for example the "(while)" and "(repeat)"
+;; macros later in this file.
+;;
+(define if2 (macro (pred one two)
+  `(if ~pred (begin ~one ~two))))
+
+
+;;
+;; Part of our while-implementation.
+;; If the specified predicate is true, then run the body.
+;;
+;; NOTE: This recurses, so it will eventually explode the stack.
+;;
+;; NOTE: We use "if2" not "if".
+;;
+(define while-fun (lambda (predicate body)
+  (if2 (predicate)
+    (body)
+    (while-fun predicate body))))
+
+;;
+;; Now a macro to use the while-fun body as part of a while-function
+;;
+;; NOTE: We use "if2" not "if".
+;;
+(define while (macro (expression body)
+                     (list 'while-fun
+                           (list 'lambda '() expression)
+                           (list 'lambda '() body))))
+
+
 ;; Setup a simple function to run a loop N times
 ;;
+;; NOTE: We use "if2" not "if".
+;;
 (define repeat (lambda (n body)
-    (if (> n 0)
-        (begin
-         (body n)
-         (repeat (- n 1) body)
-         ))))
+  (if2 (> n 0)
+     (body n)
+     (repeat (- n 1) body))))
 
 ;; A useful helper to apply a given function to each element of a list.
 (define apply (lambda (lst:list fun:function)
