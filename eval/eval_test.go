@@ -163,6 +163,11 @@ a
 		{"(read \"(+ 3 4)\")", "(+ 3 4)"},
 		{"(eval (read \"(+ 3 4)\"))", "7"},
 
+		// try caught an error
+		{"(try (/ 1 0) (catch e 3))", "3"},
+		// try no error to catch
+		{"(try (/ 1 1) (catch e 3))", "1"},
+
 		// quoting options
 		// quasiquote
 		{"`1", "1"},
@@ -231,7 +236,6 @@ a
 		{"(let ((0 0)) )", "ERROR{binding name is not a symbol, got 0}"},
 		{"(let ((0 )) )", "ERROR{arity-error: binding list had missing arguments}"},
 		{"(let (3 3) )", "ERROR{binding value is not a list, got 3}"},
-
 		{"(cond (quote 3))", "ERROR{expected pairs of two items}"},
 		{"(error )", "ERROR{arity-error: not enough arguments for (error}"},
 		{"(quote )", "ERROR{arity-error: not enough arguments for (quote}"},
@@ -273,6 +277,13 @@ a
 		{"{ :name { ", "nil"},
 		{"{ :age 333  ", "nil"},
 		{"}}}}}}", "nil"},
+
+		// try / catch
+		{"(try 3)", "ERROR{arity-error: not enough arguments for (try ..)}"},
+		{"(try 3 3)", "ERROR{expected a list for argument, got 3}"},
+		{"(try (/ 1 0) 3)", "ERROR{expected a list for argument, got 3}"},
+		{"(try (/ 1 0) (/ 1 0) (/ 3 9))", "ERROR{catch list should begin with 'catch', got [/ 1 0]}"},
+		{"(try (/ 1 0) (catch x))", "ERROR{list should have three elements, got [catch x]}"},
 
 		// type failures
 		{input: "(define blah (lambda (a:list) (print a))) (blah 3)", output: "ERROR{type-validation failed: argument a to blah was supposed to be list, got number}"},

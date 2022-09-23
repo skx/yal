@@ -833,7 +833,7 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 				// Nothing to catch, all OK
 				_, ok3 := out.(primitive.Error)
 				if !ok3 {
-					return primitive.Nil{}
+					return out
 				}
 
 				// The catch statement is blkLst[0] - we tested for that already
