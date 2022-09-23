@@ -269,5 +269,7 @@ For longer runs add `-benchtime=30s`, or similar, to the command-line.
   * Very helpful "inspiration" for writing primitives in Lisp.
 * https://github.com/kanaka/mal/
   * Make A Lisp, very helpful for the quoting, unquoting, and macro magic.
+* https://lispcookbook.github.io/cl-cookbook/macros.html
+  * The Common Lisp Cookbook – Macros
 * http://soft.vub.ac.be/~pcostanz/documents/08/macros.pdf
   * The source of the cute "while" macro, and a good read beyond that.
