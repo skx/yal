@@ -165,9 +165,11 @@
 
 ;; Find the Nth item of a list
 (define nth (lambda (lst:list i:number)
-  (if (= 0 i)
-    (car lst)
-      (nth (cdr lst) (- i 1)))))
+  (if (> i (length lst))
+    (error "Out of bounds on list-length")
+    (if (= 0 i)
+      (car lst)
+        (nth (cdr lst) (- i 1))))))
 
 ;; More mathematical functions relating to negative numbers.
 (define neg  (lambda (n:number) (- 0 n)))
