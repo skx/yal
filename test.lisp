@@ -13,6 +13,13 @@
 (print "Our mathematical functions allow 2+ arguments, e.g: %s = %s"
   (quote (+ 1 2 3 4 5 6)) (+ 1 2 3 4 5 6))
 
+
+;;
+;; Use our "repeat" function, from the standard library, to run a block
+;; N times.  The number of the attempt is given as a parameter.
+;;
+(repeat 10 (lambda (n) (print "I'm in a loop %s" n)))
+
 ;; Define a function, `fact`, to calculate factorials.
 (define fact (lambda (n)
   (if (<= n 1)

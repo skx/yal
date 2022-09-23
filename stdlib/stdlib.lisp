@@ -87,6 +87,17 @@
 (define sqrt (lambda (x:number) (# x 0.5)))
 
 
+
+;;
+;; Setup a simple function to run a loop N times
+;;
+(define repeat (lambda (n body)
+    (if (> n 0)
+        (begin
+         (body n)
+         (repeat (- n 1) body)
+         ))))
+
 ;; A useful helper to apply a given function to each element of a list.
 (define apply (lambda (lst:list fun:function)
   (if (nil? lst)
