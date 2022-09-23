@@ -184,11 +184,37 @@
 (unless false (print "OK - (unless ..) is good.") (print "FAIL"))
 
 
+;;
+;; if2 is a simple macro which allows you to run two actions if an
+;; (if ..) test succeeds.
+;;
+;; This means you can write:
+;;
+;;   (if2 true (print "1") (print "2"))
+;;
+;; Instead of having to add (begin:
+;;
+;;   (if true (begin (print "1") (print "2")))
+;;
+;; The downside here is that you don't get a negative branch, but running
+;; two things is very common - see for example the "(while)" and "(repeat)"
+;; macros in our standard library.
+;;
+(define if2 (macro (pred one two)
+  `(if ~pred (begin ~one ~two))))
+
 
 ;;
-;; Make sure that our type-checking understands what a macro is,
-;; and that it is different from a (user) function and a builtin
-;; function.
+;; You can assure yourself that this works, via the following code:
+;;
+;
+; (print (macroexpand (if2 true (print "A") (print "B"))))
+;
+
+
+;;
+;; Finally we'll ensure that our type-checking understands what a macro is,
+;; and that it is different from a (user) function or a builtin function.
 ;;
 
 
