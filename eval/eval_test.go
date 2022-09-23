@@ -8,6 +8,7 @@ import (
 
 	"github.com/skx/yal/builtins"
 	"github.com/skx/yal/env"
+	"github.com/skx/yal/primitive"
 	"github.com/skx/yal/stdlib"
 )
 
@@ -86,9 +87,8 @@ func TestEvaluate(t *testing.T) {
 		{`(if false "false" "true")`, "true"},
 		{"(if false false)", "nil"},
 
-		// macro - args are not evaluated
-		//		{`(define foo (macro (x) x)) (foo (+ 1 2))`, "(+ 1 2)"},
-
+		// macroexpand - args are not evaluated
+		{`(define foo (macro (x) x)) (macroexpand (foo (+ 1 2)))`, "(+ 1 2)"},
 		// quote
 		{`(define lst (quote (b c)))
                   '(a lst d)`, "(a lst d)"},
@@ -382,5 +382,15 @@ func TestStandardLibrary(t *testing.T) {
 			t.Fatalf("test '%s' should have produced '%s', but got '%s'", test.input, test.output, out.ToString())
 		}
 
+	}
+}
+
+func TestStartsWith(t *testing.T) {
+	l := primitive.List{}
+
+	e := New("")
+
+	if e.startsWith(l, "steve") {
+		t.Fatalf("unexpected match")
 	}
 }
