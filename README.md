@@ -188,7 +188,7 @@ We have a reasonable number of functions implemented, either in our golang core 
 * Misc features
   * `error`, `getenv`, `str`, `print`, & `type`
 * Special forms
-  * `begin`, `cond`, `define`, `env`, `eval`, `if`, `lambda`, `let`, `read`, `set!`, `quote`,
+  * `begin`, `cond`, `define`, `env`, `eval`, `gensym`, `if`, `lambda`, `let`, `macroexpand`, `read`, `set!`, `quote`, & `quasiquote`.
 * Tail recursion optimization.
 
 Building upon those primitives we have a larger standard-library of functions written in Lisp such as:
