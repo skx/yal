@@ -73,6 +73,10 @@
 (define inc  (lambda (n:number) (+ n 1)))
 (define dec  (lambda (n:number) (- n 1)))
 
+;; We could also define the incr/decr operations as macros.
+(define incr (macro (x) `(set! ~x (+ ~x 1))))
+(define decr (macro (x) `(set! ~x (- ~x 1))))
+
 ;; Not is useful
 (define !     (lambda (x) (if x #f #t)))
 

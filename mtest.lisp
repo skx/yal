@@ -8,10 +8,11 @@
 ;;  https://lispcookbook.github.io/cl-cookbook/macros.html
 
 
+;;
 ;; To implement a macro-system there are things that are required,
 ;; the groundwork, such as a decent set of quote/unquote primitives.
 ;;
-;; Simple tests of those here, from the MAL text
+;; Simple tests of those here, from the MAL text.
 ;;
 (define lst (quote (b c)))
 
@@ -33,7 +34,8 @@
 ;; Here is our first macro, given a variable-name show both the
 ;; name and the current value.
 ;;
-(define debug (macro (x) `(print "Variable '%s' has value: %s" '~x ~x)))
+(define debug (macro (x) `(print "Variable '%s' has value %s" '~x ~x)))
+(debug lst)
 
 ;;
 ;; Here's a similar example, which asserts a condition is true.
@@ -147,9 +149,9 @@
 
 ;; Confirm it works with an expression too.
 ;;
-;; NOTE This expression is only evaluated once.
+;; NOTE This expression is only evaluated once, which is what we wanted.
 ;;
-(set2! a c (begin (print "ONLY ONE TIME EXECUTED!!") (+ 32 23)))
+(set2! a c (begin (print "ONLY EXECUTED ONCE!") (+ 32 23)))
 
 ;;
 ;; So the values will be changed, again.
@@ -205,11 +207,21 @@
 
 
 ;;
-;; You can assure yourself that this works, via the following code:
+;; Increment the given variable by one.
 ;;
-;
-; (print (macroexpand (if2 true (print "A") (print "B"))))
-;
+(define incr (macro (x) `(set! ~x (+ ~x 1))))
+
+;;
+;; Show macro expansion
+;;
+(print "The (incr a) macro expands to %s" (macroexpand (incr a)))
+
+;;
+;; Use the if2 macro to run two increment options
+;;
+(set! a 32)
+(if2 true (incr a) (incr a))
+(assert (= a 34))
 
 
 ;;
