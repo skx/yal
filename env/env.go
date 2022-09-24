@@ -1,4 +1,4 @@
-// Package env contains our key=value store, which is used to implement
+// Package env contains the key=value store, which is used to implement
 // the environment.
 //
 // We need to avoid circular references, so this package will store "any"
@@ -49,7 +49,7 @@ func (env *Environment) Get(key string) (any, bool) {
 	return env.parent.Get(key)
 }
 
-// Items returns the items of our environment
+// Items returns all the items contained within our environment.
 func (env *Environment) Items() map[string]any {
 
 	// The return value
@@ -77,8 +77,7 @@ func (env *Environment) Set(key string, value any) {
 	env.values[key] = value
 }
 
-// SetOuter sets the variable in the parent scope, if not present in this
-// one.
+// SetOuter sets the variable in the parent scope, if not present in this one.
 func (env *Environment) SetOuter(key string, value any) {
 	if _, ok := env.values[key]; ok {
 		env.values[key] = value

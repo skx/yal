@@ -1,5 +1,12 @@
 // Package builtins contains the implementations of the lisp-callable
 // functions which are implemented in golang.
+//
+// Note that these builtings here don't have access to the run-time
+// environment, which is why things like "gensym" have to be implemented
+// in our core `eval.go` package.
+//
+// Updating the builtins to receive a references to the environment would
+// allow some of the implementations to be moved.
 package builtins
 
 import (
@@ -426,6 +433,7 @@ func nilFn(args []primitive.Primitive) primitive.Primitive {
 
 }
 
+// consFn implements (cons).
 func consFn(args []primitive.Primitive) primitive.Primitive {
 	if len(args) < 1 {
 		return primitive.Error("wrong number of arguments")
@@ -443,7 +451,7 @@ func consFn(args []primitive.Primitive) primitive.Primitive {
 	return primitive.List{args[0], args[1]}
 }
 
-// (print
+// printFn implements (print).
 func printFn(args []primitive.Primitive) primitive.Primitive {
 	// no args
 	if len(args) < 1 {
@@ -549,6 +557,7 @@ func joinFn(args []primitive.Primitive) primitive.Primitive {
 	return primitive.String(tmp)
 }
 
+// sortFn implements (sort)
 func sortFn(args []primitive.Primitive) primitive.Primitive {
 	// If we have only a single argument
 	if len(args) != 1 {
