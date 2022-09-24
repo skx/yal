@@ -172,11 +172,10 @@
 ;; Simple test of `cond`
 (define a 6)
 (cond
-  (quote
     (> a 20) (print "A > 20")
     (> a 15) (print "A > 15")
     true     (print "A is %s" a)
-))
+)
 
 ;;
 ;; Trivial Read/Eval pair
