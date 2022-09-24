@@ -953,7 +953,7 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 						// Get the parameter name
 						tmp := proc.Args[i].ToString()
 
-						// Strip off any "&" or "#" prefix
+						// Strip off any "&" prefix
 						tmp = strings.TrimPrefix(tmp, "&")
 
 						// Does the argument have a trailing type?
