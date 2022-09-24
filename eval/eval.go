@@ -615,11 +615,21 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 				if len(listExp) < 3 {
 					return primitive.Error("arity-error: not enough arguments for (set! ..)")
 				}
+
+				// Get the symbol we're gonna set
+				sym, ok := listExp[1].(primitive.Symbol)
+				if !ok {
+					return primitive.Error(fmt.Sprintf("tried to set a non-symbol %v", listExp[1]))
+				}
+
+				// Get the value.
 				val := ev.eval(listExp[2], e, expandMacro)
+
+				// Now set, either locally or in the parent scope.
 				if len(listExp) == 4 {
-					e.SetOuter(string(listExp[1].(primitive.Symbol)), val)
+					e.SetOuter(string(sym), val)
 				} else {
-					e.Set(string(listExp[1].(primitive.Symbol)), val)
+					e.Set(string(sym), val)
 				}
 				return primitive.Nil{}
 

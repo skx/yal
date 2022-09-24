@@ -230,6 +230,7 @@ a
 
 		// errors
 		{"(invalid)", "ERROR{argument 'invalid' not a function}"},
+		{"(set! 3 4)", "ERROR{tried to set a non-symbol 3}"},
 		{"(eval 'foo 'bar)", "ERROR{Expected only a single argument}"},
 		{"(eval 3)", "ERROR{unexpected type for eval %!V(primitive.Number=3).}"},
 		{"(let 3)", "ERROR{argument is not a list, got 3}"},
