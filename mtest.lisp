@@ -113,8 +113,8 @@
 (define set2! (macro (v1 v2 e)
                      (let ((tmp (gensym)))
                        `(begin (let ((~tmp ~e))
-                           (set! ~v1 ~tmp t)
-                           (set! ~v2 ~tmp t))))))
+                           (set! ~v1 ~tmp true)
+                           (set! ~v2 ~tmp true))))))
 
 ;;
 ;; Lets test it out.
