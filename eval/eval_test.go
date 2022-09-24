@@ -2,6 +2,7 @@ package eval
 
 import (
 	"context"
+	"fmt"
 	"strings"
 	"testing"
 	"time"
@@ -184,10 +185,14 @@ a
 		// cond
 		{`(define a 44)
  (cond
-  (quote
     (> a 20) "big"
-    true     "fallback"))`,
+    true     "small")`,
 			"big"},
+		{`(define a 4)
+ (cond
+    (> a 20) "big"
+    true     "small")`,
+			"small"},
 
 		// maths
 		{"(+ 3 1)", "4"},
@@ -237,7 +242,6 @@ a
 		{"(let ((0 0)) )", "ERROR{binding name is not a symbol, got 0}"},
 		{"(let ((0 )) )", "ERROR{arity-error: binding list had missing arguments}"},
 		{"(let (3 3) )", "ERROR{binding value is not a list, got 3}"},
-		{"(cond (quote 3))", "ERROR{expected pairs of two items}"},
 		{"(error )", "ERROR{arity-error: not enough arguments for (error}"},
 		{"(quote )", "ERROR{arity-error: not enough arguments for (quote}"},
 		{"(quasiquote )", "ERROR{arity-error: not enough arguments for (quasiquote}"},
@@ -256,12 +260,10 @@ a
 		{`
 (define fizz (lambda (n:number)
   (cond
-    (quote
       (/ n 0)  (print "fizzbuzz")
-      #t       (print n)))))
+      #t       (print n))))
 
 (fizz 3)
-
 `, "ERROR{attempted division by zero}"},
 		{"(error \"CAKE-FAIL\")", "ERROR{CAKE-FAIL}"},
 
@@ -308,6 +310,8 @@ a
 
 		// Populate the default primitives
 		builtins.PopulateEnvironment(env)
+
+		fmt.Printf("Running:%s\n", test.input)
 
 		// Run it
 		out := l.Evaluate(env)

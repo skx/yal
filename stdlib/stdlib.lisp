@@ -136,6 +136,17 @@
                            (list 'lambda '() body))))
 
 
+;;
+;; cond is a useful thing to have.
+;;
+(define cond (macro (&xs)
+  (if (> (length xs) 0)
+      (list 'if (first xs)
+            (if (> (length xs) 1)
+                (nth xs 1)
+              (error "An odd number of forms to (cond..)"))
+            (cons 'cond (rest (rest xs)))))))
+
 ;; Setup a simple function to run a loop N times
 ;;
 ;; NOTE: We use "if2" not "if".

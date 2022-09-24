@@ -29,23 +29,12 @@ Although this implementation is clearly derived from the [make a lisp](https://g
 * Support for hashes as well as lists/strings/numbers/etc.
   * A hash looks like this `{ :name "Steve" :location "Helsinki" }`
   * Sample code is visible in [hash.lisp](hash.lisp).
-* Optional parameters for functions.
-  * Any parameter which is prefixed by `&` is optional, and if not specified then `nil` is assumed.
 * Type checking for function parameters.
   * Via a `:type` suffix.  For example `(lambda (a:string b:number) ..`.
 * Support for macros.
   * See [mtest.lisp](mtest.lisp) for some simple tests/usage examples.
-  * The standard library uses macros, sparingly, for example to implement the `(while)` function.
+  * The standard library uses macros, sparingly, for example to implement the `(cond)`, and `(while)` functions.
 
-Here's what optional parameters, inspired by Emacs, look like in practice:
-
-```lisp
-(define foo (lambda (a &b &c)  (print "A:%s B:%s C:%s\n", a b c)))
-
-(foo 1 2 3)  ; => "A:1 B:2 C:3"
-(foo 1 2)    ; => "A:1 B:2 C:nil"
-(foo 1)      ; => "A:1 B:nil C:nil"
-```
 
 Here's an example of type-checking on a parameter value, in this case a list is required, via the `:list` suffix:
 
@@ -106,20 +95,18 @@ $ yal test.lisp
 A reasonable amount of sample code can be found in [test.lisp](test.lisp), but as a quick example we have a [fizzbuzz.lisp](fizzbuzz.lisp) sample:
 
 ```lisp
-;;
-;; This is a simple FizzBuzz example, which we can execute.
+;;; fizzbuzz.lisp - A simple FizzBuzz implementation.
+
 ;;
 ;; You'll see here that we can define functions, that we have
-;; primitives such as "zero?" and that we have a built-in "cond"
-;; function too.
+;; primitives such as "zero?" and that we have a "cond" funcion,
+;; implemented as a macro in our standard-library.
 ;;
 ;; cond here will take a list, which is processed in pairs:
 ;;
 ;;  (cond
-;;    (quote
 ;;      TEST1  ACTION1
 ;;      TEST2  ACTION2
-;;    )
 ;;  )
 ;;
 ;; For each pair (e.g. `TEST1 ACTION1`) we run the first statement, and if
@@ -128,9 +115,6 @@ A reasonable amount of sample code can be found in [test.lisp](test.lisp), but a
 ;; When the test returns nil/false/similar then we continue running until
 ;; we do get success.  That means it is important to end with something that
 ;; will always succeed.
-;;
-;; `(quote) is used to ensure we don't evaluate the list in advance of the
-;; statement.
 ;;
 
 ;; Is the given number divisible by 3?
@@ -148,16 +132,12 @@ A reasonable amount of sample code can be found in [test.lisp](test.lisp), but a
 (define divByFive  (lambda (n:number) (zero? (% n 5))))
 
 ;; Run the fizz-buzz test for the given number, N
-;;
-;; NOTE: `and` takes a list here.
-;;
 (define fizz (lambda (n:number)
   (cond
-    (quote
       (and (list (divByThree n) (divByFive n)))  (print "fizzbuzz")
       (divByThree n)                             (print "fizz")
       (divByFive  n)                             (print "buzz")
-      #t                                         (print n)))))
+      #t                                         (print n))))
 
 
 ;; Apply the function fizz, for each number 1-50
@@ -189,14 +169,14 @@ We have a reasonable number of functions implemented, either in our golang core 
 * Misc features:
   * `getenv`, `str`, `print`, & `type`
 * Special forms:
-  * `begin`, `cond`, `define`, `env`, `eval`, `gensym`, `if`, `lambda`, `let`, `macroexpand`, `read`, `set!`, `quote`, & `quasiquote`.
+  * `begin`, `define`, `env`, `eval`, `gensym`, `if`, `lambda`, `let`, `macroexpand`, `read`, `set!`, `quote`, & `quasiquote`.
 * Error handling:
   * `error`, `try`, and `catch` - as demonstrated in [try.lisp](try.lisp).
 * Tail recursion optimization.
 
 Building upon those primitives we have a larger standard-library of functions written in Lisp such as:
 
-* `abs`, `apply`, `append`, `filter`, `lower`, `map`, `min`, `max`, `nat`, `neg`, `now`, `nth`, `reduce`, `repeat`, `reverse`, `seq`, `upper`, `while`, etc.
+* `abs`, `apply`, `append`, `cond`, `filter`, `lower`, `map`, `min`, `max`, `nat`, `neg`, `now`, `nth`, `reduce`, `repeat`, `reverse`, `seq`, `upper`, `while`, etc.
 
 Although the lists above should be up to date you can check the definitions to see what is currently available:
 

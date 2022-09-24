@@ -2,16 +2,14 @@
 
 ;;
 ;; You'll see here that we can define functions, that we have
-;; primitives such as "zero?" and that we have a built-in "cond"
-;; function too.
+;; primitives such as "zero?" and that we have a "cond" funcion,
+;; implemented as a macro in our standard-library.
 ;;
 ;; cond here will take a list, which is processed in pairs:
 ;;
 ;;  (cond
-;;    (quote
 ;;      TEST1  ACTION1
 ;;      TEST2  ACTION2
-;;    )
 ;;  )
 ;;
 ;; For each pair (e.g. `TEST1 ACTION1`) we run the first statement, and if
@@ -20,9 +18,6 @@
 ;; When the test returns nil/false/similar then we continue running until
 ;; we do get success.  That means it is important to end with something that
 ;; will always succeed.
-;;
-;; `(quote) is used to ensure we don't evaluate the list in advance of the
-;; statement.
 ;;
 
 ;; Is the given number divisible by 3?
@@ -42,11 +37,10 @@
 ;; Run the fizz-buzz test for the given number, N
 (define fizz (lambda (n:number)
   (cond
-    (quote
       (and (list (divByThree n) (divByFive n)))  (print "fizzbuzz")
       (divByThree n)                             (print "fizz")
       (divByFive  n)                             (print "buzz")
-      #t                                         (print n)))))
+      #t                                         (print n))))
 
 
 ;; Apply the function fizz, for each number 1-50
