@@ -15,12 +15,12 @@ import (
 // This tests an infinite loop is handled
 func TestTimeout(t *testing.T) {
 
-	// Test code
+	// Test code - run an infinite loop, incrementing a variable.
 	tst := `
-(define r (lambda ()
-            (r)))
-
-(r)
+(set! a 1)
+(while true
+ (begin
+   (set! a (+ a 1) true)))
 `
 	// Load our standard library
 	st := stdlib.Contents()
