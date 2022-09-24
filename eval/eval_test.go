@@ -2,7 +2,6 @@ package eval
 
 import (
 	"context"
-	"fmt"
 	"strings"
 	"testing"
 	"time"
@@ -298,28 +297,28 @@ a
 
 	for _, test := range tests {
 
-		// Load our standard library
-		st := stdlib.Contents()
-		std := string(st)
+		t.Run(test.input, func(t *testing.T) {
 
-		// Create a new interpreter
-		l := New(std + "\n" + test.input)
+			// Load our standard library
+			st := stdlib.Contents()
+			std := string(st)
 
-		// With a new environment
-		env := env.New()
+			// Create a new interpreter
+			l := New(std + "\n" + test.input)
 
-		// Populate the default primitives
-		builtins.PopulateEnvironment(env)
+			// With a new environment
+			env := env.New()
 
-		fmt.Printf("Running:%s\n", test.input)
+			// Populate the default primitives
+			builtins.PopulateEnvironment(env)
 
-		// Run it
-		out := l.Evaluate(env)
+			// Run it
+			out := l.Evaluate(env)
 
-		if out.ToString() != test.output {
-			t.Fatalf("test '%s' should have produced '%s', but got '%s'", test.input, test.output, out.ToString())
-		}
-
+			if out.ToString() != test.output {
+				t.Fatalf("test '%s' should have produced '%s', but got '%s'", test.input, test.output, out.ToString())
+			}
+		})
 	}
 }
 
@@ -378,25 +377,28 @@ func TestStandardLibrary(t *testing.T) {
 
 	for _, test := range tests {
 
-		// Load our standard library
-		st := stdlib.Contents()
-		std := string(st)
+		t.Run(test.input, func(t *testing.T) {
 
-		// Create a new interpreter
-		l := New(std + "\n" + test.input)
+			// Load our standard library
+			st := stdlib.Contents()
+			std := string(st)
 
-		// With a new environment
-		env := env.New()
+			// Create a new interpreter
+			l := New(std + "\n" + test.input)
 
-		// Populate the default primitives
-		builtins.PopulateEnvironment(env)
+			// With a new environment
+			env := env.New()
 
-		// Run it
-		out := l.Evaluate(env)
+			// Populate the default primitives
+			builtins.PopulateEnvironment(env)
 
-		if out.ToString() != test.output {
-			t.Fatalf("test '%s' should have produced '%s', but got '%s'", test.input, test.output, out.ToString())
-		}
+			// Run it
+			out := l.Evaluate(env)
+
+			if out.ToString() != test.output {
+				t.Fatalf("test '%s' should have produced '%s', but got '%s'", test.input, test.output, out.ToString())
+			}
+		})
 
 	}
 }
