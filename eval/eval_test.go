@@ -184,10 +184,20 @@ a
 		// cond
 		{`(define a 44)
  (cond
-  (quote
     (> a 20) "big"
-    true     "fallback"))`,
+    true     "small")`,
 			"big"},
+		{`(define a 4)
+ (cond
+    (> a 20) "big"
+    true     "small")`,
+			"small"},
+
+		{"(cond true 7 true 8)", "7"},
+		{"(cond false 7 true 8)", "8"},
+		{"(cond false 7 false 8 \"else\" 9)", "9"},
+		{"(cond false 7 (= 2 2) 8 \"else\" 9)", "8"},
+		{"(cond false 7 false 8 false 9)", "nil"},
 
 		// maths
 		{"(+ 3 1)", "4"},
@@ -237,7 +247,6 @@ a
 		{"(let ((0 0)) )", "ERROR{binding name is not a symbol, got 0}"},
 		{"(let ((0 )) )", "ERROR{arity-error: binding list had missing arguments}"},
 		{"(let (3 3) )", "ERROR{binding value is not a list, got 3}"},
-		{"(cond (quote 3))", "ERROR{expected pairs of two items}"},
 		{"(error )", "ERROR{arity-error: not enough arguments for (error}"},
 		{"(quote )", "ERROR{arity-error: not enough arguments for (quote}"},
 		{"(quasiquote )", "ERROR{arity-error: not enough arguments for (quasiquote}"},
@@ -256,12 +265,10 @@ a
 		{`
 (define fizz (lambda (n:number)
   (cond
-    (quote
       (/ n 0)  (print "fizzbuzz")
-      #t       (print n)))))
+      #t       (print n))))
 
 (fizz 3)
-
 `, "ERROR{attempted division by zero}"},
 		{"(error \"CAKE-FAIL\")", "ERROR{CAKE-FAIL}"},
 
@@ -296,26 +303,28 @@ a
 
 	for _, test := range tests {
 
-		// Load our standard library
-		st := stdlib.Contents()
-		std := string(st)
+		t.Run(test.input, func(t *testing.T) {
 
-		// Create a new interpreter
-		l := New(std + "\n" + test.input)
+			// Load our standard library
+			st := stdlib.Contents()
+			std := string(st)
 
-		// With a new environment
-		env := env.New()
+			// Create a new interpreter
+			l := New(std + "\n" + test.input)
 
-		// Populate the default primitives
-		builtins.PopulateEnvironment(env)
+			// With a new environment
+			env := env.New()
 
-		// Run it
-		out := l.Evaluate(env)
+			// Populate the default primitives
+			builtins.PopulateEnvironment(env)
 
-		if out.ToString() != test.output {
-			t.Fatalf("test '%s' should have produced '%s', but got '%s'", test.input, test.output, out.ToString())
-		}
+			// Run it
+			out := l.Evaluate(env)
 
+			if out.ToString() != test.output {
+				t.Fatalf("test '%s' should have produced '%s', but got '%s'", test.input, test.output, out.ToString())
+			}
+		})
 	}
 }
 
@@ -374,25 +383,28 @@ func TestStandardLibrary(t *testing.T) {
 
 	for _, test := range tests {
 
-		// Load our standard library
-		st := stdlib.Contents()
-		std := string(st)
+		t.Run(test.input, func(t *testing.T) {
 
-		// Create a new interpreter
-		l := New(std + "\n" + test.input)
+			// Load our standard library
+			st := stdlib.Contents()
+			std := string(st)
 
-		// With a new environment
-		env := env.New()
+			// Create a new interpreter
+			l := New(std + "\n" + test.input)
 
-		// Populate the default primitives
-		builtins.PopulateEnvironment(env)
+			// With a new environment
+			env := env.New()
 
-		// Run it
-		out := l.Evaluate(env)
+			// Populate the default primitives
+			builtins.PopulateEnvironment(env)
 
-		if out.ToString() != test.output {
-			t.Fatalf("test '%s' should have produced '%s', but got '%s'", test.input, test.output, out.ToString())
-		}
+			// Run it
+			out := l.Evaluate(env)
+
+			if out.ToString() != test.output {
+				t.Fatalf("test '%s' should have produced '%s', but got '%s'", test.input, test.output, out.ToString())
+			}
+		})
 
 	}
 }

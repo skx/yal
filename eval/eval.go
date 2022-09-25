@@ -708,59 +708,6 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 				}
 				return ret
 
-			// (cond
-			case primitive.Symbol("cond"):
-
-				// Cast the argument to a list
-				l := listExp[1].(primitive.List)
-
-				// skip the quote
-				l = l[1:]
-
-				// Iterate over the list in pairs
-				for i := 0; i < len(l); i += 2 {
-
-					var section []primitive.Primitive
-					if i > len(l)-2 {
-						section = l[i:]
-					} else {
-						section = l[i : i+2]
-					}
-
-					// Test that worked
-					if len(section) != 2 {
-						return primitive.Error("expected pairs of two items")
-					}
-
-					// The two parts of this section
-					test := section[0]
-					eval := section[1]
-
-					// need to eval test now.
-					res := ev.eval(test, e, expandMacro)
-
-					// If we got an error then we return
-					// it to our caller.
-					e, eok := res.(primitive.Error)
-					if eok {
-						return e
-					}
-
-					// Was it a success?  Then
-					// goto our exit.
-					//
-					// This is horrid, but it short-circuits
-					// the evaluation of the rest of the
-					// list-pairs.
-					if b, ok := res.(primitive.Bool); ok && bool(b) {
-						// we'll execute this statement
-						// when we return
-						exp = eval
-						goto repeat_eval
-					}
-
-				}
-
 			// (env
 			case primitive.Symbol("env"):
 
@@ -958,17 +905,34 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 				// themselves.
 				//
 				min := 0
-				for _, x := range proc.Args {
-					if !strings.HasPrefix(x.ToString(), "&") {
+
+				//
+				// if this is non-empty then we add all parameters here as a llist
+				//
+				variadic := ""
+
+				//
+				// The list of arguments to add when working in a variadic fashion
+				//
+				var lst primitive.List
+
+				//
+				// Count the minimum number of arguments.
+				//
+				// A variadic argument may be nil of course.
+				//
+				for _, arg := range proc.Args {
+					if !strings.HasPrefix(arg.ToString(), "&") {
 						min++
 					}
 				}
 
 				//
-				// Check that the arguments supplied
-				// match those that are expected.
+				// Check that the arguments supplied match those that are expected.
 				//
-				if len(args) < min {
+				// Unless variadic arguments are expected, because in that case "anything" is fine.
+				//
+				if len(args) < min && (variadic == "") {
 					return primitive.Error(fmt.Sprintf("arity-error - function '%s' requires %d argument(s), %d provided", listExp[0].ToString(), min, len(args)))
 				}
 
@@ -985,11 +949,17 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 						// Get the parameter name
 						tmp := proc.Args[i].ToString()
 
-						// Strip off any "&" prefix
-						tmp = strings.TrimPrefix(tmp, "&")
+						// Is this variadic?
+						//
+						// Then save the name of the argument away, after removing
+						// the prefix
+						//
+						if strings.HasPrefix(tmp, "&") {
+							tmp = strings.TrimPrefix(tmp, "&")
+							variadic = tmp
+						}
 
-						// Does the argument have
-						// a trailing type?
+						// Does the argument have a trailing type?
 						if strings.Contains(tmp, ":") {
 
 							before, after, found := strings.Cut(tmp, ":")
@@ -1037,14 +1007,31 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 						}
 
 						// And now set the value
-						e.Set(tmp, x)
+						if variadic == "" {
+							e.Set(tmp, x)
+						}
+
+					}
+
+					// Variadic arguments?  Then save this arg away
+					if len(variadic) > 0 {
+						lst = append(lst, x)
 					}
 				}
 
-				// Here we go round the loop again.
+				// For variadic arguments we can't set the value as we go,
+				// because we have to wait until we've collected them all.
 				//
-				// Which will execute the body of the function
-				// this time.
+				// So set them now.
+				if len(variadic) > 0 {
+					e.Set(variadic, lst)
+				}
+
+				// Here we go round the evaluation loop again.
+				//
+				// Which will execute the body of the function this time.
+				//
+				// TCO.
 				exp = proc.Body
 			}
 		}

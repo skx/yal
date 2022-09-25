@@ -113,6 +113,17 @@
 
 
 ;;
+;; Run an arbitrary series of statements, if the given condition is true.
+;;
+;; This is the more general/useful version of the "if2" macro, given above.
+;;
+;; Sample usage:
+;;
+;;  (when (= 1 1) (print "OK") (print "Still OK") (print "final statement"))
+;;
+(define when (macro (pred &rest) `(if ~pred (begin ~@rest))))
+
+;;
 ;; Part of our while-implementation.
 ;; If the specified predicate is true, then run the body.
 ;;
@@ -135,6 +146,17 @@
                            (list 'lambda '() expression)
                            (list 'lambda '() body))))
 
+
+;;
+;; cond is a useful thing to have.
+;;
+(define cond (macro (&xs)
+  (if (> (length xs) 0)
+      (list 'if (first xs)
+            (if (> (length xs) 1)
+                (nth xs 1)
+              (error "An odd number of forms to (cond..)"))
+            (cons 'cond (rest (rest xs)))))))
 
 ;; Setup a simple function to run a loop N times
 ;;
