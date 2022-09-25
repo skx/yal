@@ -33,7 +33,7 @@ Although this implementation is clearly derived from the [make a lisp](https://g
   * Via a `:type` suffix.  For example `(lambda (a:string b:number) ..`.
 * Support for macros.
   * See [mtest.lisp](mtest.lisp) for some simple tests/usage examples.
-  * The standard library uses macros, sparingly, for example to implement the `(cond)`, and `(while)` functions.
+  * The standard library uses macros to implement the `(cond)`, and `(while)` functions, for example.
 
 
 Here's an example of type-checking on a parameter value, in this case a list is required, via the `:list` suffix:
