@@ -168,23 +168,6 @@
 ;;
 
 
-;;
-;; Define a simple "unless" macro, with a mandatory case and
-;; an optional one.
-;;
-(define unless (macro (pred a &b) `(if (! ~pred) ~a ~b)))
-
-;;
-;; Use that to operate a series of expressions.
-;;
-(unless false (list
-               (print "unless-test one")
-               (print "unless-test two")
-               (print "unless-test three")))
-
-(unless true (print "FAIL") (print "OK - (unless ..) is good"))
-(unless false (print "OK - (unless ..) is good.") (print "FAIL"))
-
 
 ;;
 ;; if2 is a simple macro which allows you to run two actions if an
@@ -201,6 +184,9 @@
 ;; The downside here is that you don't get a negative branch, but running
 ;; two things is very common - see for example the "(while)" and "(repeat)"
 ;; macros in our standard library.
+;;
+;; See also "(when) in the standard-library, which allows a list of operations
+;; when a condition is true rather than two, and only two.
 ;;
 (define if2 (macro (pred one two)
   `(if ~pred (begin ~one ~two))))

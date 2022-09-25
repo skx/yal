@@ -916,18 +916,14 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 				//
 				var lst primitive.List
 
-				for _, x := range proc.Args {
-
-					// Minimum argument count is increased.
-					min++
-
-					// Is this variadic?
-					//
-					// Then save the name of the argument away.
-					//
-					if strings.HasPrefix(x.ToString(), "&") {
-						variadic = x.ToString()
-						variadic = strings.TrimPrefix(variadic, "&")
+				//
+				// Count the minimum number of arguments.
+				//
+				// A variadic argument may be nil of course.
+				//
+				for _, arg := range proc.Args {
+					if !strings.HasPrefix(arg.ToString(), "&") {
+						min++
 					}
 				}
 
@@ -953,8 +949,15 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 						// Get the parameter name
 						tmp := proc.Args[i].ToString()
 
-						// Strip off any "&" prefix
-						tmp = strings.TrimPrefix(tmp, "&")
+						// Is this variadic?
+						//
+						// Then save the name of the argument away, after removing
+						// the prefix
+						//
+						if strings.HasPrefix(tmp, "&") {
+							tmp = strings.TrimPrefix(tmp, "&")
+							variadic = tmp
+						}
 
 						// Does the argument have a trailing type?
 						if strings.Contains(tmp, ":") {
@@ -1004,7 +1007,9 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 						}
 
 						// And now set the value
-						e.Set(tmp, x)
+						if variadic == "" {
+							e.Set(tmp, x)
+						}
 
 					}
 

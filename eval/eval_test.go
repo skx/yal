@@ -193,6 +193,12 @@ a
     true     "small")`,
 			"small"},
 
+		{"(cond true 7 true 8)", "7"},
+		{"(cond false 7 true 8)", "8"},
+		{"(cond false 7 false 8 \"else\" 9)", "9"},
+		{"(cond false 7 (= 2 2) 8 \"else\" 9)", "8"},
+		{"(cond false 7 false 8 false 9)", "nil"},
+
 		// maths
 		{"(+ 3 1)", "4"},
 		{"(- 3 1)", "2"},
