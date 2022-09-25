@@ -189,6 +189,15 @@
     0
     )))
 
+
+;; Alias to (length)
+(define count (lambda (arg) (length arg)))
+
+
+;; Count the length of a string
+(define strlen (lambda (str:string) (length (split str "" ))))
+
+
 ;; Find the Nth item of a list
 (define nth (lambda (lst:list i:number)
   (if (> i (length lst))
