@@ -113,6 +113,17 @@
 
 
 ;;
+;; Run an arbitrary series of statements, if the given condition is true.
+;;
+;; This is the more general/useful version of the "if2" macro, given above.
+;;
+;; Sample usage:
+;;
+;;  (when (= 1 1) (print "OK") (print "Still OK") (print "final statement"))
+;;
+(define when (macro (pred &rest) `(if ~pred (begin ~@rest))))
+
+;;
 ;; Part of our while-implementation.
 ;; If the specified predicate is true, then run the body.
 ;;
