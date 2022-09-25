@@ -1349,6 +1349,26 @@ func TestNow(t *testing.T) {
 
 }
 
+func TestMs(t *testing.T) {
+
+	// No arguments
+	out := msFn([]primitive.Primitive{})
+
+	// Will lead to a number
+	e, ok := out.(primitive.Number)
+	if !ok {
+		t.Fatalf("expected number, got %v", out)
+	}
+
+	// Get the current time
+	tm := int(time.Now().UnixNano() / int64(time.Millisecond))
+
+	if math.Abs(float64(tm-int(e))) > 10 {
+		t.Fatalf("weird result; (ms) != ms - outside our bound of ten seconds inaccuracy")
+	}
+
+}
+
 func TestGet(t *testing.T) {
 
 	// no arguments

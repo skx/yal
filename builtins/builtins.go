@@ -86,6 +86,7 @@ func PopulateEnvironment(env *env.Environment) {
 	env.Set("error", &primitive.Procedure{F: errorFn})
 	env.Set("getenv", &primitive.Procedure{F: getenvFn})
 	env.Set("now", &primitive.Procedure{F: nowFn})
+	env.Set("ms", &primitive.Procedure{F: msFn})
 	env.Set("print", &primitive.Procedure{F: printFn})
 	env.Set("sort", &primitive.Procedure{F: sortFn})
 	env.Set("sprintf", &primitive.Procedure{F: sprintfFn})
@@ -693,8 +694,12 @@ func getenvFn(args []primitive.Primitive) primitive.Primitive {
 
 // nowFn is the implementation of `(now)`
 func nowFn(args []primitive.Primitive) primitive.Primitive {
-
 	return primitive.Number(time.Now().Unix())
+}
+
+// msFn is the implementation of `(ms)`
+func msFn(args []primitive.Primitive) primitive.Primitive {
+	return primitive.Number(time.Now().UnixNano() / int64(time.Millisecond))
 }
 
 // matchFn is the implementation of (match ..)

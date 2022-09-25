@@ -43,8 +43,9 @@
 ;; `now` function which times how long it took.
 (apply (list 1 10 100 1000 10000 100000)
        (lambda (x)
-         (let ((start (now)))
-           (print "%s! => %s [%s seconds]" x (fact x) (- (now) start)))))
+         (let ( (start (now))
+                (m     (ms)) )
+           (print "%s! => %s [%s seconds / %s ms]" x (fact x) (- (now) start) (- (ms) m) ))))
 
 
 ; Split a string into a list, reverse it, and join it
