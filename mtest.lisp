@@ -6,29 +6,11 @@
 ;;  https://lisp-journey.gitlab.io/blog/common-lisp-macros-by-example-tutorial/
 ;;
 ;;  https://lispcookbook.github.io/cl-cookbook/macros.html
+;;
 
 
-;;
-;; To implement a macro-system there are things that are required,
-;; the groundwork, such as a decent set of quote/unquote primitives.
-;;
-;; Simple tests of those here, from the MAL text.
-;;
+;; Define a simple list for testing-purposes.
 (define lst (quote (b c)))
-
-;; `(a lst d) -> (a lst d)
-(if (! (eq (str `(a lst d)) "(a lst d)"))
-    (print "Looks like our quote is broken"))
-
-;; (quasiquote (a (unquote lst) d)) -> (a (b c) d)
-(if (! (eq (str (quasiquote (a (unquote lst) d))) "(a (b c) d)"))
-    (print "Looks like our quasiquote/unquote is broken"))
-
-;; (quasiquote (a (splice-unquote lst) d)) -> (a (b c) d)
-(if (! (eq (str (quasiquote (a (splice-unquote lst) d))) "(a b c d)"))
-    (print "Looks like our quasiquote/splice-unquote is broken"))
-
-
 
 ;;
 ;; Here is our first macro, given a variable-name show both the
@@ -74,7 +56,7 @@
 ;; NOTE:  This has a short-coming, that the "e" parameter is executed
 ;;        or evaluated twice.
 ;;
-;;        We'll refine to fix this
+;;        We'll refine to fix this.
 ;;
 (define set2! (macro (v1 v2 e)
                      `(begin
@@ -218,8 +200,8 @@
 
 ;; Type of a macro is "macro"
 (define truthy (macro () true))
-(print (type truthy))
+(print "The type of a macro is (type truthy):%s" (type truthy))
 
 ;; The macro? predicate will recognize one too.
 (if (macro? truthy)
-    (print "macro? works"))
+    (print "(macro? truthy) -> true"))
