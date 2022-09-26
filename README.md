@@ -11,6 +11,7 @@
 * [Fuzz Testing](#fuzz-testing)
 * [Benchmark](#benchmark)
 * [References](#references)
+* [See Also](#see-also)
 
 
 # yet another lisp
@@ -255,3 +256,15 @@ For longer runs add `-benchtime=30s`, or similar, to the command-line.
   * The Common Lisp Cookbook – Macros
 * http://soft.vub.ac.be/~pcostanz/documents/08/macros.pdf
   * The source of the cute "while" macro, and a good read beyond that.
+
+
+## See Also
+
+This repository was put together after [experimenting with a scripting language](https://github.com/skx/monkey/), an [evaluation engine](https://github.com/skx/evalfilter/), putting together a [TCL-like scripting language](https://github.com/skx/critical), writing a [BASIC interpreter](https://github.com/skx/gobasic) and creating [tutorial-style FORTH interpreter](https://github.com/skx/foth).
+
+I've also played around with a couple of compilers which might be interesting to refer to:
+
+* Brainfuck compiler:
+  * [https://github.com/skx/bfcc/](https://github.com/skx/bfcc/)
+* A math-compiler:
+  * [https://github.com/skx/math-compiler](https://github.com/skx/math-compiler)
