@@ -5,6 +5,7 @@
 * [yet another lisp](#yet-another-lisp)
 * [Special Features](#special-features)
 * [Building / Installing](#building--installing)
+* [Usage](#usage)
 * [Examples](#examples)
 * [Features](#features)
 * [Omissions](#omissions)
@@ -83,11 +84,16 @@ If you don't have the repository installed, but you have a working golang enviro
 $ go install github.com/skx/yal@latest
 ```
 
-Once installed you can execute a file containing your lisp like so:
 
-```sh
-$ yal test.lisp
-```
+
+## Usage
+
+Once you've built, and optinall installed, the CLI driver there are two ways to execute code:
+
+* By specifying sexpressions on the command-line.
+  * `yal -e "(print (os))"`
+* By passing the name of a file to read adn execute.
+  * `yal test.lisp`
 
 
 
