@@ -1349,6 +1349,39 @@ func TestNow(t *testing.T) {
 
 }
 
+
+func TestArch(t *testing.T) {
+
+	// No arguments
+	out := archFn([]primitive.Primitive{})
+
+	// Will lead to a number
+	e, ok := out.(primitive.String)
+	if !ok {
+		t.Fatalf("expected string, got %v", out)
+	}
+
+	if e.ToString() != runtime.GOARCH {
+		t.Fatalf("got wrong value for runtime architecture")
+	}
+}
+
+func TestOs(t *testing.T) {
+
+	// No arguments
+	out := osFn([]primitive.Primitive{})
+
+	// Will lead to a number
+	e, ok := out.(primitive.String)
+	if !ok {
+		t.Fatalf("expected string, got %v", out)
+	}
+
+	if e.ToString() != runtime.GOOS {
+		t.Fatalf("got wrong value for runtime OS")
+	}
+}
+
 func TestMs(t *testing.T) {
 
 	// No arguments

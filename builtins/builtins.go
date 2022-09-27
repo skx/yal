@@ -14,6 +14,7 @@ import (
 	"math"
 	"os"
 	"regexp"
+	"runtime"
 	"sort"
 	"strconv"
 	"strings"
@@ -83,20 +84,22 @@ func PopulateEnvironment(env *env.Environment) {
 	env.Set("set", &primitive.Procedure{F: setFn})
 
 	// core
+	env.Set("arch", &primitive.Procedure{F: archFn})
 	env.Set("error", &primitive.Procedure{F: errorFn})
 	env.Set("getenv", &primitive.Procedure{F: getenvFn})
-	env.Set("now", &primitive.Procedure{F: nowFn})
 	env.Set("ms", &primitive.Procedure{F: msFn})
+	env.Set("now", &primitive.Procedure{F: nowFn})
+	env.Set("os", &primitive.Procedure{F: osFn})
 	env.Set("print", &primitive.Procedure{F: printFn})
 	env.Set("sort", &primitive.Procedure{F: sortFn})
 	env.Set("sprintf", &primitive.Procedure{F: sprintfFn})
 
 	// string
-	env.Set("match", &primitive.Procedure{F: matchFn})
-	env.Set("str", &primitive.Procedure{F: strFn})
-	env.Set("split", &primitive.Procedure{F: splitFn})
-	env.Set("ord", &primitive.Procedure{F: ordFn})
 	env.Set("chr", &primitive.Procedure{F: chrFn})
+	env.Set("match", &primitive.Procedure{F: matchFn})
+	env.Set("ord", &primitive.Procedure{F: ordFn})
+	env.Set("split", &primitive.Procedure{F: splitFn})
+	env.Set("str", &primitive.Procedure{F: strFn})
 }
 
 // Convert a string such as "steve\tkemp" into "steve<TAB>kemp"
@@ -451,6 +454,17 @@ func consFn(args []primitive.Primitive) primitive.Primitive {
 	}
 	return primitive.List{args[0], args[1]}
 }
+
+// osFn implements (os)
+func osFn(args []primitive.Primitive) primitive.Primitive {
+	return primitive.String(runtime.GOOS)
+}
+
+// archFn implements (os)
+func archFn(args []primitive.Primitive) primitive.Primitive {
+	return primitive.String(runtime.GOARCH)
+}
+
 
 // printFn implements (print).
 func printFn(args []primitive.Primitive) primitive.Primitive {

@@ -168,7 +168,7 @@ We have a reasonable number of functions implemented, either in our golang core 
 * Comparison functions:
   * `<`, `<=`, `>`, `>=`, `=`, & `eq`.
 * Misc features:
-  * `getenv`, `str`, `print`, & `type`
+  * `arch`, `getenv`, `os`, `print`, `str` & `type`
 * Special forms:
   * `begin`, `define`, `env`, `eval`, `gensym`, `if`, `lambda`, `let`, `macroexpand`, `read`, `set!`, `quote`, & `quasiquote`.
 * Error handling:
