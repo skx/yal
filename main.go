@@ -8,6 +8,7 @@
 package main
 
 import (
+	"flag"
 	"fmt"
 	"os"
 
@@ -20,27 +21,42 @@ import (
 
 func main() {
 
+	// Look to see if we're gonna execute a statement
+	exp := flag.String("e", "", "A string to evaluate.")
+	flag.Parse()
+
 	// Ensure we have an argument
-	if len(os.Args) < 2 {
-		fmt.Printf("Usage: yal file.lisp\n")
+	if len (flag.Args()) != 1 && ( *exp == "" ) {
+		fmt.Printf("Usage: yal [-e expr] file.lisp\n")
 		return
 	}
 
-	// Read the specified file.
-	content, err := os.ReadFile(os.Args[1])
-	if err != nil {
-		fmt.Printf("Error reading %s:%s\n", os.Args[1], err)
-		return
+	// Source we'll execute, either from the CLI, or a file
+	src := ""
+
+	if *exp != "" {
+		src = *exp
+	}
+
+	// If we have a file, then read the content
+	if (len(flag.Args() ) > 0) {
+		content, err := os.ReadFile(flag.Args()[0])
+		if err != nil {
+			fmt.Printf("Error reading %s:%s\n", os.Args[1], err)
+			return
+		}
+
+		src = string(content)
 	}
 
 	// Create a new environment
 	environment := env.New()
 
 	// If we got any command-line arguments then save them
-	if len(os.Args) > 2 {
+	if len(flag.Args()) > 0 {
 
 		x := primitive.List{}
-		for _, arg := range os.Args[2:] {
+		for _, arg := range flag.Args() {
 			x = append(x, primitive.String(arg))
 		}
 
@@ -57,7 +73,7 @@ func main() {
 	pre := stdlib.Contents()
 
 	// Prepend that to the users' script
-	src := string(pre) + "\n" + string(content)
+	src = string(pre) + "\n" + src
 
 	// Create a new interpreter with that source
 	interpreter := eval.New(src)
