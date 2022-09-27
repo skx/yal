@@ -445,7 +445,7 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 		// Behaviour depends on the type of the primitive/expression
 		// we've been given to execute.
 		//
-		switch exp.(type) {
+		switch obj := exp.(type) {
 
 		// Numbers return themselves
 		case primitive.Number:
@@ -459,9 +459,18 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 		case primitive.String:
 			return exp
 
-		// Hashes return themselves
+		// Hashes return themselves, but the values should be
+		// evaluated - see #8.
 		case primitive.Hash:
-			return exp
+			ret := primitive.NewHash()
+
+			for x, y := range obj.Entries {
+
+				val := ev.eval(y, e, expandMacro)
+
+				ret.Set(x, val)
+			}
+			return ret
 
 		// Nil returns itself
 		case primitive.Nil:
