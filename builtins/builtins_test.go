@@ -3,6 +3,7 @@ package builtins
 import (
 	"math"
 	"os"
+	"runtime"
 	"strings"
 	"testing"
 	"time"
