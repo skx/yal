@@ -12,4 +12,8 @@
 (print "Args: %s" os.args)
 
 ;; And followup with the username
-(print "User: %s" (getenv "USER"))
+(print "The current user is %s, running on %s (arch:%s)"
+       (getenv "USER")
+       (os)
+       (arch)
+       )
