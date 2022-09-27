@@ -762,10 +762,10 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 				}
 
 				// first expression is what to execute: a list
-				exp := listExp[1]
+				expr := listExp[1]
 
 				// Cast the argument to a list
-				expLst, ok1 := exp.(primitive.List)
+				expLst, ok1 := expr.(primitive.List)
 				if !ok1 {
 					return primitive.Error(fmt.Sprintf("expected a list for argument, got %v", listExp[1]))
 				}
