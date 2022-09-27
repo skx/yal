@@ -26,7 +26,7 @@ func main() {
 	flag.Parse()
 
 	// Ensure we have an argument
-	if len (flag.Args()) != 1 && ( *exp == "" ) {
+	if len (flag.Args()) < 1 && ( *exp == "" ) {
 		fmt.Printf("Usage: yal [-e expr] file.lisp\n")
 		return
 	}
