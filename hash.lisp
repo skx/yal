@@ -4,7 +4,7 @@
 
 ;; Create a hash, with some details
 (set! person { :name "Steve"
-      :age 46
+      :age (- 2022 1976)
       :location "Helsinki"
       })
 

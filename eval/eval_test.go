@@ -80,6 +80,7 @@ func TestEvaluate(t *testing.T) {
 		// hashes
 		{"{:age 34}", "{\n\t:age => 34\n}"},
 		{"(get {:age 34, :alive true} :alive)", "#t"},
+		{"{:age (+ 3 1)}", "{\n\t:age => 4\n}"},
 
 		// if
 		{"(if true true false)", "#t"},
