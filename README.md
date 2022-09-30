@@ -180,6 +180,11 @@ We have a reasonable number of functions implemented, either in our golang core 
 * Error handling:
   * `error`, `try`, and `catch` - as demonstrated in [try.lisp](try.lisp).
 * Tail recursion optimization.
+* MAL compatability:
+  * `fn*` can be used as a synonym for `lambda`.
+  * `def!` can be used as a synonym for `define`.
+  * `defmacro!` is used to define macros.
+
 
 Building upon those primitives we have a larger standard-library of functions written in Lisp such as:
 

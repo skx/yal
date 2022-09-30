@@ -606,7 +606,7 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 				}
 
 			// (define
-			case primitive.Symbol("define"):
+			case primitive.Symbol("define"), primitive.Symbol("def!"):
 				if len(listExp) < 3 {
 					return primitive.Error("arity-error: not enough arguments for (define ..)")
 				}
@@ -618,6 +618,31 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 					return primitive.Nil{}
 				}
 				return primitive.Error(fmt.Sprintf("Expected a symbol, got %v", listExp[1]))
+
+			// (defmacro!
+			case primitive.Symbol("defmacro!"):
+				if len(listExp) < 3 {
+					return primitive.Error("arity-error: not enough arguments for (defmacro! ..)")
+				}
+
+				// name of macro
+				symb, ok := listExp[1].(primitive.Symbol)
+				if !ok {
+					return primitive.Error(fmt.Sprintf("Expected a symbol, got %v", listExp[1]))
+				}
+
+				// macro body
+				val := ev.eval(listExp[2], e, expandMacro)
+
+				mac, ok2 := val.(*primitive.Procedure)
+				if !ok2 {
+					return primitive.Error(fmt.Sprintf("expected a function body for (defmacro..), got %v", val))
+				}
+
+				// this is now a macro
+				mac.Macro = true
+				e.Set(string(symb), mac)
+				return primitive.Nil{}
 
 			// (set!
 			case primitive.Symbol("set!"):
@@ -812,7 +837,7 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 				return ev.eval(blkLst[2], tmpEnv, expandMacro)
 
 			// (lambda
-			case primitive.Symbol("lambda"), primitive.Symbol("macro"):
+			case primitive.Symbol("lambda"), primitive.Symbol("fn*"):
 
 				// ensure we have arguments
 				if len(listExp) < 3 {
@@ -836,17 +861,16 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 					args = append(args, xs)
 				}
 
-				// Macro?
-				macro := false
-				if listExp[0].ToString() == "macro" {
-					macro = true
-				}
-
+				// This is a procedure, which will default
+				// to not being a macro.
+				//
+				// To make it a macro it should be set with
+				// "(defmacro!..)"
 				return &primitive.Procedure{
 					Args:  args,
 					Body:  listExp[2],
 					Env:   e,
-					Macro: macro,
+					Macro: false,
 				}
 
 			// Anything else is either a built-in function,

@@ -74,8 +74,8 @@
 (define dec  (lambda (n:number) (- n 1)))
 
 ;; We could also define the incr/decr operations as macros.
-(define incr (macro (x) `(set! ~x (+ ~x 1))))
-(define decr (macro (x) `(set! ~x (- ~x 1))))
+(defmacro! incr (fn* (x) `(set! ~x (+ ~x 1))))
+(defmacro! decr (fn* (x) `(set! ~x (- ~x 1))))
 
 ;; Not is useful
 (define !     (lambda (x) (if x #f #t)))
@@ -108,7 +108,7 @@
 ;; two things is very common - see for example the "(while)" and "(repeat)"
 ;; macros later in this file.
 ;;
-(define if2 (macro (pred one two)
+(defmacro! if2 (fn* (pred one two)
   `(if ~pred (begin ~one ~two))))
 
 
@@ -121,7 +121,7 @@
 ;;
 ;;  (when (= 1 1) (print "OK") (print "Still OK") (print "final statement"))
 ;;
-(define when (macro (pred &rest) `(if ~pred (begin ~@rest))))
+(defmacro! when (fn* (pred &rest) `(if ~pred (begin ~@rest))))
 
 ;;
 ;; Part of our while-implementation.
@@ -141,7 +141,7 @@
 ;;
 ;; NOTE: We use "if2" not "if".
 ;;
-(define while (macro (expression body)
+(defmacro! while (fn* (expression body)
                      (list 'while-fun
                            (list 'lambda '() expression)
                            (list 'lambda '() body))))
@@ -150,7 +150,7 @@
 ;;
 ;; cond is a useful thing to have.
 ;;
-(define cond (macro (&xs)
+(defmacro! cond (fn* (&xs)
   (if (> (length xs) 0)
       (list 'if (first xs)
             (if (> (length xs) 1)
