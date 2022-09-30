@@ -273,6 +273,10 @@ a
 `, "ERROR{attempted division by zero}"},
 		{"(error \"CAKE-FAIL\")", "ERROR{CAKE-FAIL}"},
 
+		{"(defmacro!)", "ERROR{arity-error: not enough arguments for (defmacro! ..)}"},
+		{"(defmacro! 1 2)", "ERROR{Expected a symbol, got 1}"},
+		{"(defmacro! foo 2)", "ERROR{expected a function body for (defmacro..), got 2}"},
+
 		{"(read foo bar)", "ERROR{Expected only a single argument}"},
 		{"(read \")\")", "ERROR{failed to read ):unexpected ')'}"},
 		{"(read \"}\")", "ERROR{failed to read }:unexpected '}'}"},

@@ -861,17 +861,16 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 					args = append(args, xs)
 				}
 
-				// Macro?
-				macro := false
-				if listExp[0].ToString() == "macro" {
-					macro = true
-				}
-
+				// This is a procedure, which will default
+				// to not being a macro.
+				//
+				// To make it a macro it should be set with
+				// "(defmacro!..)"
 				return &primitive.Procedure{
 					Args:  args,
 					Body:  listExp[2],
 					Env:   e,
-					Macro: macro,
+					Macro: false,
 				}
 
 			// Anything else is either a built-in function,
