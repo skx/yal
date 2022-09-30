@@ -17,7 +17,7 @@
 
 # yet another lisp
 
-Another trivial/toy Lisp implementation in Go - there is obviously a lot of MAL-history here, and so you should expect that most things will work in a similar fashion.
+Another trivial/toy Lisp implementation in Go.
 
 
 ## Special Features
