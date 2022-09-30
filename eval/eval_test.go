@@ -89,7 +89,7 @@ func TestEvaluate(t *testing.T) {
 		{"(if false false)", "nil"},
 
 		// macroexpand - args are not evaluated
-		{`(define foo (macro (x) x)) (macroexpand (foo (+ 1 2)))`, "(+ 1 2)"},
+		{`(defmacro! foo (fn* (x) x)) (macroexpand (foo (+ 1 2)))`, "(+ 1 2)"},
 		// quote
 		{`(define lst (quote (b c)))
                   '(a lst d)`, "(a lst d)"},
@@ -105,7 +105,7 @@ func TestEvaluate(t *testing.T) {
 			"(a b c d)"},
 
 		// expand a macro
-		{`(define steve (macro () "steve"))
+		{`(defmacro! steve (fn* () "steve"))
                   (macroexpand (steve))`,
 			"steve"},
 

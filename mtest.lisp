@@ -16,7 +16,7 @@
 ;; Here is our first macro, given a variable-name show both the
 ;; name and the current value.
 ;;
-(define debug (macro (x) `(print "Variable '%s' has value %s" '~x ~x)))
+(defmacro! debug (fn* (x) `(print "Variable '%s' has value %s" '~x ~x)))
 (debug lst)
 
 ;;
@@ -26,7 +26,7 @@
 ;; we both evaluate it, and show it literally (in the case where things
 ;; failed).
 ;;
-(define assert (macro (exp)
+(defmacro! assert (fn* (exp)
                       `(if ~exp
                          ()
                            (print "Assertion failed: %s" `~exp))))
@@ -58,7 +58,7 @@
 ;;
 ;;        We'll refine to fix this.
 ;;
-(define set2! (macro (v1 v2 e)
+(defmacro! set2! (fn* (v1 v2 e)
                      `(begin
                        (set! ~v1 ~e)
                        (set! ~v2 ~e))))
@@ -80,7 +80,7 @@
 ;;       The "(set!..)" calls operate in a new scope.  So they can't modify
 ;;       the global environment.
 ;;
-(define set2! (macro (v1 v2 e)
+(defmacro! set2! (fn* (v1 v2 e)
                      (let ((tmp (gensym)))
                        `(begin (let ((~tmp ~e))
                            (set! ~v1 ~tmp)
@@ -94,7 +94,7 @@
 ;; The difference here is we use the three-argument form of the (set!..)
 ;; form, to update the global/parent scope.
 ;;
-(define set2! (macro (v1 v2 e)
+(defmacro! set2! (fn* (v1 v2 e)
                      (let ((tmp (gensym)))
                        `(begin (let ((~tmp ~e))
                            (set! ~v1 ~tmp true)
@@ -170,14 +170,14 @@
 ;; See also "(when) in the standard-library, which allows a list of operations
 ;; when a condition is true rather than two, and only two.
 ;;
-(define if2 (macro (pred one two)
+(defmacro! if2 (fn* (pred one two)
   `(if ~pred (begin ~one ~two))))
 
 
 ;;
 ;; Increment the given variable by one.
 ;;
-(define incr (macro (x) `(set! ~x (+ ~x 1))))
+(defmacro! incr (fn* (x) `(set! ~x (+ ~x 1))))
 
 ;;
 ;; Show macro expansion
@@ -199,7 +199,7 @@
 
 
 ;; Type of a macro is "macro"
-(define truthy (macro () true))
+(defmacro! truthy (fn* () true))
 (print "The type of a macro is (type truthy):%s" (type truthy))
 
 ;; The macro? predicate will recognize one too.

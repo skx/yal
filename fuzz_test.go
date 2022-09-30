@@ -93,7 +93,7 @@ func FuzzYAL(f *testing.F) {
 
 	// Macros
 	f.Add([]byte(`
-(define unless (macro (pred a &b) ` + "`" + `(if (! ~pred) ~a ~b)))
+(defmacro! unless (fn* (pred a &b) ` + "`" + `(if (! ~pred) ~a ~b)))
 (unless false (print "OK")
 `))
 
