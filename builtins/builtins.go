@@ -93,6 +93,7 @@ func PopulateEnvironment(env *env.Environment) {
 	env.Set("print", &primitive.Procedure{F: printFn})
 	env.Set("sort", &primitive.Procedure{F: sortFn})
 	env.Set("sprintf", &primitive.Procedure{F: sprintfFn})
+	env.Set("slurp", &primitive.Procedure{F: slurpFn})
 
 	// string
 	env.Set("chr", &primitive.Procedure{F: chrFn})
@@ -413,6 +414,20 @@ func typeFn(args []primitive.Primitive) primitive.Primitive {
 	return primitive.String(args[0].Type())
 }
 
+// slurpFn returns the contents of the specified file
+func slurpFn(args []primitive.Primitive) primitive.Primitive {
+	if len(args) != 1 {
+		return primitive.Error("wrong number of arguments")
+	}
+
+	fName := args[0].ToString()
+	data, err := os.ReadFile(fName)
+	if err != nil {
+		return primitive.Error(fmt.Sprintf("error reading %s %s", fName, err))
+	}
+	return primitive.String(string(data))
+}
+
 // strFn implements "str"
 func strFn(args []primitive.Primitive) primitive.Primitive {
 	return primitive.String(args[0].ToString())
@@ -464,7 +479,6 @@ func osFn(args []primitive.Primitive) primitive.Primitive {
 func archFn(args []primitive.Primitive) primitive.Primitive {
 	return primitive.String(runtime.GOARCH)
 }
-
 
 // printFn implements (print).
 func printFn(args []primitive.Primitive) primitive.Primitive {
