@@ -86,6 +86,11 @@
 (define even? (lambda (n) (zero? (% n 2))))
 (define odd?  (lambda (n) (! (even? n))))
 
+;;
+;; is the given argument "true", or "false"?
+;;
+(def! true?  (fn* (arg) (if (eq #t arg) true false)))
+(def! false? (fn* (arg) (if (eq #f arg) true false)))
 
 ;; Square root
 (define sqrt (lambda (x:number) (# x 0.5)))
