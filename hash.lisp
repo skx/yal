@@ -8,6 +8,8 @@
       :location "Helsinki"
       })
 
+(print "Keys of person: %s" (keys person))
+(print "Values of person: %s" (vals person))
 
 ;; This function is used as a callback by apply-hash.
 (define hash-element (lambda (key val)

@@ -82,6 +82,7 @@ func PopulateEnvironment(env *env.Environment) {
 	env.Set("get", &primitive.Procedure{F: getFn})
 	env.Set("keys", &primitive.Procedure{F: keysFn})
 	env.Set("set", &primitive.Procedure{F: setFn})
+	env.Set("vals", &primitive.Procedure{F: valsFn})
 
 	// core
 	env.Set("arch", &primitive.Procedure{F: archFn})
@@ -679,6 +680,44 @@ func keysFn(args []primitive.Primitive) primitive.Primitive {
 	// Now append
 	for _, x := range keys {
 		c = append(c, primitive.String(x))
+	}
+
+	return c
+}
+
+// valsFn is the implementation of `(vals hash)`
+func valsFn(args []primitive.Primitive) primitive.Primitive {
+
+	// We need a single argument
+	if len(args) != 1 {
+		return primitive.Error("invalid argument count")
+	}
+
+	// First is a Hash
+	if _, ok := args[0].(primitive.Hash); !ok {
+		return primitive.Error("argument not a hash")
+	}
+
+	// Create the list to hold the result
+	var c primitive.List
+
+	// Cast the argument
+	tmp := args[0].(primitive.Hash)
+
+	// Get the keys as a list
+	keys := []string{}
+
+	// Add the keys
+	for x := range tmp.Entries {
+		keys = append(keys, x)
+	}
+
+	// Sort the list
+	sort.Strings(keys)
+
+	// Now append the value
+	for _, x := range keys {
+		c = append(c, tmp.Entries[x])
 	}
 
 	return c

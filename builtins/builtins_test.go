@@ -1533,7 +1533,7 @@ func TestKeys(t *testing.T) {
 		h,
 	})
 
-	// Will lead to a string
+	// Will lead to a list
 	_, ok2 := res.(primitive.List)
 	if !ok2 {
 		t.Fatalf("expected list, got %v", res)
@@ -1551,6 +1551,67 @@ func TestKeys(t *testing.T) {
 		t.Fatalf("not a sorted list?")
 	}
 	if lst[3].ToString() != "XXX" {
+		t.Fatalf("not a sorted list?")
+	}
+}
+
+func TestVals(t *testing.T) {
+
+	// no arguments
+	out := valsFn([]primitive.Primitive{})
+
+	// Will lead to an error
+	e, ok := out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if !strings.Contains(string(e), "argument") {
+		t.Fatalf("got error, but wrong one")
+	}
+
+	// First argument must be a hash
+	out = valsFn([]primitive.Primitive{
+		primitive.String("foo"),
+	})
+
+	// Will lead to an error
+	e, ok = out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if !strings.Contains(string(e), "not a hash") {
+		t.Fatalf("got error, but wrong one %v", out)
+	}
+
+	// create a hash
+	h := primitive.NewHash()
+	h.Set("XXX", primitive.String("Last"))
+	h.Set("Name", primitive.String("Steve"))
+	h.Set("Age", primitive.Number(43))
+	h.Set("Location", primitive.String("Helsinki"))
+
+	// Get the values
+	res := valsFn([]primitive.Primitive{
+		h,
+	})
+
+	// Will lead to a list
+	_, ok2 := res.(primitive.List)
+	if !ok2 {
+		t.Fatalf("expected list, got %v", res)
+	}
+
+	lst := res.(primitive.List)
+	if lst[0].ToString() != "43" {
+		t.Fatalf("not a sorted list?")
+	}
+	if lst[1].ToString() != "Helsinki" {
+		t.Fatalf("not a sorted list?")
+	}
+	if lst[2].ToString() != "Steve" {
+		t.Fatalf("not a sorted list?")
+	}
+	if lst[3].ToString() != "Last" {
 		t.Fatalf("not a sorted list?")
 	}
 }
