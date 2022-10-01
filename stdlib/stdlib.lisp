@@ -373,3 +373,10 @@
   (if (nil? seq1)
       seq2
       (cons (car seq1) (concat (cdr seq1) seq2)))))
+
+
+;;
+;; Read a file
+;;
+(def! load-file (fn* (f)
+                     (eval (join (list "(do " (slurp f) "\nnil)")))))
