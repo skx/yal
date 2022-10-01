@@ -845,6 +845,46 @@ func TestStr(t *testing.T) {
 	}
 }
 
+func TestSlurp(t *testing.T) {
+
+	// calling with no argument
+	out := slurpFn([]primitive.Primitive{})
+
+	// Will lead to an error
+	_, ok := out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+
+	// Call with a file that doesn't exist
+	out = slurpFn([]primitive.Primitive{
+		primitive.String("path/not/found")})
+
+	_, ok = out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+
+	// Create a temporary file, and read the contents
+	tmp, _ := os.CreateTemp("", "yal")
+	os.WriteFile(tmp.Name(), []byte("I like cake"), 0777)
+	defer os.Remove(tmp.Name())
+
+	str := slurpFn([]primitive.Primitive{
+		primitive.String(tmp.Name())})
+
+	// Will lead to an error
+	txt, ok2 := str.(primitive.String)
+	if !ok2 {
+		t.Fatalf("expected string, got %v", out)
+	}
+
+	if txt.ToString() != "I like cake" {
+		t.Fatalf("re-reading the temporary file gave bogus contents")
+	}
+
+}
+
 func TestType(t *testing.T) {
 
 	// No arguments
@@ -1349,7 +1389,6 @@ func TestNow(t *testing.T) {
 	}
 
 }
-
 
 func TestArch(t *testing.T) {
 
