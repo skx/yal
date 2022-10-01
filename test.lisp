@@ -24,7 +24,7 @@
 ;; Use our "while" function, from the standard library, to run a block
 ;; of code N/5 times.
 ;;
-(let ((a 5))
+(let* (a 5)
   (while (> a 0)
     (begin
      (print "(while) loop - iteration %s" a)
@@ -43,25 +43,23 @@
 ;; `now` function which times how long it took.
 (apply (list 1 10 100 1000 10000 100000)
        (lambda (x)
-         (let ( (start (now))
-                (m     (ms)) )
+         (let* ( start (now)
+                 m     (ms))
            (print "%s! => %s [%s seconds / %s ms]" x (fact x) (- (now) start) (- (ms) m) ))))
 
 
 ; Split a string into a list, reverse it, and join it
-(let ((input "Steve Kemp"))
-  (begin
+(let* (input "Steve Kemp")
    (print "Starting string: %s" input)
-   (print "Reversed string: %s" (join (reverse (split "Steve Kemp" ""))))))
+   (print "Reversed string: %s" (join (reverse (split "Steve Kemp" "")))))
 
 
 ;; Define a variable "foo => 0"
 ;; but then change it, and show that result
-(let ((foo 0))
-   (begin
-      (print "foo is set to %s" foo)
-      (set! foo 3)
-      (print "foo is now set to %s" foo)))
+(let* (foo 0)
+  (print "foo is set to %s" foo)
+  (set! foo 3)
+  (print "foo is now set to %s" foo))
 
 ;;Now we're outside the scope of the `let` so `foo` is nil
 (if foo
@@ -111,16 +109,14 @@
 ;;
 ;; Setup a list of integers, and do a few things with it.
 ;;
-(let ((vals '(32 92 109 903 31 3 -93 -31 -17 -3)))
-  (begin
-     (print "Working with the list: %s " vals)
-     (print "\tBiggest item is %s"       (max vals))
-     (print "\tSmallest item is %s"      (min vals))
-     (print "\tReversed list is %s "     (reverse vals))
-     (print "\tSorted list is %s "       (sort vals))
-     (print "\tFirst item is %s "        (first vals))
-     (print "\tRemaining items %s "      (rest vals))
-   ))
+(let* (vals '(32 92 109 903 31 3 -93 -31 -17 -3))
+  (print "Working with the list: %s " vals)
+  (print "\tBiggest item is %s"       (max vals))
+  (print "\tSmallest item is %s"      (min vals))
+  (print "\tReversed list is %s "     (reverse vals))
+  (print "\tSorted list is %s "       (sort vals))
+  (print "\tFirst item is %s "        (first vals))
+  (print "\tRemaining items %s "      (rest vals)))
 
 
 ;;

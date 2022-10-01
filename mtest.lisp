@@ -81,8 +81,8 @@
 ;;       the global environment.
 ;;
 (defmacro! set2! (fn* (v1 v2 e)
-                     (let ((tmp (gensym)))
-                       `(begin (let ((~tmp ~e))
+                     (let* (tmp (gensym))
+                       `(begin (let* (~tmp ~e)
                            (set! ~v1 ~tmp)
                            (set! ~v2 ~tmp))))))
 
@@ -95,8 +95,8 @@
 ;; form, to update the global/parent scope.
 ;;
 (defmacro! set2! (fn* (v1 v2 e)
-                     (let ((tmp (gensym)))
-                       `(begin (let ((~tmp ~e))
+                     (let* (tmp (gensym))
+                       `(begin (let* (~tmp ~e)
                            (set! ~v1 ~tmp true)
                            (set! ~v2 ~tmp true))))))
 
