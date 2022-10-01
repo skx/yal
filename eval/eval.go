@@ -720,7 +720,7 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 						return primitive.Error("arity-error: binding list had missing arguments")
 					}
 					// get the value
-					bindingVal := ev.eval(bl[1], e, expandMacro)
+					bindingVal := ev.eval(bl[1], newEnv, expandMacro)
 
 					// The thing to set
 					set, ok2 := bl[0].(primitive.Symbol)

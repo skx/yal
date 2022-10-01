@@ -125,6 +125,7 @@ func TestEvaluate(t *testing.T) {
 		{"(let ((a 5) (b 6)) a (* a b))", "30"},
 		{"(let ((a 5)) (set! a 44) a)", "44"},
 		{"(let ((a 5)) c)", "nil"},
+		{"(let ((a 3) (b (+ a 3))) b))", "6"},
 
 		// let*
 		{"(let* (z 9) z)", "9"},
