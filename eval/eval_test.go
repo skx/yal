@@ -126,6 +126,13 @@ func TestEvaluate(t *testing.T) {
 		{"(let ((a 5)) (set! a 44) a)", "44"},
 		{"(let ((a 5)) c)", "nil"},
 
+		// let*
+		{"(let* (z 9) z)", "9"},
+		{"(let* (x 9) x)", "9"},
+		{"(let* (z (+ 2 3)) (+ 1 z))", "6"},
+		{"(let* (p (+ 2 3) q (+ 2 p)) (+ p q))", "12"},
+		{"(def! y (let* (z 7) z)) y", "7"},
+
 		// (set!) inside (let) will only modify the local scope
 		{`
 (set! a 3)
@@ -248,6 +255,12 @@ a
 		{"(let ((0 0)) )", "ERROR{binding name is not a symbol, got 0}"},
 		{"(let ((0 )) )", "ERROR{arity-error: binding list had missing arguments}"},
 		{"(let (3 3) )", "ERROR{binding value is not a list, got 3}"},
+
+		{"(let*)", "ERROR{arity-error: not enough arguments for (let* ..)}"},
+		{"(let* 32)", "ERROR{argument is not a list, got 32}"},
+		{"(let* (a 3 b))", "ERROR{list for (len*) must have even length, got [a 3 b]}"},
+		{"(let* (a 3 3 b))", "ERROR{binding name is not a symbol, got 3}"},
+
 		{"(error )", "ERROR{arity-error: not enough arguments for (error}"},
 		{"(quote )", "ERROR{arity-error: not enough arguments for (quote}"},
 		{"(quasiquote )", "ERROR{arity-error: not enough arguments for (quasiquote}"},

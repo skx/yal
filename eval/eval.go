@@ -742,6 +742,54 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 				}
 				return ret
 
+			// (let*
+			case primitive.Symbol("let*"):
+				// let should have two entries
+
+				if len(listExp) < 2 {
+					return primitive.Error("arity-error: not enough arguments for (let* ..)")
+				}
+
+				newEnv := env.NewEnvironment(e)
+				bindingsList, ok := listExp[1].(primitive.List)
+				if !ok {
+					return primitive.Error(fmt.Sprintf("argument is not a list, got %v", listExp[1]))
+				}
+
+				// Length of binding must be %2
+				if len(bindingsList)%2 != 0 {
+					return primitive.Error(fmt.Sprintf("list for (len*) must have even length, got %v", bindingsList))
+				}
+
+				for i := 0; i < len(bindingsList); i += 2 {
+
+					// The key/val pair we're working with
+					key := bindingsList[i]
+					val := bindingsList[i+1]
+
+					// evaluate the value - use the new environment.
+					eVal := ev.eval(val, newEnv, expandMacro)
+
+					// The thing to set
+					eKey, ok := key.(primitive.Symbol)
+					if !ok {
+						return primitive.Error(fmt.Sprintf("binding name is not a symbol, got %v", key))
+					}
+
+					// Finally set the parameter
+					newEnv.Set(string(eKey), eVal)
+				}
+
+				// Now we've populated the new
+				// environment with the pairs we received
+				// in the setup phase we can execute
+				// the body.
+				var ret primitive.Primitive
+				for _, x := range listExp[2:] {
+					ret = ev.eval(x, newEnv, expandMacro)
+				}
+				return ret
+
 			// (env
 			case primitive.Symbol("env"):
 
