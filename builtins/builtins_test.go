@@ -867,7 +867,10 @@ func TestSlurp(t *testing.T) {
 
 	// Create a temporary file, and read the contents
 	tmp, _ := os.CreateTemp("", "yal")
-	os.WriteFile(tmp.Name(), []byte("I like cake"), 0777)
+	err := os.WriteFile(tmp.Name(), []byte("I like cake"), 0777)
+	if err != nil {
+		t.Fatalf("failed to write to file")
+	}
 	defer os.Remove(tmp.Name())
 
 	str := slurpFn([]primitive.Primitive{
