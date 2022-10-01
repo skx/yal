@@ -79,6 +79,7 @@ func PopulateEnvironment(env *env.Environment) {
 	env.Set("list", &primitive.Procedure{F: listFn})
 
 	// Hash
+	env.Set("contains?", &primitive.Procedure{F: containsFn})
 	env.Set("get", &primitive.Procedure{F: getFn})
 	env.Set("keys", &primitive.Procedure{F: keysFn})
 	env.Set("set", &primitive.Procedure{F: setFn})
@@ -721,6 +722,35 @@ func valsFn(args []primitive.Primitive) primitive.Primitive {
 	}
 
 	return c
+}
+
+// containsFn implements (contains?)
+func containsFn(args []primitive.Primitive) primitive.Primitive {
+
+	// We need a pair of arguments
+	if len(args) != 2 {
+		return primitive.Error("invalid argument count")
+	}
+
+	// First is a Hash
+	hsh, ok := args[0].(primitive.Hash)
+	if !ok {
+		return primitive.Error("argument not a hash")
+	}
+
+	// The second should be a string, but other things can be converted
+	str, ok := args[1].(primitive.String)
+	if !ok {
+		str = primitive.String(args[1].ToString())
+	}
+
+	_, found := hsh.Entries[str.ToString()]
+	if found {
+		return primitive.Bool(true)
+	}
+
+	return primitive.Bool(false)
+
 }
 
 // setFn is the implementation of `(set hash key val)`

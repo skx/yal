@@ -1496,6 +1496,88 @@ func TestGet(t *testing.T) {
 	}
 }
 
+func TestContains(t *testing.T) {
+
+	// no arguments
+	out := containsFn([]primitive.Primitive{})
+
+	// Will lead to an error
+	e, ok := out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if !strings.Contains(string(e), "argument") {
+		t.Fatalf("got error, but wrong one")
+	}
+
+	// First argument must be a hash
+	out = containsFn([]primitive.Primitive{
+		primitive.String("foo"),
+		primitive.String("bar"),
+	})
+
+	// Will lead to an error
+	e, ok = out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if !strings.Contains(string(e), "not a hash") {
+		t.Fatalf("got error, but wrong one %v", out)
+	}
+
+	// create a hash
+	h := primitive.NewHash()
+	h.Set("XXX", primitive.String("Last"))
+	h.Set("Name", primitive.String("Steve"))
+	h.Set("Age", primitive.Number(43))
+	h.Set("Location", primitive.String("Helsinki"))
+
+	// Should have Age
+	res := containsFn([]primitive.Primitive{
+		h,
+		primitive.String("Age"),
+	})
+
+	// Will lead to a bool
+	v, ok2 := res.(primitive.Bool)
+	if !ok2 {
+		t.Fatalf("expected bool, got %v", res)
+	}
+	if v != primitive.Bool(true) {
+		t.Fatalf("failed to find expected key")
+	}
+
+	// Should have Age - as a symbol
+	res = containsFn([]primitive.Primitive{
+		h,
+		primitive.Symbol("Age"),
+	})
+
+	// Will lead to a bool
+	v, ok2 = res.(primitive.Bool)
+	if !ok2 {
+		t.Fatalf("expected bool, got %v", res)
+	}
+	if v != primitive.Bool(true) {
+		t.Fatalf("failed to find expected key")
+	}
+
+	// Should NOT have Cake
+	res = containsFn([]primitive.Primitive{
+		h,
+		primitive.String("Cake"),
+	})
+
+	// Will lead to a bool
+	v, ok2 = res.(primitive.Bool)
+	if !ok2 {
+		t.Fatalf("expected bool, got %v", res)
+	}
+	if v != primitive.Bool(false) {
+		t.Fatalf("unexpectedly found missing key")
+	}
+}
+
 func TestKeys(t *testing.T) {
 
 	// no arguments

@@ -68,7 +68,8 @@ We have a reasonable number of functions implemented, either in our golang core 
   * `true` and `false` are available as synonyms.
 * Hash operations:
   * Hashes are literals like this `{ :name "Steve" :location "Helsinki" }`
-  * Hash functions are `get`, `keys`, & `set`.
+  * Hash functions are `contains?`, `get`, `keys`, `set`, & `vals`.
+    * Note that keys are returned in sorted order.  Values are returned in order of their sorted keys too.
 * List operations:
   * `car`, `cdr`, `list`, & `sort`.
 * Logical operations:

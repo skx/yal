@@ -11,6 +11,15 @@
 (print "Keys of person: %s" (keys person))
 (print "Values of person: %s" (vals person))
 
+
+(if (contains? person :age)
+    (print "\tThe person has an age attribute"))
+(if (contains? person ":location")
+    (print "\tThe person has an location attribute"))
+(if (contains? person :cake)
+    (print "\tThe person has a cake preference"))
+
+
 ;; This function is used as a callback by apply-hash.
 (define hash-element (lambda (key val)
    (print "KEY:%s VAL:%s" key val)))
