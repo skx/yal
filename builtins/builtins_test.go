@@ -845,6 +845,49 @@ func TestStr(t *testing.T) {
 	}
 }
 
+func TestSlurp(t *testing.T) {
+
+	// calling with no argument
+	out := slurpFn([]primitive.Primitive{})
+
+	// Will lead to an error
+	_, ok := out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+
+	// Call with a file that doesn't exist
+	out = slurpFn([]primitive.Primitive{
+		primitive.String("path/not/found")})
+
+	_, ok = out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+
+	// Create a temporary file, and read the contents
+	tmp, _ := os.CreateTemp("", "yal")
+	err := os.WriteFile(tmp.Name(), []byte("I like cake"), 0777)
+	if err != nil {
+		t.Fatalf("failed to write to file")
+	}
+	defer os.Remove(tmp.Name())
+
+	str := slurpFn([]primitive.Primitive{
+		primitive.String(tmp.Name())})
+
+	// Will lead to an error
+	txt, ok2 := str.(primitive.String)
+	if !ok2 {
+		t.Fatalf("expected string, got %v", out)
+	}
+
+	if txt.ToString() != "I like cake" {
+		t.Fatalf("re-reading the temporary file gave bogus contents")
+	}
+
+}
+
 func TestType(t *testing.T) {
 
 	// No arguments
@@ -1350,7 +1393,6 @@ func TestNow(t *testing.T) {
 
 }
 
-
 func TestArch(t *testing.T) {
 
 	// No arguments
@@ -1454,6 +1496,88 @@ func TestGet(t *testing.T) {
 	}
 }
 
+func TestContains(t *testing.T) {
+
+	// no arguments
+	out := containsFn([]primitive.Primitive{})
+
+	// Will lead to an error
+	e, ok := out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if !strings.Contains(string(e), "argument") {
+		t.Fatalf("got error, but wrong one")
+	}
+
+	// First argument must be a hash
+	out = containsFn([]primitive.Primitive{
+		primitive.String("foo"),
+		primitive.String("bar"),
+	})
+
+	// Will lead to an error
+	e, ok = out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if !strings.Contains(string(e), "not a hash") {
+		t.Fatalf("got error, but wrong one %v", out)
+	}
+
+	// create a hash
+	h := primitive.NewHash()
+	h.Set("XXX", primitive.String("Last"))
+	h.Set("Name", primitive.String("Steve"))
+	h.Set("Age", primitive.Number(43))
+	h.Set("Location", primitive.String("Helsinki"))
+
+	// Should have Age
+	res := containsFn([]primitive.Primitive{
+		h,
+		primitive.String("Age"),
+	})
+
+	// Will lead to a bool
+	v, ok2 := res.(primitive.Bool)
+	if !ok2 {
+		t.Fatalf("expected bool, got %v", res)
+	}
+	if v != primitive.Bool(true) {
+		t.Fatalf("failed to find expected key")
+	}
+
+	// Should have Age - as a symbol
+	res = containsFn([]primitive.Primitive{
+		h,
+		primitive.Symbol("Age"),
+	})
+
+	// Will lead to a bool
+	v, ok2 = res.(primitive.Bool)
+	if !ok2 {
+		t.Fatalf("expected bool, got %v", res)
+	}
+	if v != primitive.Bool(true) {
+		t.Fatalf("failed to find expected key")
+	}
+
+	// Should NOT have Cake
+	res = containsFn([]primitive.Primitive{
+		h,
+		primitive.String("Cake"),
+	})
+
+	// Will lead to a bool
+	v, ok2 = res.(primitive.Bool)
+	if !ok2 {
+		t.Fatalf("expected bool, got %v", res)
+	}
+	if v != primitive.Bool(false) {
+		t.Fatalf("unexpectedly found missing key")
+	}
+}
+
 func TestKeys(t *testing.T) {
 
 	// no arguments
@@ -1494,7 +1618,7 @@ func TestKeys(t *testing.T) {
 		h,
 	})
 
-	// Will lead to a string
+	// Will lead to a list
 	_, ok2 := res.(primitive.List)
 	if !ok2 {
 		t.Fatalf("expected list, got %v", res)
@@ -1512,6 +1636,67 @@ func TestKeys(t *testing.T) {
 		t.Fatalf("not a sorted list?")
 	}
 	if lst[3].ToString() != "XXX" {
+		t.Fatalf("not a sorted list?")
+	}
+}
+
+func TestVals(t *testing.T) {
+
+	// no arguments
+	out := valsFn([]primitive.Primitive{})
+
+	// Will lead to an error
+	e, ok := out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if !strings.Contains(string(e), "argument") {
+		t.Fatalf("got error, but wrong one")
+	}
+
+	// First argument must be a hash
+	out = valsFn([]primitive.Primitive{
+		primitive.String("foo"),
+	})
+
+	// Will lead to an error
+	e, ok = out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if !strings.Contains(string(e), "not a hash") {
+		t.Fatalf("got error, but wrong one %v", out)
+	}
+
+	// create a hash
+	h := primitive.NewHash()
+	h.Set("XXX", primitive.String("Last"))
+	h.Set("Name", primitive.String("Steve"))
+	h.Set("Age", primitive.Number(43))
+	h.Set("Location", primitive.String("Helsinki"))
+
+	// Get the values
+	res := valsFn([]primitive.Primitive{
+		h,
+	})
+
+	// Will lead to a list
+	_, ok2 := res.(primitive.List)
+	if !ok2 {
+		t.Fatalf("expected list, got %v", res)
+	}
+
+	lst := res.(primitive.List)
+	if lst[0].ToString() != "43" {
+		t.Fatalf("not a sorted list?")
+	}
+	if lst[1].ToString() != "Helsinki" {
+		t.Fatalf("not a sorted list?")
+	}
+	if lst[2].ToString() != "Steve" {
+		t.Fatalf("not a sorted list?")
+	}
+	if lst[3].ToString() != "Last" {
 		t.Fatalf("not a sorted list?")
 	}
 }

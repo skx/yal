@@ -79,9 +79,11 @@ func PopulateEnvironment(env *env.Environment) {
 	env.Set("list", &primitive.Procedure{F: listFn})
 
 	// Hash
+	env.Set("contains?", &primitive.Procedure{F: containsFn})
 	env.Set("get", &primitive.Procedure{F: getFn})
 	env.Set("keys", &primitive.Procedure{F: keysFn})
 	env.Set("set", &primitive.Procedure{F: setFn})
+	env.Set("vals", &primitive.Procedure{F: valsFn})
 
 	// core
 	env.Set("arch", &primitive.Procedure{F: archFn})
@@ -93,6 +95,7 @@ func PopulateEnvironment(env *env.Environment) {
 	env.Set("print", &primitive.Procedure{F: printFn})
 	env.Set("sort", &primitive.Procedure{F: sortFn})
 	env.Set("sprintf", &primitive.Procedure{F: sprintfFn})
+	env.Set("slurp", &primitive.Procedure{F: slurpFn})
 
 	// string
 	env.Set("chr", &primitive.Procedure{F: chrFn})
@@ -413,6 +416,20 @@ func typeFn(args []primitive.Primitive) primitive.Primitive {
 	return primitive.String(args[0].Type())
 }
 
+// slurpFn returns the contents of the specified file
+func slurpFn(args []primitive.Primitive) primitive.Primitive {
+	if len(args) != 1 {
+		return primitive.Error("wrong number of arguments")
+	}
+
+	fName := args[0].ToString()
+	data, err := os.ReadFile(fName)
+	if err != nil {
+		return primitive.Error(fmt.Sprintf("error reading %s %s", fName, err))
+	}
+	return primitive.String(string(data))
+}
+
 // strFn implements "str"
 func strFn(args []primitive.Primitive) primitive.Primitive {
 	return primitive.String(args[0].ToString())
@@ -464,7 +481,6 @@ func osFn(args []primitive.Primitive) primitive.Primitive {
 func archFn(args []primitive.Primitive) primitive.Primitive {
 	return primitive.String(runtime.GOARCH)
 }
-
 
 // printFn implements (print).
 func printFn(args []primitive.Primitive) primitive.Primitive {
@@ -668,6 +684,73 @@ func keysFn(args []primitive.Primitive) primitive.Primitive {
 	}
 
 	return c
+}
+
+// valsFn is the implementation of `(vals hash)`
+func valsFn(args []primitive.Primitive) primitive.Primitive {
+
+	// We need a single argument
+	if len(args) != 1 {
+		return primitive.Error("invalid argument count")
+	}
+
+	// First is a Hash
+	if _, ok := args[0].(primitive.Hash); !ok {
+		return primitive.Error("argument not a hash")
+	}
+
+	// Create the list to hold the result
+	var c primitive.List
+
+	// Cast the argument
+	tmp := args[0].(primitive.Hash)
+
+	// Get the keys as a list
+	keys := []string{}
+
+	// Add the keys
+	for x := range tmp.Entries {
+		keys = append(keys, x)
+	}
+
+	// Sort the list
+	sort.Strings(keys)
+
+	// Now append the value
+	for _, x := range keys {
+		c = append(c, tmp.Entries[x])
+	}
+
+	return c
+}
+
+// containsFn implements (contains?)
+func containsFn(args []primitive.Primitive) primitive.Primitive {
+
+	// We need a pair of arguments
+	if len(args) != 2 {
+		return primitive.Error("invalid argument count")
+	}
+
+	// First is a Hash
+	hsh, ok := args[0].(primitive.Hash)
+	if !ok {
+		return primitive.Error("argument not a hash")
+	}
+
+	// The second should be a string, but other things can be converted
+	str, ok := args[1].(primitive.String)
+	if !ok {
+		str = primitive.String(args[1].ToString())
+	}
+
+	_, found := hsh.Entries[str.ToString()]
+	if found {
+		return primitive.Bool(true)
+	}
+
+	return primitive.Bool(false)
+
 }
 
 // setFn is the implementation of `(set hash key val)`
