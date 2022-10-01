@@ -606,7 +606,7 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 				}
 
 			// (define
-			case primitive.Symbol("define"):
+			case primitive.Symbol("define"), primitive.Symbol("def!"):
 				if len(listExp) < 3 {
 					return primitive.Error("arity-error: not enough arguments for (define ..)")
 				}
@@ -618,6 +618,31 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 					return primitive.Nil{}
 				}
 				return primitive.Error(fmt.Sprintf("Expected a symbol, got %v", listExp[1]))
+
+			// (defmacro!
+			case primitive.Symbol("defmacro!"):
+				if len(listExp) < 3 {
+					return primitive.Error("arity-error: not enough arguments for (defmacro! ..)")
+				}
+
+				// name of macro
+				symb, ok := listExp[1].(primitive.Symbol)
+				if !ok {
+					return primitive.Error(fmt.Sprintf("Expected a symbol, got %v", listExp[1]))
+				}
+
+				// macro body
+				val := ev.eval(listExp[2], e, expandMacro)
+
+				mac, ok2 := val.(*primitive.Procedure)
+				if !ok2 {
+					return primitive.Error(fmt.Sprintf("expected a function body for (defmacro..), got %v", val))
+				}
+
+				// this is now a macro
+				mac.Macro = true
+				e.Set(string(symb), mac)
+				return primitive.Nil{}
 
 			// (set!
 			case primitive.Symbol("set!"):
@@ -705,6 +730,54 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 
 					// Finally set the parameter
 					newEnv.Set(string(set), bindingVal)
+				}
+
+				// Now we've populated the new
+				// environment with the pairs we received
+				// in the setup phase we can execute
+				// the body.
+				var ret primitive.Primitive
+				for _, x := range listExp[2:] {
+					ret = ev.eval(x, newEnv, expandMacro)
+				}
+				return ret
+
+			// (let*
+			case primitive.Symbol("let*"):
+				// let should have two entries
+
+				if len(listExp) < 2 {
+					return primitive.Error("arity-error: not enough arguments for (let* ..)")
+				}
+
+				newEnv := env.NewEnvironment(e)
+				bindingsList, ok := listExp[1].(primitive.List)
+				if !ok {
+					return primitive.Error(fmt.Sprintf("argument is not a list, got %v", listExp[1]))
+				}
+
+				// Length of binding must be %2
+				if len(bindingsList)%2 != 0 {
+					return primitive.Error(fmt.Sprintf("list for (len*) must have even length, got %v", bindingsList))
+				}
+
+				for i := 0; i < len(bindingsList); i += 2 {
+
+					// The key/val pair we're working with
+					key := bindingsList[i]
+					val := bindingsList[i+1]
+
+					// evaluate the value - use the new environment.
+					eVal := ev.eval(val, newEnv, expandMacro)
+
+					// The thing to set
+					eKey, ok := key.(primitive.Symbol)
+					if !ok {
+						return primitive.Error(fmt.Sprintf("binding name is not a symbol, got %v", key))
+					}
+
+					// Finally set the parameter
+					newEnv.Set(string(eKey), eVal)
 				}
 
 				// Now we've populated the new
@@ -812,7 +885,7 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 				return ev.eval(blkLst[2], tmpEnv, expandMacro)
 
 			// (lambda
-			case primitive.Symbol("lambda"), primitive.Symbol("macro"):
+			case primitive.Symbol("lambda"), primitive.Symbol("fn*"):
 
 				// ensure we have arguments
 				if len(listExp) < 3 {
@@ -836,17 +909,16 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 					args = append(args, xs)
 				}
 
-				// Macro?
-				macro := false
-				if listExp[0].ToString() == "macro" {
-					macro = true
-				}
-
+				// This is a procedure, which will default
+				// to not being a macro.
+				//
+				// To make it a macro it should be set with
+				// "(defmacro!..)"
 				return &primitive.Procedure{
 					Args:  args,
 					Body:  listExp[2],
 					Env:   e,
-					Macro: macro,
+					Macro: false,
 				}
 
 			// Anything else is either a built-in function,

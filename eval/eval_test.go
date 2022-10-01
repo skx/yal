@@ -89,7 +89,7 @@ func TestEvaluate(t *testing.T) {
 		{"(if false false)", "nil"},
 
 		// macroexpand - args are not evaluated
-		{`(define foo (macro (x) x)) (macroexpand (foo (+ 1 2)))`, "(+ 1 2)"},
+		{`(defmacro! foo (fn* (x) x)) (macroexpand (foo (+ 1 2)))`, "(+ 1 2)"},
 		// quote
 		{`(define lst (quote (b c)))
                   '(a lst d)`, "(a lst d)"},
@@ -105,7 +105,7 @@ func TestEvaluate(t *testing.T) {
 			"(a b c d)"},
 
 		// expand a macro
-		{`(define steve (macro () "steve"))
+		{`(defmacro! steve (fn* () "steve"))
                   (macroexpand (steve))`,
 			"steve"},
 
@@ -125,6 +125,13 @@ func TestEvaluate(t *testing.T) {
 		{"(let ((a 5) (b 6)) a (* a b))", "30"},
 		{"(let ((a 5)) (set! a 44) a)", "44"},
 		{"(let ((a 5)) c)", "nil"},
+
+		// let*
+		{"(let* (z 9) z)", "9"},
+		{"(let* (x 9) x)", "9"},
+		{"(let* (z (+ 2 3)) (+ 1 z))", "6"},
+		{"(let* (p (+ 2 3) q (+ 2 p)) (+ p q))", "12"},
+		{"(def! y (let* (z 7) z)) y", "7"},
 
 		// (set!) inside (let) will only modify the local scope
 		{`
@@ -248,6 +255,12 @@ a
 		{"(let ((0 0)) )", "ERROR{binding name is not a symbol, got 0}"},
 		{"(let ((0 )) )", "ERROR{arity-error: binding list had missing arguments}"},
 		{"(let (3 3) )", "ERROR{binding value is not a list, got 3}"},
+
+		{"(let*)", "ERROR{arity-error: not enough arguments for (let* ..)}"},
+		{"(let* 32)", "ERROR{argument is not a list, got 32}"},
+		{"(let* (a 3 b))", "ERROR{list for (len*) must have even length, got [a 3 b]}"},
+		{"(let* (a 3 3 b))", "ERROR{binding name is not a symbol, got 3}"},
+
 		{"(error )", "ERROR{arity-error: not enough arguments for (error}"},
 		{"(quote )", "ERROR{arity-error: not enough arguments for (quote}"},
 		{"(quasiquote )", "ERROR{arity-error: not enough arguments for (quasiquote}"},
@@ -272,6 +285,10 @@ a
 (fizz 3)
 `, "ERROR{attempted division by zero}"},
 		{"(error \"CAKE-FAIL\")", "ERROR{CAKE-FAIL}"},
+
+		{"(defmacro!)", "ERROR{arity-error: not enough arguments for (defmacro! ..)}"},
+		{"(defmacro! 1 2)", "ERROR{Expected a symbol, got 1}"},
+		{"(defmacro! foo 2)", "ERROR{expected a function body for (defmacro..), got 2}"},
 
 		{"(read foo bar)", "ERROR{Expected only a single argument}"},
 		{"(read \")\")", "ERROR{failed to read ):unexpected ')'}"},
