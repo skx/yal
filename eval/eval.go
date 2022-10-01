@@ -508,8 +508,8 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 			// first token/symbol
 			switch listExp[0] {
 
-			// (begin ..)
-			case primitive.Symbol("begin"):
+			// (begin ..) | (do ..)
+			case primitive.Symbol("begin"), primitive.Symbol("do"):
 				var ret primitive.Primitive
 				for _, x := range listExp[1:] {
 					ret = ev.eval(x, e, expandMacro)
