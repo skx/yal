@@ -29,7 +29,7 @@ To set a global variable use `set!`:
 
     (set! foo "bar")
 
-To start a new local scope, with local variables, use `let*`:
+To start a new scope, with local variables, use `let*`:
 
     (let (foo "bar"
          baz  "bart")
@@ -45,7 +45,7 @@ To define a function use `set!` with `fn*`:
         1
           (* n (fact (- n 1))))))
 
-To define a macro use `setmacro!`:
+To define a macro use `defmacro!`:
 
     (defmacro! debug (fn* (x) `(print "Variable '%s' has value %s" '~x ~x)))
 
@@ -80,13 +80,14 @@ We have a reasonable number of functions implemented, either in our golang core 
 * Comparison functions:
   * `<`, `<=`, `>`, `>=`, `=`, & `eq`.
 * Misc features:
-  * `arch`, `getenv`, `os`, `print`, `str` & `type`
+  * `arch`, `getenv`, `os`, `print`, `slurp`, `str` & `type`
 * Special forms:
-  * `begin`, `define`, `env`, `eval`, `gensym`, `if`, `lambda`, `let`, `macroexpand`, `read`, `set!`, `quote`, & `quasiquote`.
+  * `begin`, `define`, `do`, `env`, `eval`, `gensym`, `if`, `lambda`, `let`, `macroexpand`, `read`, `set!`, `quote`, & `quasiquote`.
 * Error handling:
   * `error`, `try`, and `catch` - as demonstrated in [try.lisp](try.lisp).
 * Tail recursion optimization.
 * MAL compatability:
+  * `do` can be used as a synonym for `begin`.
   * `def!` can be used as a synonym for `define`.
   * `defmacro!` is used to define macros.
   * `fn*` can be used as a synonym for `lambda`.
@@ -179,7 +180,7 @@ Once you've built, and optinall installed, the CLI driver there are two ways to 
 
 * By specifying sexpressions on the command-line.
   * `yal -e "(print (os))"`
-* By passing the name of a file to read adn execute.
+* By passing the name of a file to read and execute.
   * `yal test.lisp`
 
 
