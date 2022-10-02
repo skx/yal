@@ -37,15 +37,25 @@
     1
       (* n (fact (- n 1))))))
 
+
+
+
+;; Return the number of ms a function invokation took.
+(define benchmark (lambda (fn)
+  (let* (start-ms (ms)
+         _ (fn)
+         end-ms (ms))
+    (- end-ms start-ms))))
+
 ;; Invoke the factorial function, using apply
 ;;
 ;; Calculate the factorial of "big numbers" mostly as a test of the
 ;; `now` function which times how long it took.
-(apply (list 1 10 100 1000 10000 100000)
+(apply (list 1 10 100 1000 10000 50000 100000)
        (lambda (x)
-         (let* ( start (now)
-                 m     (ms))
-           (print "%s! => %s [%s seconds / %s ms]" x (fact x) (- (now) start) (- (ms) m) ))))
+         (print "Calculating %s factorial took %sms"
+           x
+           (benchmark (lambda () (fact x))))))
 
 
 ; Split a string into a list, reverse it, and join it
