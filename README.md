@@ -232,9 +232,7 @@ If you find a crash then it is either a bug which needs to be fixed, or a false-
 
 ## Benchmark
 
-There is a simple benchmark included, comparing the time taken to run 100! in pure golang, and in our interpreted lisp.
-
-To run this:
+There is a simple benchmark included within this repository, computing the factorial of 100, to run this execute:
 
 ```sh
 $ go test -run=Bench -bench=.
@@ -248,10 +246,13 @@ PASS
 ok  	github.com/skx/yal	2.679s
 ```
 
-Here you see that the lisp version is approximately 3000% slower than the pure golang implementation.
-
 For longer runs add `-benchtime=30s`, or similar, to the command-line.
 
+Here you see that the lisp version is approximately 3000% slower than the pure golang implementation.  There is a small comparison of my toy scripting languages available here:
+
+* [Toy Language Benchmarks](https://github.com/skx/toy-language-benchmarks)
+
+This shows that the Lisp implementation here isn't so bad!
 
 
 
