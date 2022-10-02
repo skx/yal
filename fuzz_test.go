@@ -127,6 +127,7 @@ func FuzzYAL(f *testing.F) {
 		"unexpected type for eval",        // (eval
 		"type-validation failed",
 		"unknown type-specification",
+		"not a hash",
 		"recursion limit",
 	}
 
