@@ -42,7 +42,7 @@
 ;; are the same then EVERY element was true so our AND result is true.
 ;;
 (define and (lambda (xs:list)
-  (let ((res nil))
+  (let* (res nil)
     (set! res (filter xs (lambda (x) (if x true false))))
     (if (= (length res) (length xs))
         true
@@ -57,7 +57,7 @@
 ;; OR result is true.
 ;;
 (define or (lambda (xs:list)
-  (let ((res nil))
+  (let* (res nil)
     (set! res (filter xs (lambda (x) (if x true false))))
     (if (> (length res) 0)
         true
@@ -182,7 +182,7 @@
 
 ;; A helper to apply a function to each key/value pair of a hash
 (define apply-hash (lambda (hs:hash fun:function)
-  (let ((lst (keys hs)))
+  (let* (lst (keys hs))
     (apply lst (lambda (x) (fun x (get hs x)))))))
 
 ;; Return the length of the given string or list.
@@ -350,7 +350,7 @@
 
 ;; Translate the elements of the string using the specified hash
 (define translate (lambda (x:string hsh:hash)
-  (let ((chrs (split x "")))
+  (let* (chrs (split x ""))
     (join (map chrs (lambda (x)
                   (if (get hsh x)
                       (get hsh x)

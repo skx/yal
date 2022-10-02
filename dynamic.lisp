@@ -12,12 +12,17 @@
 ;;
 (define call-by-name
   (lambda (name:string &args)
-    (let ((out nil)  ; out is the result of the filter
-          (nm  nil)  ; nm is the name of the result == name
-          (fn  nil)) ; fn is the function of the result
+    (let* (out nil  ; out is the result of the filter
+           nm  nil  ; nm is the name of the result == name
+           fn  nil) ; fn is the function of the result
 
       ;; find the entry in the list with the right name
       (set! out (filter (env) (lambda (x) (eq (get x :name) name))))
+
+      ;; If we have a list of arguments, which we will, then
+      ;; take the first one.
+      (if (list? args)
+        (set! args (car args)))
 
       ;; there should be only one matching entry
       (if (= (length out) 1)
