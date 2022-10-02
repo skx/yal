@@ -83,12 +83,11 @@ We have a reasonable number of functions implemented, either in our golang core 
 * Misc features:
   * `arch`, `getenv`, `os`, `print`, `slurp`, `sprintf`, `str` & `type`
 * Special forms:
-  * `begin`, `define`, `do`, `env`, `eval`, `gensym`, `if`, `lambda`, `let`, `macroexpand`, `read`, `set!`, `quote`, & `quasiquote`.
+  * `define`, `do`, `env`, `eval`, `gensym`, `if`, `lambda`, `let`, `macroexpand`, `read`, `set!`, `quote`, & `quasiquote`.
 * Error handling:
   * `error`, `try`, and `catch` - as demonstrated in [try.lisp](try.lisp).
 * Tail recursion optimization.
 * MAL compatability:
-  * `do` can be used as a synonym for `begin`.
   * `def!` can be used as a synonym for `define`.
   * `defmacro!` is used to define macros.
   * `fn*` can be used as a synonym for `lambda`.

@@ -19,7 +19,7 @@ func TestTimeout(t *testing.T) {
 	tst := `
 (set! a 1)
 (while true
- (begin
+ (do
    (set! a (+ a 1) true)))
 `
 	// Load our standard library
@@ -157,7 +157,7 @@ a
 		{"()", "()"},
 		{"(car '(1 2 3))", "1"},
 		{"(cdr '(1 2 3))", "(2 3)"},
-		{"(begin 1 2)", "2"},
+		{"(do 1 2)", "2"},
 
 		// numbers
 		{"3", "3"},

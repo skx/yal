@@ -105,16 +105,16 @@
 ;;
 ;;   (if2 true (print "1") (print "2"))
 ;;
-;; Instead of having to use (begin), like so:
+;; Instead of having to use (do), like so:
 ;;
-;;   (if true (begin (print "1") (print "2")))
+;;   (if true (do (print "1") (print "2")))
 ;;
 ;; The downside here is that you don't get a negative branch, but running
 ;; two things is very common - see for example the "(while)" and "(repeat)"
 ;; macros later in this file.
 ;;
 (defmacro! if2 (fn* (pred one two)
-  `(if ~pred (begin ~one ~two))))
+  `(if ~pred (do ~one ~two))))
 
 
 ;;
@@ -126,7 +126,7 @@
 ;;
 ;;  (when (= 1 1) (print "OK") (print "Still OK") (print "final statement"))
 ;;
-(defmacro! when (fn* (pred &rest) `(if ~pred (begin ~@rest))))
+(defmacro! when (fn* (pred &rest) `(if ~pred (do ~@rest))))
 
 ;;
 ;; Part of our while-implementation.
@@ -176,7 +176,7 @@
 (define apply (lambda (lst:list fun:function)
   (if (nil? lst)
       ()
-      (begin
+      (do
          (fun (car lst))
          (apply (cdr lst) fun)))))
 
@@ -188,7 +188,7 @@
 ;; Return the length of the given string or list.
 (define length (lambda (arg)
   (if (list? arg)
-    (begin
+    (do
       (if (nil? arg) 0
         (inc (length (cdr arg)))))
     0

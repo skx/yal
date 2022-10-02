@@ -26,7 +26,7 @@
 
       ;; there should be only one matching entry
       (if (= (length out) 1)
-          (begin
+          (do
            (set! nm (get (car out) :name))   ;; nm == name
            (set! fn (get (car out) :value))  ;; fn is the function to call
            (if fn (fn args)))))))            ;; if we got it, invoke it
