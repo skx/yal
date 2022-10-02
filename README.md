@@ -71,17 +71,17 @@ We have a reasonable number of functions implemented, either in our golang core 
   * Hash functions are `contains?`, `get`, `keys`, `set`, & `vals`.
     * Note that keys are returned in sorted order.  Values are returned in order of their sorted keys too.
 * List operations:
-  * `car`, `cdr`, `list`, & `sort`.
+  * `car`, `cdr`, `cons`, `list`, & `sort`.
 * Logical operations:
   * `and`, & `or`.
 * Mathematical operations:
   * `+`, `-`, `*`, `/`, `#`, & `%`.
 * String operations:
-  * `join`, `match` (regular-expression matching), & `split`.
+  * `chr`, `join`, `match` (regular-expression matching),`ord`, & `split`.
 * Comparison functions:
   * `<`, `<=`, `>`, `>=`, `=`, & `eq`.
 * Misc features:
-  * `arch`, `getenv`, `os`, `print`, `slurp`, `str` & `type`
+  * `arch`, `getenv`, `os`, `print`, `slurp`, `sprintf`, `str` & `type`
 * Special forms:
   * `begin`, `define`, `do`, `env`, `eval`, `gensym`, `if`, `lambda`, `let`, `macroexpand`, `read`, `set!`, `quote`, & `quasiquote`.
 * Error handling:
