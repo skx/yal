@@ -129,7 +129,8 @@ func FuzzYAL(f *testing.F) {
 		"unknown type-specification",
 		"not a hash",
 		"recursion limit",
-        "expected a function body",
+		"expected a function body",
+		"must have even length",
 	}
 
 	f.Fuzz(func(t *testing.T, input []byte) {
