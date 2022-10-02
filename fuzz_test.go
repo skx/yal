@@ -48,7 +48,7 @@ func FuzzYAL(f *testing.F) {
 
 	f.Add([]byte(`
 ; Split a string into a list, reverse it, and join it
-(let ((input "Steve Kemp"))
+(let* (input "Steve Kemp")
   (begin
    (print "Starting string: %s" input)
    (print "Reversed string: %s" (join (reverse (split "Steve Kemp" ""))))))
@@ -69,8 +69,7 @@ func FuzzYAL(f *testing.F) {
 ;;
 ;; Setup a list of integers, and do a few things with it.
 ;;
-(let ((vals '(32 92 109 903 31 3 -93 -31 -17 -3)))
-  (begin
+(let* (vals '(32 92 109 903 31 3 -93 -31 -17 -3))
      (print "Working with the list: %s " vals)
      (print "\tBiggest item is %s"       (max vals))
      (print "\tSmallest item is %s"      (min vals))
@@ -78,7 +77,7 @@ func FuzzYAL(f *testing.F) {
      (print "\tSorted list is %s "       (sort vals))
      (print "\tFirst item is %s "        (first vals))
      (print "\tRemaining items %s "      (rest vals))
-   ))
+   )
 `))
 
 	f.Add([]byte(`
