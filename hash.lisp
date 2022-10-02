@@ -55,6 +55,6 @@
 (print "Values in the environment matching the regexp /int/\n%s" out)
 
 ;;
-(apply out (lambda (x) (begin
+(apply out (lambda (x) (do
                         (print "Function in env. matching regexp /int/")
                         (print "\t%s" (get x :name)))))

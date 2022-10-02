@@ -26,7 +26,7 @@
 ;;
 (let* (a 5)
   (while (> a 0)
-    (begin
+    (do
      (print "(while) loop - iteration %s" a)
      (set! a (- a 1) true))))
 
@@ -83,7 +83,7 @@
 ;; Test our some of our earlier functions against a range of numbers
 (apply (list -2 -1 0 1 2 3 4 5)
   (lambda (x)
-    (begin
+    (do
       (if (neg? x)  (print "%s is negative" x))
       (if (zero? x) (print "%s is ZERO"     x))
       (if (even? x) (print "%s is EVEN"     x))

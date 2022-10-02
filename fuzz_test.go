@@ -49,7 +49,7 @@ func FuzzYAL(f *testing.F) {
 	f.Add([]byte(`
 ; Split a string into a list, reverse it, and join it
 (let* (input "Steve Kemp")
-  (begin
+  (do
    (print "Starting string: %s" input)
    (print "Reversed string: %s" (join (reverse (split "Steve Kemp" ""))))))
 `))

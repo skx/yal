@@ -46,7 +46,7 @@
 ;;
 ;; We want to treat it as:
 ;:
-;;    (begin
+;;    (do
 ;;      (set! v1 e)
 ;;      (set! v2 e)
 ;;    )
@@ -59,7 +59,7 @@
 ;;        We'll refine to fix this.
 ;;
 (defmacro! set2! (fn* (v1 v2 e)
-                     `(begin
+                     `(do
                        (set! ~v1 ~e)
                        (set! ~v2 ~e))))
 
@@ -67,7 +67,7 @@
 ;;
 ;; You can see this in the following code:
 ;;
-;;   (set2! a c (begin (print "EXECUTED TWICE!") (+ 32 23)))
+;;   (set2! a c (do (print "EXECUTED TWICE!") (+ 32 23)))
 
 ;;
 ;; The second attempt would use a temporary variable to store the new
@@ -82,7 +82,7 @@
 ;;
 (defmacro! set2! (fn* (v1 v2 e)
                      (let* (tmp (gensym))
-                       `(begin (let* (~tmp ~e)
+                       `(do (let* (~tmp ~e)
                            (set! ~v1 ~tmp)
                            (set! ~v2 ~tmp))))))
 
@@ -96,7 +96,7 @@
 ;;
 (defmacro! set2! (fn* (v1 v2 e)
                      (let* (tmp (gensym))
-                       `(begin (let* (~tmp ~e)
+                       `(do (let* (~tmp ~e)
                            (set! ~v1 ~tmp true)
                            (set! ~v2 ~tmp true))))))
 
@@ -133,7 +133,7 @@
 ;;
 ;; NOTE This expression is only evaluated once, which is what we wanted.
 ;;
-(set2! a c (begin (print "ONLY EXECUTED ONCE!") (+ 32 23)))
+(set2! a c (do (print "ONLY EXECUTED ONCE!") (+ 32 23)))
 
 ;;
 ;; So the values will be changed, again.
@@ -159,9 +159,9 @@
 ;;
 ;;   (if2 true (print "1") (print "2"))
 ;;
-;; Instead of having to add (begin:
+;; Instead of having to add (do:
 ;;
-;;   (if true (begin (print "1") (print "2")))
+;;   (if true (do (print "1") (print "2")))
 ;;
 ;; The downside here is that you don't get a negative branch, but running
 ;; two things is very common - see for example the "(while)" and "(repeat)"
@@ -171,7 +171,7 @@
 ;; when a condition is true rather than two, and only two.
 ;;
 (defmacro! if2 (fn* (pred one two)
-  `(if ~pred (begin ~one ~two))))
+  `(if ~pred (do ~one ~two))))
 
 
 ;;
