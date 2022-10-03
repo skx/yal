@@ -31,8 +31,8 @@ To set a global variable use `set!`:
 
 To start a new scope, with local variables, use `let*`:
 
-    (let (foo "bar"
-         baz  "bart")
+    (let* (foo "bar"
+           baz  "bart")
       (print "foo is %s" foo)
       (print "baz is %s" baz)
       ;...
@@ -49,7 +49,8 @@ To define a macro use `defmacro!`:
 
     (defmacro! debug (fn* (x) `(print "Variable '%s' has value %s" '~x ~x)))
 
-    ; Using this macro
+You might use this macro like so:
+
     (set! foo "steve")
     (debug foo)
 
@@ -63,9 +64,13 @@ That concludes the brief overview, note that `lambda` can be used as a synonym f
 
 We have a reasonable number of functions implemented, either in our golang core or in our standard-library (which is implemented in yal itself):
 
-* Support for strings, numbers, errors, lists, hashes, etc.
+* Basic types include strings, numbers, errors, lists, hashes, etc.
   * `#t` is the true symbol, `#f` is false.
   * `true` and `false` are available as synonyms.
+* Comparison functions:
+  * `<`, `<=`, `>`, `>=`, `=`, & `eq`.
+* Error handling:
+  * `error`, `try`, and `catch` - as demonstrated in [try.lisp](try.lisp).
 * Hash operations:
   * Hashes are literals like this `{ :name "Steve" :location "Helsinki" }`
   * Hash functions are `contains?`, `get`, `keys`, `set`, & `vals`.
@@ -76,17 +81,16 @@ We have a reasonable number of functions implemented, either in our golang core 
   * `and`, & `or`.
 * Mathematical operations:
   * `+`, `-`, `*`, `/`, `#`, & `%`.
+* Macro support.
+  * See [mtest.lisp](mtest.lisp) for some simple tests/usage examples.
+  * The standard library uses macros to implement `(cond)`, `(while)`, and other functions.
+* Platform features:
+  * `arch`, `getenv`, `os`, `print`, `slurp`, `sprintf`, `str` & `type`
 * String operations:
   * `chr`, `join`, `match` (regular-expression matching),`ord`, & `split`.
-* Comparison functions:
-  * `<`, `<=`, `>`, `>=`, `=`, & `eq`.
-* Misc features:
-  * `arch`, `getenv`, `os`, `print`, `slurp`, `sprintf`, `str` & `type`
 * Special forms:
-  * `define`, `do`, `env`, `eval`, `gensym`, `if`, `lambda`, `let`, `macroexpand`, `read`, `set!`, `quote`, & `quasiquote`.
-* Error handling:
-  * `error`, `try`, and `catch` - as demonstrated in [try.lisp](try.lisp).
-* Tail recursion optimization.
+  * `define`, `do`, `env`, `eval`, `gensym`, `if`, `lambda`, `let*`, `macroexpand`, `read`, `set!`, `quote`, & `quasiquote`.
+* Tail call optimization.
 * MAL compatability:
   * `def!` can be used as a synonym for `define`.
   * `defmacro!` is used to define macros.
@@ -120,10 +124,6 @@ There are a couple of areas where we've implemented special/unusual things:
   * Sample code is visible in [hash.lisp](hash.lisp).
 * Type checking for function parameters.
   * Via a `:type` suffix.  For example `(lambda (a:string b:number) ..`.
-* Support for macros.
-  * See [mtest.lisp](mtest.lisp) for some simple tests/usage examples.
-  * The standard library uses macros to implement the `(cond)`, and `(while)` functions, for example.
-
 
 Here's an example of type-checking on a parameter value, in this case a list is required, via the `:list` suffix:
 
