@@ -1,26 +1,28 @@
+;;; stdlib.lisp - Standard library as implemented in lisp.
+;; This is essentially prepended to any program the user tries to run,
+;; and implements behaviour which is useful for users.
 ;;
-;; stdlib.lisp - Standard library executed alongside any user-supplied
-;; program.
+;; For compatability with MAL mal.lisp is also considered part of our
+;; standard-library.
 ;;
-;; This implements behaviour which is useful for users.
-;;
+
 
 
 ;; There is a built in `type` function which returns the type of an object.
 ;;
 ;; Use this to define some simple methods to test argument-types
-(define boolean?  (lambda (x) (eq (type x) "boolean")))
-(define error?    (lambda (x) (eq (type x) "error")))
-(define function? (lambda (x) (or
+(set! boolean?  (fn* (x) (eq (type x) "boolean")))
+(set! error?    (fn* (x) (eq (type x) "error")))
+(set! function? (fn* (x) (or
                                 (list
                                    (eq (type x) "procedure(lisp)")
                                    (eq (type x) "procedure(golang)")))))
-(define hash?     (lambda (x) (eq (type x) "hash")))
-(define macro?    (lambda (x) (eq (type x) "macro")))
-(define list?     (lambda (x) (eq (type x) "list")))
-(define number?   (lambda (x) (eq (type x) "number")))
-(define string?   (lambda (x) (eq (type x) "string")))
-(define symbol?   (lambda (x) (eq (type x) "symbol")))
+(set! hash?     (fn* (x) (eq (type x) "hash")))
+(set! macro?    (fn* (x) (eq (type x) "macro")))
+(set! list?     (fn* (x) (eq (type x) "list")))
+(set! number?   (fn* (x) (eq (type x) "number")))
+(set! string?   (fn* (x) (eq (type x) "string")))
+(set! symbol?   (fn* (x) (eq (type x) "symbol")))
 
 ;; We've defined "<" in golang, we can now implement the missing
 ;; functions in terms of that:
@@ -29,9 +31,9 @@
 ;; <=
 ;; >=
 ;;
-(define >  (lambda (a b) (< b a)))
-(define >= (lambda (a b) (! (< a b))))
-(define <= (lambda (a b) (! (> a b))))
+(set! >  (fn* (a b) (< b a)))
+(set! >= (fn* (a b) (! (< a b))))
+(set! <= (fn* (a b) (! (> a b))))
 
 ;;
 ;; This is a bit sneaky.  NOTE there is no short-circuiting here.
@@ -41,7 +43,7 @@
 ;: If the length of the input list, and the length of the filtered list
 ;; are the same then EVERY element was true so our AND result is true.
 ;;
-(define and (lambda (xs:list)
+(set! and (fn* (xs:list)
   (let* (res nil)
     (set! res (filter xs (lambda (x) (if x true false))))
     (if (= (length res) (length xs))
@@ -56,7 +58,7 @@
 ;; If the output list has at least one element that was true then the
 ;; OR result is true.
 ;;
-(define or (lambda (xs:list)
+(set! or (fn* (xs:list)
   (let* (res nil)
     (set! res (filter xs (lambda (x) (if x true false))))
     (if (> (length res) 0)
@@ -64,174 +66,60 @@
       false))))
 
 
-;; Traditionally we use `car` and `cdr` for accessing the first and rest
-;; elements of a list.  For readability it might be nice to vary that
-(define first (lambda (x:list) (car x)))
-(define rest  (lambda (x:list) (cdr x)))
-
 ;; inc/dec are useful primitives to have
-(define inc  (lambda (n:number) (+ n 1)))
-(define dec  (lambda (n:number) (- n 1)))
+(set! inc  (fn* (n:number) (+ n 1)))
+(set! dec  (fn* (n:number) (- n 1)))
 
 ;; We could also define the incr/decr operations as macros.
 (defmacro! incr (fn* (x) `(set! ~x (+ ~x 1))))
 (defmacro! decr (fn* (x) `(set! ~x (- ~x 1))))
 
 ;; Not is useful
-(define !     (lambda (x) (if x #f #t)))
-
-;; Some simple tests of numbers
-(define zero? (lambda (n) (= n 0)))
-(define one?  (lambda (n) (= n 1)))
-(define even? (lambda (n) (zero? (% n 2))))
-(define odd?  (lambda (n) (! (even? n))))
-
-;;
-;; is the given argument "true", or "false"?
-;;
-(def! true?  (fn* (arg) (if (eq #t arg) true false)))
-(def! false? (fn* (arg) (if (eq #f arg) true false)))
+(set! !     (fn* (x) (if x #f #t)))
 
 ;; Square root
-(define sqrt (lambda (x:number) (# x 0.5)))
+(set! sqrt (fn* (x:number) (# x 0.5)))
 
-
-
-;;
-;; if2 is a simple macro which allows you to run two actions if an
-;; (if ..) test succeeds.
-;;
-;; This means you can write:
-;;
-;;   (if2 true (print "1") (print "2"))
-;;
-;; Instead of having to use (do), like so:
-;;
-;;   (if true (do (print "1") (print "2")))
-;;
-;; The downside here is that you don't get a negative branch, but running
-;; two things is very common - see for example the "(while)" and "(repeat)"
-;; macros later in this file.
-;;
-(defmacro! if2 (fn* (pred one two)
-  `(if ~pred (do ~one ~two))))
-
-
-;;
-;; Run an arbitrary series of statements, if the given condition is true.
-;;
-;; This is the more general/useful version of the "if2" macro, given above.
-;;
-;; Sample usage:
-;;
-;;  (when (= 1 1) (print "OK") (print "Still OK") (print "final statement"))
-;;
-(defmacro! when (fn* (pred &rest) `(if ~pred (do ~@rest))))
-
-;;
-;; Part of our while-implementation.
-;; If the specified predicate is true, then run the body.
-;;
-;; NOTE: This recurses, so it will eventually explode the stack.
-;;
-;; NOTE: We use "if2" not "if".
-;;
-(define while-fun (lambda (predicate body)
-  (if2 (predicate)
-    (body)
-    (while-fun predicate body))))
-
-;;
-;; Now a macro to use the while-fun body as part of a while-function
-;;
-;; NOTE: We use "if2" not "if".
-;;
-(defmacro! while (fn* (expression body)
-                     (list 'while-fun
-                           (list 'lambda '() expression)
-                           (list 'lambda '() body))))
-
-
-;;
-;; cond is a useful thing to have.
-;;
-(defmacro! cond (fn* (&xs)
-  (if (> (length xs) 0)
-      (list 'if (first xs)
-            (if (> (length xs) 1)
-                (nth xs 1)
-              (error "An odd number of forms to (cond..)"))
-            (cons 'cond (rest (rest xs)))))))
 
 ;; Setup a simple function to run a loop N times
 ;;
-;; NOTE: We use "if2" not "if".
-;;
-(define repeat (lambda (n body)
-  (if2 (> n 0)
-     (body n)
-     (repeat (- n 1) body))))
-
-;; A useful helper to apply a given function to each element of a list.
-(define apply (lambda (lst:list fun:function)
-  (if (nil? lst)
-      ()
+(set! repeat (fn* (n body)
+  (if (> n 0)
       (do
-         (fun (car lst))
-         (apply (cdr lst) fun)))))
+          (body n)
+          (repeat (- n 1) body)))))
 
 ;; A helper to apply a function to each key/value pair of a hash
-(define apply-hash (lambda (hs:hash fun:function)
+(set! apply-hash (fn* (hs:hash fun:function)
   (let* (lst (keys hs))
     (apply lst (lambda (x) (fun x (get hs x)))))))
 
-;; Return the length of the given string or list.
-(define length (lambda (arg)
-  (if (list? arg)
-    (do
-      (if (nil? arg) 0
-        (inc (length (cdr arg)))))
-    0
-    )))
-
-
-;; Alias to (length)
-(define count (lambda (arg) (length arg)))
-
 
 ;; Count the length of a string
-(define strlen (lambda (str:string) (length (split str "" ))))
+(set! strlen (fn* (str:string) (length (split str "" ))))
 
-
-;; Find the Nth item of a list
-(define nth (lambda (lst:list i:number)
-  (if (> i (length lst))
-    (error "Out of bounds on list-length")
-    (if (= 0 i)
-      (car lst)
-        (nth (cdr lst) (- i 1))))))
 
 ;; More mathematical functions relating to negative numbers.
-(define neg  (lambda (n:number) (- 0 n)))
-(define neg? (lambda (n:number) (< n 0)))
-(define pos? (lambda (n:number) (> n 0)))
-(define abs  (lambda (n:number) (if (neg? n) (neg n) n)))
-(define sign (lambda (n:number) (if (neg? n) (neg 1) 1)))
+(set! neg  (fn* (n:number) (- 0 n)))
+(set! neg? (fn* (n:number) (< n 0)))
+(set! pos? (fn* (n:number) (> n 0)))
+(set! abs  (fn* (n:number) (if (neg? n) (neg n) n)))
+(set! sign (fn* (n:number) (if (neg? n) (neg 1) 1)))
 
 
 ;; Create ranges of numbers in a list
-(define range (lambda (start:number end:number step:number)
+(set! range (fn* (start:number end:number step:number)
   (if (< start end)
      (cons start (range (+ start step) end step))
         ())))
 
 ;; Create sequences from 0/1 to N
-(define seq (lambda (n:number) (range 0 n 1)))
-(define nat (lambda (n:number) (range 1 n 1)))
+(set! seq (fn* (n:number) (range 0 n 1)))
+(set! nat (fn* (n:number) (range 1 n 1)))
 
 
 ;; Remove items from a list where the predicate function is not T
-(define filter (lambda (xs:list f:function)
+(set! filter (fn* (xs:list f:function)
   (if (nil? xs)
      ()
      (if (f (car xs))
@@ -239,22 +127,16 @@
            (filter (cdr xs) f)))))
 
 
-;; Replace a list with the contents of evaluating the given function on
-;; every item of the list
-(define map (lambda (xs:list f:function)
-  (if (nil? xs)
-     ()
-       (cons (f (car xs)) (map (cdr xs) f)))))
 
 
 ;; reduce function
-(define reduce (lambda (xs f acc)
+(set! reduce (fn* (xs f acc)
   (if (nil? xs)
     acc
       (reduce (cdr xs) f (f acc (car xs))))))
 
 ;; Now define min/max using reduce
-(define min (lambda (xs:list)
+(set! min (fn* (xs:list)
   (if (nil? xs)
     ()
       (reduce xs
@@ -262,7 +144,7 @@
            (if (< a b) a b))
               (car xs)))))
 
-(define max (lambda (xs:list)
+(set! max (fn* (xs:list)
   (if (nil? xs)
     ()
       (reduce xs
@@ -272,13 +154,13 @@
 
 
 ; O(n^2) behavior with linked lists
-(define append (lambda (xs:list el)
+(set! append (fn* (xs:list el)
   (if (nil? xs)
     (list el)
       (cons (car xs) (append (cdr xs) el)))))
 
 
-(define reverse (lambda (x:list)
+(set! reverse (fn* (x:list)
   (if (nil? x)
     ()
       (append (reverse (cdr x)) (car x)))))
@@ -289,7 +171,7 @@
 ;; Define a hash which has literal characters and their upper-case, and
 ;; lower-cased versions
 ;;
-(define upper-table {
+(set! upper-table {
   a "A"
   b "B"
   c "C"
@@ -318,7 +200,7 @@
   z "Z"
   } )
 
-(define lower-table {
+(set! lower-table {
   A "a"
   B "b"
   C "c"
@@ -349,7 +231,7 @@
 
 
 ;; Translate the elements of the string using the specified hash
-(define translate (lambda (x:string hsh:hash)
+(set! translate (fn* (x:string hsh:hash)
   (let* (chrs (split x ""))
     (join (map chrs (lambda (x)
                   (if (get hsh x)
@@ -357,31 +239,9 @@
                     x)))))))
 
 ;; Convert the given string to upper-case, via the lookup table.
-(define upper (lambda (x:string)
+(set! upper (fn* (x:string)
                 (translate x upper-table)))
 
 ;; Convert the given string to upper-case, via the lookup table.
-(define lower (lambda (x:string)
+(set! lower (fn* (x:string)
                 (translate x lower-table)))
-
-
-;; This is required for our quote/quasiquote/unquote/splice-unquote handling
-;;
-;; Testing is hard, but
-;;
-;; (define lst (quote (b c)))                      ; b c
-;; (print (quasiquote (a lst d)))                  ; (a lst d)
-;; (print (quasiquote (a (unquote lst) d)))        ; (a (b c) d)
-;; (print (quasiquote (a (splice-unquote lst) d))) ; (a b c d)
-;;
-(define concat (lambda (seq1 seq2)
-  (if (nil? seq1)
-      seq2
-      (cons (car seq1) (concat (cdr seq1) seq2)))))
-
-
-;;
-;; Read a file
-;;
-(def! load-file (fn* (f)
-                     (eval (join (list "(do " (slurp f) "\nnil)")))))
