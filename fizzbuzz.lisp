@@ -32,10 +32,10 @@
 (define divByThree (lambda (n:number) (zero? (% n 3))))
 
 ;; Is the given number divisible by 5?
-(define divByFive  (lambda (n:number) (zero? (% n 5))))
+(set! divByFive  (fn* (n:number) (zero? (% n 5))))
 
 ;; Run the fizz-buzz test for the given number, N
-(define fizz (lambda (n:number)
+(set! fizz (fn* (n:number)
   (cond
       (and (list (divByThree n) (divByFive n)))  (print "fizzbuzz")
       (divByThree n)                             (print "fizz")

@@ -62,7 +62,7 @@ That concludes the brief overview, note that `lambda` can be used as a synonym f
 
 ## Features
 
-We have a reasonable number of functions implemented, either in our golang core or in our standard-library (which is implemented in yal itself):
+We have a reasonable number of functions implemented, either in our golang core or in the standard-library which is loaded ahead of all user-scripts (the standard-library is implemented in lisp).
 
 * Basic types include strings, numbers, errors, lists, hashes, etc.
   * `#t` is the true symbol, `#f` is false.
@@ -96,6 +96,7 @@ We have a reasonable number of functions implemented, either in our golang core 
   * `defmacro!` is used to define macros.
   * `fn*` can be used as a synonym for `lambda`.
   * `let*` can be used to define a local scope.
+  * Several functions/macros that are expected to be present can be found in [stdlib/mal.lisp](stdlib/mal.lisp).
 
 Building upon those primitives we have a larger standard-library of functions written in Lisp such as:
 
@@ -107,7 +108,8 @@ Although the lists above should be up to date you can check the definitions to s
   * [builtins/builtins.go](builtins/builtins.go)
 * Primitives implemented in 100% pure lisp:
   * [stdlib/stdlib.lisp](stdlib/stdlib.lisp)
-  * The code in this file is essentially **prepended** to any script that is supplied upon the command-line.
+  * [stdlib/mal.lisp](stdlib/mal.lisp)
+  * The code in these files is essentially **prepended** to any script that is supplied upon the command-line.
 
 
 
@@ -128,7 +130,7 @@ There are a couple of areas where we've implemented special/unusual things:
 Here's an example of type-checking on a parameter value, in this case a list is required, via the `:list` suffix:
 
 ```lisp
-(define blah (lambda (a:list) (print "I received the list %s" a)))
+(set! blah (fn* (a:list) (print "I received the list %s" a)))
 
 (blah '(1 2 3))    ; => "I received the list (1 2 3)"
 (blah #f)          ; => Error running: argument a to blah was supposed to be list, but got false
@@ -150,7 +152,7 @@ The following type suffixes are permitted and match what you'd expect:
 
 If multiple types are permitted then just keep appending things, for example:
 
-* `(define blah (lambda (a:list:number)  (print "I was given a list OR a number: %s" a)))`
+* `(set! blah (fn* (a:list:number)  (print "I was given a list OR a number: %s" a)))`
   * Allows either a list, or a number.
 
 
@@ -193,6 +195,10 @@ A reasonable amount of sample code can be found in the various included examples
 * [fizzbuzz.lisp](fizzbuzz.lisp) is a standalone sample of solving the fizzbuzz problem.
 * [mtest.lisp](mtest.lisp) shows some macro examples.
 
+As noted there is a standard-library of functions which are loaded along with any user-supplied script.  These functions are implemented in lisp and also serve as a demonstration of syntax and features:
+
+* [stdlib/stdlib.lisp](stdlib/stdlib.lisp)
+* [stdlib/mal.lisp](stdlib/mal.lisp)
 
 
 
@@ -247,11 +253,12 @@ ok  	github.com/skx/yal	2.679s
 
 For longer runs add `-benchtime=30s`, or similar, to the command-line.
 
-Here you see that the lisp version is approximately 3000% slower than the pure golang implementation.  There is a small comparison of my toy scripting languages available here:
+Here you see that the lisp version is approximately 3000% slower than the pure golang implementation.  I put together a small comparison of toy scripting languages available here:
 
 * [Toy Language Benchmarks](https://github.com/skx/toy-language-benchmarks)
 
-This shows that the Lisp implementation here isn't so bad!
+This shows that the Lisp implementation isn't so slow, although it is not the fasted of the scripting languages I've implemented.
+
 
 
 

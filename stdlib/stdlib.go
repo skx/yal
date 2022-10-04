@@ -7,9 +7,13 @@ import (
 )
 
 //go:embed stdlib.lisp
-var message string
+var stdlib string
+
+//go:embed mal.lisp
+var mal string
 
 // Contents returns the embedded contents of our Lisp standard-library.
 func Contents() []byte {
-	return []byte(message)
+
+	return []byte(stdlib + "\n" + mal + "\n")
 }

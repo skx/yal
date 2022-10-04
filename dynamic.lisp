@@ -10,8 +10,8 @@
 ;; a given name via `filter`.  Assuming only one response then we're
 ;; able to find it by name, and execute it.
 ;;
-(define call-by-name
-  (lambda (name:string &args)
+(set! call-by-name
+  (fn* (name:string &args)
     (let* (out nil  ; out is the result of the filter
            nm  nil  ; nm is the name of the result == name
            fn  nil) ; fn is the function of the result

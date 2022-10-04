@@ -21,7 +21,7 @@
 
 
 ;; This function is used as a callback by apply-hash.
-(define hash-element (lambda (key val)
+(set! hash-element (fn* (key val)
    (print "KEY:%s VAL:%s" key val)))
 
 ;; The `apply-hash` function will trigger a callback for each key and value
@@ -34,7 +34,7 @@
 
 ;; Here we see a type-restriction, the following function can only be
 ;; invoked with a hash-argument.
-(define blah (lambda (h:hash) (print "Got argument of type %s" (type h))))
+(set! blah (fn* (h:hash) (print "Got argument of type %s" (type h))))
 
 ;; Call it
 (blah person)
@@ -55,6 +55,5 @@
 (print "Values in the environment matching the regexp /int/\n%s" out)
 
 ;;
-(apply out (lambda (x) (do
-                        (print "Function in env. matching regexp /int/")
-                        (print "\t%s" (get x :name)))))
+(print "Function in env. matching regexp /int/:")
+(apply out (lambda (x) (print "\t%s" (get x :name))))
