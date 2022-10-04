@@ -128,7 +128,7 @@ There are a couple of areas where we've implemented special/unusual things:
 Here's an example of type-checking on a parameter value, in this case a list is required, via the `:list` suffix:
 
 ```lisp
-(define blah (lambda (a:list) (print "I received the list %s" a)))
+(set! blah (fn* (a:list) (print "I received the list %s" a)))
 
 (blah '(1 2 3))    ; => "I received the list (1 2 3)"
 (blah #f)          ; => Error running: argument a to blah was supposed to be list, but got false
@@ -150,7 +150,7 @@ The following type suffixes are permitted and match what you'd expect:
 
 If multiple types are permitted then just keep appending things, for example:
 
-* `(define blah (lambda (a:list:number)  (print "I was given a list OR a number: %s" a)))`
+* `(set! blah (fn* (a:list:number)  (print "I was given a list OR a number: %s" a)))`
   * Allows either a list, or a number.
 
 

@@ -1,4 +1,4 @@
-#!/home/skx/go/bin/yal
+#!/usr/bin/env yal
 ;;
 ;;  Usage:
 ;;

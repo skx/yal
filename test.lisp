@@ -32,7 +32,7 @@
 
 
 ;; Define a function, `fact`, to calculate factorials.
-(define fact (lambda (n)
+(set! fact (fn* (n)
   (if (<= n 1)
     1
       (* n (fact (- n 1))))))
@@ -41,7 +41,7 @@
 
 
 ;; Return the number of ms a function invokation took.
-(define benchmark (lambda (fn)
+(set! benchmark (fn* (fn)
   (let* (start-ms (ms)
          _ (fn)
          end-ms (ms))
@@ -78,11 +78,11 @@
 
 
 ;; Define another function, and invoke it
-(define sum2 (lambda (n acc) (if (= n 0) acc (sum2 (- n 1) (+ n acc)))))
+(set! sum2 (fn* (n acc) (if (= n 0) acc (sum2 (- n 1) (+ n acc)))))
 (print "Sum of 1-100: %s" (sum2 100 0))
 
 ;; Now create a utility function to square a number
-(define sq (lambda (x) (* x x)))
+(set! sq (fn* (x) (* x x)))
 
 ;; For each item in the range 1-10, print it, and the associated square.
 ;; Awesome!  Much Wow!
@@ -132,7 +132,7 @@
 ;;
 ;; A simple assertion function
 ;;
-(define assert (lambda (result msg)
+(set! assert (fn* (result msg)
   (if result ()
     (print "ASSERT failed - %s" msg))))
 
@@ -172,12 +172,12 @@
 
 
 ;; We have a built-in eval function, which operates upon symbols, or strings.
-(define e "(+ 3 4)")
+(set! e "(+ 3 4)")
 (print "Eval of '%s' resulted in %s" e (eval e))
 (print "Eval of '%s' resulted in %s" "(+ 40 2)" (eval "(+ 40 2)"))
 
 ;; Simple test of `cond`
-(define a 6)
+(set! a 6)
 (cond
     (> a 20) (print "A > 20")
     (> a 15) (print "A > 15")
@@ -195,5 +195,5 @@
 (print "%s" (lower "Hello, World; in LOWER-case."))
 
 ;; All done! -> In red :)
-(define red (lambda (msg) (sprintf "\e[0;31m%s\e[0m" msg)))
+(set! red (fn* (msg) (sprintf "\e[0;31m%s\e[0m" msg)))
 (print (red "All done!"))

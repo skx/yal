@@ -10,7 +10,7 @@
 
 
 ;; Define a simple list for testing-purposes.
-(define lst (quote (b c)))
+(set! lst (quote (b c)))
 
 ;;
 ;; Here is our first macro, given a variable-name show both the
@@ -105,9 +105,9 @@
 ;;
 ;; Define three variables A, B, & C
 ;;
-(define a 1)
-(define b 2)
-(define c 3)
+(set! a 1)
+(set! b 2)
+(set! c 3)
 
 ;;
 ;; Confirm they have expected values
