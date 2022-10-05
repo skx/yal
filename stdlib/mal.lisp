@@ -23,32 +23,10 @@
 (def! false? (fn* (arg) (if (eq #f arg) true false)))
 
 
-
-
-;;
-;; if2 is a simple macro which allows you to run two actions if an
-;; (if ..) test succeeds.
-;;
-;; This means you can write:
-;;
-;;   (if2 true (print "1") (print "2"))
-;;
-;; Instead of having to use (do), like so:
-;;
-;;   (if true (do (print "1") (print "2")))
-;;
-;; The downside here is that you don't get a negative branch, but running
-;; two things is very common - see for example the "(while)" and "(repeat)"
-;; macros later in this file.
-;;
-(defmacro! if2 (fn* (pred one two)
-  `(if ~pred (do ~one ~two))))
-
-
-;;
 ;; Run an arbitrary series of statements, if the given condition is true.
 ;;
-;; This is the more general/useful version of the "if2" macro, given above.
+;; This is the more general/useful version of the "if2" macro, which
+;; we demonstrate in mtest.lisp.
 ;;
 ;; Sample usage:
 ;;
@@ -62,17 +40,13 @@
 ;;
 ;; NOTE: This recurses, so it will eventually explode the stack.
 ;;
-;; NOTE: We use "if2" not "if".
-;;
 (define while-fun (lambda (predicate body)
-  (if2 (predicate)
+  (when (predicate)
     (body)
     (while-fun predicate body))))
 
 ;;
 ;; Now a macro to use the while-fun body as part of a while-function
-;;
-;; NOTE: We use "if2" not "if".
 ;;
 (defmacro! while (fn* (expression body)
                      (list 'while-fun
