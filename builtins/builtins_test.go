@@ -830,6 +830,15 @@ func TestCdr(t *testing.T) {
 
 func TestStr(t *testing.T) {
 
+	// calling with no arguments will lead to an error
+	fail := strFn([]primitive.Primitive{})
+
+	// Will lead to an error
+	_, ok := fail.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", fail)
+	}
+
 	// calling with an arg
 	out := strFn([]primitive.Primitive{
 		primitive.Number(32),

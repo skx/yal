@@ -432,6 +432,9 @@ func slurpFn(args []primitive.Primitive) primitive.Primitive {
 
 // strFn implements "str"
 func strFn(args []primitive.Primitive) primitive.Primitive {
+	if len(args) != 1 {
+		return primitive.Error("wrong number of arguments")
+	}
 	return primitive.String(args[0].ToString())
 }
 
