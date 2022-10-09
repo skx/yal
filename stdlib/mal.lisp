@@ -35,23 +35,18 @@
 (defmacro! when (fn* (pred &rest) `(if ~pred (do ~@rest))))
 
 ;;
-;; Part of our while-implementation.
 ;; If the specified predicate is true, then run the body.
 ;;
 ;; NOTE: This recurses, so it will eventually explode the stack.
 ;;
-(define while-fun (lambda (predicate body)
-  (when (predicate)
-    (body)
-    (while-fun predicate body))))
-
-;;
-;; Now a macro to use the while-fun body as part of a while-function
-;;
-(defmacro! while (fn* (expression body)
-                     (list 'while-fun
-                           (list 'lambda '() expression)
-                           (list 'lambda '() body))))
+(defmacro! while (fn* (condition &body)
+  (let* (inner-sym (gensym))
+    `(let* (~inner-sym (fn* ()
+                            (if ~condition
+                                (do
+                                    ~@body
+                                    (~inner-sym)))))
+       (~inner-sym)))))
 
 
 ;;
