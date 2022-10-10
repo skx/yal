@@ -192,6 +192,7 @@ Once you've built, and optinall installed, the CLI driver there are two ways to 
 A reasonable amount of sample code can be found in the various included examples:
 
 * [test.lisp](test.lisp) shows many things.
+* [fibonacci.list](fibonacci.lisp) calculate the first 25 numbers of the Fibonacci sequence.
 * [fizzbuzz.lisp](fizzbuzz.lisp) is a standalone sample of solving the fizzbuzz problem.
 * [mtest.lisp](mtest.lisp) shows some macro examples.
 
@@ -199,6 +200,35 @@ As noted there is a standard-library of functions which are loaded along with an
 
 * [stdlib/stdlib.lisp](stdlib/stdlib.lisp)
 * [stdlib/mal.lisp](stdlib/mal.lisp)
+
+Running these example will produce output, for example:
+
+```lisp
+yal fibonacci.lisp
+1st fibonacci number is 1
+2nd fibonacci number is 1
+3rd fibonacci number is 2
+4th fibonacci number is 3
+5th fibonacci number is 5
+6th fibonacci number is 8
+7th fibonacci number is 13
+8th fibonacci number is 21
+9th fibonacci number is 34
+10th fibonacci number is 55
+11th fibonacci number is 89
+12th fibonacci number is 144
+13th fibonacci number is 233
+14th fibonacci number is 377
+15th fibonacci number is 610
+16th fibonacci number is 987
+17th fibonacci number is 1597
+18th fibonacci number is 2584
+19th fibonacci number is 4181
+20th fibonacci number is 6765
+21st fibonacci number is 10946
+22nd fibonacci number is 17711
+
+```
 
 
 
