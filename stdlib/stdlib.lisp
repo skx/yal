@@ -80,6 +80,12 @@
 ;; Square root
 (set! sqrt (fn* (x:number) (# x 0.5)))
 
+;; Return the last element of a list
+(set! last (fn* (lst:list)
+  (let* (c (cdr lst))
+    (if (! (nil? c))
+      (last c)
+      (car lst)))))
 
 ;; Setup a simple function to run a loop N times
 ;;

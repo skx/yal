@@ -76,7 +76,7 @@ We have a reasonable number of functions implemented, either in our golang core 
   * Hash functions are `contains?`, `get`, `keys`, `set`, & `vals`.
     * Note that keys are returned in sorted order.  Values are returned in order of their sorted keys too.
 * List operations:
-  * `car`, `cdr`, `cons`, `list`, & `sort`.
+  * `car`, `cdr`, `cons`, `first`, `last`, `list`, & `sort`.
 * Logical operations:
   * `and`, & `or`.
 * Mathematical operations:
@@ -204,7 +204,7 @@ As noted there is a standard-library of functions which are loaded along with an
 Running these example will produce output, for example:
 
 ```lisp
-yal fibonacci.lisp
+$ yal fibonacci.lisp
 1st fibonacci number is 1
 2nd fibonacci number is 1
 3rd fibonacci number is 2
