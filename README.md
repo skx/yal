@@ -125,6 +125,7 @@ There are a couple of areas where we've implemented special/unusual things:
   * See [args.lisp](args.lisp) for an example.
 * Introspection via the `(env)` function, which will return details of all variables/functions in the environment.
   * Allowing dynamic invocation shown in [dynamic.lisp](dynamic.lisp) and other neat things.
+  * This includes help-information for both built-in and user-written functions.
 * Support for hashes as well as lists/strings/numbers/etc.
   * A hash looks like this `{ :name "Steve" :location "Helsinki" }`
   * Sample code is visible in [hash.lisp](hash.lisp).
@@ -188,6 +189,13 @@ Once you've built, and optinall installed, the CLI driver there are two ways to 
   * `yal -e "(print (os))"`
 * By passing the name of a file to read and execute.
   * `yal test.lisp`
+
+As our interpreter allows documentation to be attached to functions, both those implemented in golang and those written in lisp, we also have a flag to dump that information:
+
+* `yal -h`
+  * Shows all functions which contain help-text, in sorted order.
+  * Examples are included where available.
+
 
 
 
