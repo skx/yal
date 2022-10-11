@@ -1402,6 +1402,37 @@ func TestNow(t *testing.T) {
 
 }
 
+// We don't really test the contents here.
+func TestDateTime(t *testing.T) {
+
+	// No arguments
+	dt := dateFn([]primitive.Primitive{})
+	tm := timeFn([]primitive.Primitive{})
+
+	// date should return a list
+	out, ok := dt.(primitive.List)
+	if !ok {
+		t.Fatalf("expected list for (date), got %v", dt)
+	}
+
+	// "weekday", "day", "month", "year" == four entries
+	if len(out)!= 4 {
+		t.Fatalf("date list had the wrong length, got %d: %v", len(out), out)
+	}
+
+	// time should return a list
+	out, ok = tm.(primitive.List)
+	if !ok {
+		t.Fatalf("expected list for (time), got %v", tm)
+	}
+
+	// "hour", "minute", "seconds" == three entries
+	if len(out)!= 3 {
+		t.Fatalf("time list had the wrong length, got %d: %v", len(out), out)
+	}
+
+}
+
 func TestArch(t *testing.T) {
 
 	// No arguments
