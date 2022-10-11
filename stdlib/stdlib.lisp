@@ -35,6 +35,22 @@
 (set! >= (fn* (a b) (! (< a b))))
 (set! <= (fn* (a b) (! (> a b))))
 
+;; We have a built in function "date" to return the current date
+;; as a list (DD MM YYYY).  We also ahve a builtin function (time)
+;; to return the time as a list (HH MM SS).
+;;
+;; create some helper functions for retrieving the various parts of
+;; the date/time.
+(set! year (fn* () (nth (date) 3)))
+(set! month (fn* () (nth (date) 2)))
+(set! day (fn* () (nth (date) 1)))
+(set! weekday (fn* () (nth (date) 0)))
+
+(set! hour (fn* () (nth (time) 0)))
+(set! minute (fn* () (nth (time) 1)))
+(set! second (fn* () (nth (time) 2)))
+(set! hms (fn* () (sprintf "%s:%s:%s" (hour) (minute) (second))))
+
 ;;
 ;; This is a bit sneaky.  NOTE there is no short-circuiting here.
 ;;
