@@ -69,6 +69,10 @@ We have a reasonable number of functions implemented, either in our golang core 
   * `true` and `false` are available as synonyms.
 * Comparison functions:
   * `<`, `<=`, `>`, `>=`, `=`, & `eq`.
+* Date and time functions:
+  * `(date)` and `(time)` are implemented in our core application, but individual fields are made available via our standard-library:
+    * `(year)`, `(month)`, `(day)`, `(weekday)`, `(hour)`, `(minute)`, `(second)` ‚ `(hms)`.
+  * Each of these are demonstrated in [time.lisp](time.lisp).
 * Error handling:
   * `error`, `try`, and `catch` - as demonstrated in [try.lisp](try.lisp).
 * Hash operations:
