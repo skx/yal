@@ -68,15 +68,17 @@ func PopulateEnvironment(env *env.Environment) {
 	env.Set("eq", &primitive.Procedure{F: eqFn})
 
 	// Types
-	env.Set("nil?", &primitive.Procedure{F: nilFn})
-	env.Set("type", &primitive.Procedure{F: typeFn})
+	env.Set("nil?", &primitive.Procedure{F: nilFn, Help: `nil? returns a true value if the specified argument is nil, or an empty list.`})
+	env.Set("type", &primitive.Procedure{F: typeFn, Help: `type returns a string describing the type of the specified object.
+
+Example:  (type "string") (type 3) (type type)`})
 
 	// List
-	env.Set("car", &primitive.Procedure{F: carFn})
-	env.Set("cdr", &primitive.Procedure{F: cdrFn})
-	env.Set("cons", &primitive.Procedure{F: consFn})
-	env.Set("join", &primitive.Procedure{F: joinFn})
-	env.Set("list", &primitive.Procedure{F: listFn})
+	env.Set("car", &primitive.Procedure{F: carFn, Help: `car returns the first item from the specified list.`})
+	env.Set("cdr", &primitive.Procedure{F: cdrFn, Help: `cdr returns all items from the specified list, except the first.`})
+	env.Set("cons", &primitive.Procedure{F: consFn, Help: `cons joins the two specified lists: FIXME`})
+	env.Set("join", &primitive.Procedure{F: joinFn, Help: `join returns a string formed by converting every element of the supplied list into a string and concatenating them.`})
+	env.Set("list", &primitive.Procedure{F: listFn, Help: `list creates and returns a list containing each of the specified arguments, in order.`})
 
 	// Hash
 	env.Set("contains?", &primitive.Procedure{F: containsFn})
@@ -590,7 +592,6 @@ func splitFn(args []primitive.Primitive) primitive.Primitive {
 	return c
 }
 
-
 // timeFn returns the current (HH, MM, SS) as a list.
 func timeFn(args []primitive.Primitive) primitive.Primitive {
 	var ret primitive.List
@@ -607,7 +608,6 @@ func timeFn(args []primitive.Primitive) primitive.Primitive {
 
 	return ret
 }
-
 
 // (join (1 2 3)
 func joinFn(args []primitive.Primitive) primitive.Primitive {
