@@ -53,7 +53,9 @@
 ;;
 ;;  (when (= 1 1) (print "OK") (print "Still OK") (print "final statement"))
 ;;
-(defmacro! when (fn* (pred &rest) `(if ~pred (do ~@rest))))
+(defmacro! when (fn* (pred &rest)
+                     "when is a macro which runs the specified body, providing the specified predicate is true.    It is similar to an if-statement, however there is no provision for an 'else' clause, and the body specified may contain more than once expression to be evaluated."
+                     `(if ~pred (do ~@rest))))
 
 ;;
 ;; If the specified predicate is true, then run the body.
@@ -61,25 +63,27 @@
 ;; NOTE: This recurses, so it will eventually explode the stack.
 ;;
 (defmacro! while (fn* (condition &body)
-  (let* (inner-sym (gensym))
-    `(let* (~inner-sym (fn* ()
-                            (if ~condition
-                                (do
-                                    ~@body
-                                    (~inner-sym)))))
-       (~inner-sym)))))
+                      "while is a macro which repeatedly runs the specified body, while the condition returns a true-result"
+                      (let* (inner-sym (gensym))
+                        `(let* (~inner-sym (fn* ()
+                                                (if ~condition
+                                                    (do
+                                                        ~@body
+                                                        (~inner-sym)))))
+                           (~inner-sym)))))
 
 
 ;;
 ;; cond is a useful thing to have.
 ;;
 (defmacro! cond (fn* (&xs)
-  (if (> (length xs) 0)
-      (list 'if (first xs)
-            (if (> (length xs) 1)
-                (nth xs 1)
-              (error "An odd number of forms to (cond..)"))
-            (cons 'cond (rest (rest xs)))))))
+                     "cond is a macro which accepts a list of conditions and results, and returns the value of the first matching condition.  It is similar in functionality to a C case-statement."
+                     (if (> (length xs) 0)
+                         (list 'if (first xs)
+                               (if (> (length xs) 1)
+                                   (nth xs 1)
+                                 (error "An odd number of forms to (cond..)"))
+                               (cons 'cond (rest (rest xs)))))))
 
 ;; A useful helper to apply a given function to each element of a list.
 (set! apply (fn* (lst:list fun:function)
