@@ -897,7 +897,7 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 			case primitive.Symbol("lambda"), primitive.Symbol("fn*"):
 
 				// ensure we have arguments
-				if len(listExp) < 3 {
+				if len(listExp) != 3 && len(listExp) != 4 {
 					return primitive.Error("wrong number of arguments")
 				}
 
@@ -918,6 +918,15 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 					args = append(args, xs)
 				}
 
+				body := listExp[2]
+				help := ""
+
+				// If there's an optional help string ..
+				if len(listExp) == 4 {
+					help = listExp[2].ToString()
+					body = listExp[3]
+
+				}
 				// This is a procedure, which will default
 				// to not being a macro.
 				//
@@ -925,8 +934,9 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 				// "(defmacro!..)"
 				return &primitive.Procedure{
 					Args:  args,
-					Body:  listExp[2],
+					Body:  body,
 					Env:   e,
+					Help:  help,
 					Macro: false,
 				}
 
