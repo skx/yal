@@ -12,6 +12,7 @@ import (
 	"fmt"
 	"os"
 	"sort"
+	"strings"
 
 	"github.com/skx/yal/builtins"
 	"github.com/skx/yal/env"
@@ -74,6 +75,16 @@ func main() {
 	// Show the help?
 	if *hlp {
 
+		// Read the standard library
+		pre := stdlib.Contents()
+
+		// Create a new interpreter with that source
+		interpreter := eval.New(string(pre))
+
+		// Now evaluate the library, so we get the help for the
+		// built-in functions
+		interpreter.Evaluate(environment)
+
 		// Build up a list of all things known in the environment
 		keys := []string{}
 
@@ -91,7 +102,9 @@ func main() {
 
 			prc, ok := val.(*primitive.Procedure)
 			if ok && len(prc.Help) > 0 {
-				fmt.Printf("%s\n\t%s\n\n", key, prc.Help)
+				txt := prc.Help
+				txt = strings.Replace(txt, "\\t", "\t", -1)
+				fmt.Printf("%s\n\t%s\n\n", key, txt)
 			}
 
 		}
