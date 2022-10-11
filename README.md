@@ -79,6 +79,9 @@ We have a reasonable number of functions implemented, either in our golang core 
   * Hashes are literals like this `{ :name "Steve" :location "Helsinki" }`
   * Hash functions are `contains?`, `get`, `keys`, `set`, & `vals`.
     * Note that keys are returned in sorted order.  Values are returned in order of their sorted keys too.
+* Help functions:
+  * `help` will return the supplied help text for any functions which provide it - which includes all of our built-in functions and large parts of our standard-library.
+  * **NOTE**: This does not (yet?) include help for special forms such as `(let* ..)`, `(if ..)`, etc.
 * List operations:
   * `car`, `cdr`, `cons`, `first`, `last`, `list`, & `sort`.
 * Logical operations:
@@ -125,6 +128,7 @@ There are a couple of areas where we've implemented special/unusual things:
   * See [args.lisp](args.lisp) for an example.
 * Introspection via the `(env)` function, which will return details of all variables/functions in the environment.
   * Allowing dynamic invocation shown in [dynamic.lisp](dynamic.lisp) and other neat things.
+  * This includes help-information for both built-in and user-written functions.
 * Support for hashes as well as lists/strings/numbers/etc.
   * A hash looks like this `{ :name "Steve" :location "Helsinki" }`
   * Sample code is visible in [hash.lisp](hash.lisp).
@@ -188,6 +192,13 @@ Once you've built, and optinall installed, the CLI driver there are two ways to 
   * `yal -e "(print (os))"`
 * By passing the name of a file to read and execute.
   * `yal test.lisp`
+
+As our interpreter allows documentation to be attached to functions, both those implemented in golang and those written in lisp, we also have a flag to dump that information:
+
+* `yal -h`
+  * Shows all functions which contain help-text, in sorted order.
+  * Examples are included where available.
+
 
 
 
