@@ -79,6 +79,9 @@ We have a reasonable number of functions implemented, either in our golang core 
   * Hashes are literals like this `{ :name "Steve" :location "Helsinki" }`
   * Hash functions are `contains?`, `get`, `keys`, `set`, & `vals`.
     * Note that keys are returned in sorted order.  Values are returned in order of their sorted keys too.
+* Help functions:
+  * `help` will return the supplied help text for any functions which provide it - which includes all of our built-in functions and large parts of our standard-library.
+  * **NOTE**: This does not (yet?) include help for special forms such as `(let* ..)`, `(if ..)`, etc.
 * List operations:
   * `car`, `cdr`, `cons`, `first`, `last`, `list`, & `sort`.
 * Logical operations:

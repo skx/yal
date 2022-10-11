@@ -89,6 +89,11 @@ Example:  (type "string") (type 3) (type type)`})
 
 \tSee also: set
 \t Example: (get {:name "steve" :location "Europe" } ":name")`})
+
+	env.Set("help", &primitive.Procedure{F: helpFn, Help: `help returns any help associated with the item specified as the single argument.
+
+\tExample: (print (help print))`})
+
 	env.Set("keys", &primitive.Procedure{F: keysFn, Help: `keys returns the keys which are present in the specified hash.
 
 NOTE: Keys are returned in sorted order.
@@ -752,6 +757,23 @@ func getFn(args []primitive.Primitive) primitive.Primitive {
 
 	tmp := args[0].(primitive.Hash)
 	return tmp.Get(args[1].ToString())
+}
+
+// helpFn is the implementation of `(help fn)`
+func helpFn(args []primitive.Primitive) primitive.Primitive {
+	// We need a single argument
+	if len(args) != 1 {
+		return primitive.Error("invalid argument count")
+	}
+
+	// Which is a function
+	proc, ok := args[0].(*primitive.Procedure)
+
+	if !ok {
+		return primitive.Error("argument not a procedure")
+	}
+
+	return primitive.String(proc.Help)
 }
 
 // keysFn is the implementation of `(keys hash)`
