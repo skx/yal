@@ -184,11 +184,25 @@
 
 
 ;; More mathematical functions relating to negative numbers.
-(set! neg  (fn* (n:number) (- 0 n)))
-(set! neg? (fn* (n:number) (< n 0)))
-(set! pos? (fn* (n:number) (> n 0)))
-(set! abs  (fn* (n:number) (if (neg? n) (neg n) n)))
-(set! sign (fn* (n:number) (if (neg? n) (neg 1) 1)))
+(set! neg  (fn* (n:number)
+                "Negate the supplied number, and return it."
+                (- 0 n)))
+
+(set! neg? (fn* (n:number)
+                "Return true if the supplied number is negative."
+                (< n 0)))
+
+(set! pos? (fn* (n:number)
+                "Return true if the supplied number is positive."
+                (> n 0)))
+
+(set! abs  (fn* (n:number)
+                "Return the absolute value of the supplied number."
+                (if (neg? n) (neg n) n)))
+
+(set! sign (fn* (n:number)
+                "Return 1 if the specified number is positive, and -1 if it is negative."
+                (if (neg? n) (neg 1) 1)))
 
 
 ;; Create ranges of numbers in a list

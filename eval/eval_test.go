@@ -50,8 +50,51 @@ func TestTimeout(t *testing.T) {
 	// We should get the context error, but sometimes we don't
 	// the important thing is we DON'T hang forever
 	if !strings.Contains(out.ToString(), "deadline exceeded") &&
-		!strings.Contains(out.ToString(), "not a function")		{
+		!strings.Contains(out.ToString(), "not a function") {
 		t.Fatalf("Didn't get the expected output.  Got: %s", out.ToString())
+	}
+
+}
+
+// TestStdlibHelp is designed to ensure that > 80% of our standard library
+// functions have help-documentation
+func TestStdlibHelp(t *testing.T) {
+
+	// Load our standard library
+	st := stdlib.Contents()
+	std := string(st)
+
+	// Create a new interpreter
+	l := New(std)
+
+	// With a new environment
+	env := env.New()
+
+	// Populate the default primitives
+	builtins.PopulateEnvironment(env)
+
+	// Run it
+	_ = l.Evaluate(env)
+
+	// Now we should have an environment which is
+	// populated with functions
+	for name, val := range env.Items() {
+
+		proc, ok := val.(*primitive.Procedure)
+
+		if !ok {
+			t.Skip("ignoring non-procedure entry in environment " + name)
+		}
+		if len(name) == 1 {
+			t.Skip("ignoring procedure with a single-character name " + name)
+		}
+
+		t.Run(name, func(t *testing.T) {
+
+			if len(proc.Help) == 0 {
+				t.Fatalf("empty help for %s", name)
+			}
+		})
 	}
 
 }
