@@ -773,7 +773,20 @@ func helpFn(args []primitive.Primitive) primitive.Primitive {
 		return primitive.Error("argument not a procedure")
 	}
 
-	return primitive.String(proc.Help)
+	// Return value
+	str := ""
+
+	for _, arg := range proc.Args {
+		if len(str) == 0 {
+			str = "Arguments"
+		}
+		str += " " + arg.ToString()
+	}
+	if len(str) > 0 {
+		str += "\n"
+	}
+	str += proc.Help
+	return primitive.String(str)
 }
 
 // keysFn is the implementation of `(keys hash)`

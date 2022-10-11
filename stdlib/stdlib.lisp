@@ -66,15 +66,38 @@
 ;;
 ;; create some helper functions for retrieving the various parts of
 ;; the date/time.
-(set! year (fn* () (nth (date) 3)))
-(set! month (fn* () (nth (date) 2)))
-(set! day (fn* () (nth (date) 1)))
-(set! weekday (fn* () (nth (date) 0)))
+(set! year (fn* ()
+                "Return the current year, as an integer."
+                (nth (date) 3)))
 
-(set! hour (fn* () (nth (time) 0)))
-(set! minute (fn* () (nth (time) 1)))
-(set! second (fn* () (nth (time) 2)))
-(set! hms (fn* () (sprintf "%s:%s:%s" (hour) (minute) (second))))
+(set! month (fn* ()
+                 "Return the number of the current month, as an integer."
+                 (nth (date) 2)))
+
+(set! day (fn* ()
+               "Return the day of the current month, as an integer."
+               (nth (date) 1)))
+
+(set! weekday (fn* ()
+                   "Return a string containing the current day of the week."
+                   (nth (date) 0)))
+
+(set! hour (fn* ()
+                "Return the current hour, as an integer."
+                (nth (time) 0)))
+
+(set! minute (fn* ()
+                  "Return the current minute, as an integer."
+                  (nth (time) 1)))
+
+(set! second (fn* ()
+                  "Return the current seconds, as an integer."
+                  (nth (time) 2)))
+
+(set! hms (fn* ()
+               "Return the current time, formatted as 'HH:MM:SS', as a string."
+               (sprintf "%s:%s:%s" (hour) (minute) (second))))
+
 
 ;;
 ;; This is a bit sneaky.  NOTE there is no short-circuiting here.
@@ -108,8 +131,8 @@
 
 
 ;; inc/dec are useful primitives to have
-(set! inc  (fn* (n:number) (+ n 1)))
-(set! dec  (fn* (n:number) (- n 1)))
+(set! inc (fn* (n:number) (+ n 1)))
+(set! dec (fn* (n:number) (- n 1)))
 
 ;; We could also define the incr/decr operations as macros.
 (defmacro! incr (fn* (x) `(set! ~x (+ ~x 1))))
@@ -123,18 +146,20 @@
 
 ;; Return the last element of a list
 (set! last (fn* (lst:list)
-  (let* (c (cdr lst))
-    (if (! (nil? c))
-      (last c)
-      (car lst)))))
+                "last returns the last item in the specified list, it is the opposite of cdr."
+                (let* (c (cdr lst))
+                  (if (! (nil? c))
+                      (last c)
+                    (car lst)))))
 
 ;; Setup a simple function to run a loop N times
 ;;
 (set! repeat (fn* (n body)
-  (if (> n 0)
-      (do
-          (body n)
-          (repeat (- n 1) body)))))
+                  "Execute the supplied body of code N times."
+                  (if (> n 0)
+                      (do
+                          (body n)
+                          (repeat (- n 1) body)))))
 
 ;; A helper to apply a function to each key/value pair of a hash
 (set! apply-hash (fn* (hs:hash fun:function)
@@ -143,7 +168,9 @@
 
 
 ;; Count the length of a string
-(set! strlen (fn* (str:string) (length (split str "" ))))
+(set! strlen (fn* (str:string)
+                  "Calculate and return the length of the supplied string."
+                  (length (split str "" ))))
 
 
 ;; More mathematical functions relating to negative numbers.
@@ -156,13 +183,18 @@
 
 ;; Create ranges of numbers in a list
 (set! range (fn* (start:number end:number step:number)
-  (if (< start end)
-     (cons start (range (+ start step) end step))
-        ())))
+                 "Create a list of numbers between the start and end bounds, incrementing by the given offset each time."
+                 (if (< start end)
+                     (cons start (range (+ start step) end step))
+                   ())))
 
 ;; Create sequences from 0/1 to N
-(set! seq (fn* (n:number) (range 0 n 1)))
-(set! nat (fn* (n:number) (range 1 n 1)))
+(set! seq (fn* (n:number)
+               "Create, and return, list of number ranging from 0-N"
+               (range 0 n 1)))
+(set! nat (fn* (n:number)
+               "Create, and return, a list of numbers ranging from 1 to N."
+               (range 1 n 1)))
 
 
 ;; Remove items from a list where the predicate function is not T
@@ -184,20 +216,22 @@
 
 ;; Now define min/max using reduce
 (set! min (fn* (xs:list)
-  (if (nil? xs)
-    ()
-      (reduce xs
-        (lambda (a b)
-           (if (< a b) a b))
-              (car xs)))))
+               "Return the smallest integer from the list of numbers supplied."
+               (if (nil? xs)
+                   ()
+                 (reduce xs
+                         (lambda (a b)
+                           (if (< a b) a b))
+                         (car xs)))))
 
 (set! max (fn* (xs:list)
-  (if (nil? xs)
-    ()
-      (reduce xs
-        (lambda (a b)
-           (if (< a b) b a))
-              (car xs)))))
+               "Return the maximum integer from the list of numbers supplied."
+               (if (nil? xs)
+                   ()
+                 (reduce xs
+                         (lambda (a b)
+                           (if (< a b) b a))
+                         (car xs)))))
 
 
 ; O(n^2) behavior with linked lists
@@ -208,9 +242,10 @@
 
 
 (set! reverse (fn* (x:list)
-  (if (nil? x)
-    ()
-      (append (reverse (cdr x)) (car x)))))
+                   "Return a list containing all values in the supplied list, in reverse order."
+                   (if (nil? x)
+                       ()
+                     (append (reverse (cdr x)) (car x)))))
 
 ;;
 ;; This is either gross or cool.
@@ -279,16 +314,19 @@
 
 ;; Translate the elements of the string using the specified hash
 (set! translate (fn* (x:string hsh:hash)
-  (let* (chrs (split x ""))
-    (join (map chrs (lambda (x)
-                  (if (get hsh x)
-                      (get hsh x)
-                    x)))))))
+                     "Translate each character in the given string, via the means of the supplied lookup-table.  This is used by 'upper' and 'lower'."
+                     (let* (chrs (split x ""))
+                       (join (map chrs (lambda (x)
+                                         (if (get hsh x)
+                                             (get hsh x)
+                                           x)))))))
 
 ;; Convert the given string to upper-case, via the lookup table.
 (set! upper (fn* (x:string)
-                (translate x upper-table)))
+                 "Convert each character from the supplied string to upper-case, and return that string."
+                 (translate x upper-table)))
 
 ;; Convert the given string to upper-case, via the lookup table.
 (set! lower (fn* (x:string)
+                 "Convert each character from the supplied string to lower-case, and return that string."
                 (translate x lower-table)))
