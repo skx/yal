@@ -20,6 +20,10 @@ type Procedure struct {
 	// if it is a native one.
 	F func(args []Primitive) Primitive
 
+	// Help contains some function-specific help text, ideally with
+	// an example usage of the function.
+	Help string
+
 	// Macro is true is this function should have arguments passed literally, and
 	// not evaluated.
 	Macro bool
