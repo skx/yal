@@ -26,7 +26,7 @@
                        (eq (type x) "procedure(golang)")))))
 
 (set! hash?     (fn* (x)
-                     "Returns true if the argument specified is a hash"
+                     "Returns true if the argument specified is a hash."
                      (eq (type x) "hash")))
 
 (set! macro?    (fn* (x)
