@@ -3,7 +3,7 @@
 ;;
 ;; This is a sample input file for our minimal lisp interpreter.
 ;;
-;; We use it to demonstrates and test our the basic features.
+;; We use it to demonstrate and test some basic features.
 ;;
 ;; Here we use "while" from our standard library, and have defined a
 ;; function to turn "1" into "1st", etc, as appropriate.  This uses our

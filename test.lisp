@@ -3,7 +3,7 @@
 ;;
 ;; This is a sample input file for our minimal lisp interpreter.
 ;;
-;; We use it to demonstrates and test our the basic features.
+;; We use it to demonstrate and test some basic features.
 ;;
 ;; NOTE: A lot of the things called here are defined in the standard
 ;; library, which is pre-pended to all loaded-scripts.
