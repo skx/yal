@@ -808,7 +808,9 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 					// add the help-text
 					proc, ok := v.(*primitive.Procedure)
 					if ok {
-						tmp.Set(":help", primitive.String(proc.Help))
+						if len(proc.Help) > 0 {
+							tmp.Set(":help", primitive.String(proc.Help))
+						}
 					}
 
 					c = append(c, tmp)
