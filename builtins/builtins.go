@@ -87,6 +87,7 @@ func PopulateEnvironment(env *env.Environment) {
 
 	// core
 	env.Set("arch", &primitive.Procedure{F: archFn})
+	env.Set("date", &primitive.Procedure{F: dateFn})
 	env.Set("error", &primitive.Procedure{F: errorFn})
 	env.Set("getenv", &primitive.Procedure{F: getenvFn})
 	env.Set("ms", &primitive.Procedure{F: msFn})
@@ -96,6 +97,7 @@ func PopulateEnvironment(env *env.Environment) {
 	env.Set("sort", &primitive.Procedure{F: sortFn})
 	env.Set("sprintf", &primitive.Procedure{F: sprintfFn})
 	env.Set("slurp", &primitive.Procedure{F: slurpFn})
+	env.Set("time", &primitive.Procedure{F: timeFn})
 
 	// string
 	env.Set("chr", &primitive.Procedure{F: chrFn})
@@ -485,6 +487,25 @@ func archFn(args []primitive.Primitive) primitive.Primitive {
 	return primitive.String(runtime.GOARCH)
 }
 
+// dateFn returns the current (Weekday, DD, MM, YYYY) as a list.
+func dateFn(args []primitive.Primitive) primitive.Primitive {
+	var ret primitive.List
+
+	t := time.Now()
+
+	name := t.Weekday().String()
+	day := t.Day()
+	mon := int(t.Month())
+	year := t.Year()
+
+	ret = append(ret, primitive.String(name))
+	ret = append(ret, primitive.Number(day))
+	ret = append(ret, primitive.Number(mon))
+	ret = append(ret, primitive.Number(year))
+
+	return ret
+}
+
 // printFn implements (print).
 func printFn(args []primitive.Primitive) primitive.Primitive {
 	// no args
@@ -568,6 +589,25 @@ func splitFn(args []primitive.Primitive) primitive.Primitive {
 
 	return c
 }
+
+
+// timeFn returns the current (HH, MM, SS) as a list.
+func timeFn(args []primitive.Primitive) primitive.Primitive {
+	var ret primitive.List
+
+	t := time.Now()
+
+	hr := t.Hour()
+	mn := t.Minute()
+	sc := t.Second()
+
+	ret = append(ret, primitive.Number(hr))
+	ret = append(ret, primitive.Number(mn))
+	ret = append(ret, primitive.Number(sc))
+
+	return ret
+}
+
 
 // (join (1 2 3)
 func joinFn(args []primitive.Primitive) primitive.Primitive {
