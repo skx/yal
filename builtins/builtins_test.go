@@ -12,6 +12,36 @@ import (
 	"github.com/skx/yal/primitive"
 )
 
+// TestHelp ensures that all our built-in functions have help-text available
+func TestHelp(t *testing.T) {
+
+	// create a new environment, and populate it
+	e := env.New()
+	PopulateEnvironment(e)
+
+	// For each function
+	items := e.Items()
+
+	for name, val := range items {
+
+		proc, ok := val.(*primitive.Procedure)
+		if ok {
+
+			t.Run("Testing "+name, func(t *testing.T) {
+
+				// We ignore one-character long names.
+				if len(name) == 1 {
+					t.Skip("Ignoring built-in function for the moment")
+				}
+
+				if len(proc.Help) == 0 {
+					t.Fatalf("help text is unset")
+				}
+			})
+		}
+	}
+}
+
 // TestSetup just instantiates the primitives in the environment
 func TestSetup(t *testing.T) {
 
@@ -1416,7 +1446,7 @@ func TestDateTime(t *testing.T) {
 	}
 
 	// "weekday", "day", "month", "year" == four entries
-	if len(out)!= 4 {
+	if len(out) != 4 {
 		t.Fatalf("date list had the wrong length, got %d: %v", len(out), out)
 	}
 
@@ -1427,7 +1457,7 @@ func TestDateTime(t *testing.T) {
 	}
 
 	// "hour", "minute", "seconds" == three entries
-	if len(out)!= 3 {
+	if len(out) != 3 {
 		t.Fatalf("time list had the wrong length, got %d: %v", len(out), out)
 	}
 
