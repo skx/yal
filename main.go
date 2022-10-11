@@ -11,6 +11,7 @@ import (
 	"flag"
 	"fmt"
 	"os"
+	"sort"
 
 	"github.com/skx/yal/builtins"
 	"github.com/skx/yal/env"
@@ -23,10 +24,11 @@ func main() {
 
 	// Look to see if we're gonna execute a statement
 	exp := flag.String("e", "", "A string to evaluate.")
+	hlp := flag.Bool("h", false, "Should we show help information, and exit?")
 	flag.Parse()
 
 	// Ensure we have an argument
-	if len (flag.Args()) < 1 && ( *exp == "" ) {
+	if len(flag.Args()) < 1 && (*exp == "") && !*hlp {
 		fmt.Printf("Usage: yal [-e expr] file.lisp\n")
 		return
 	}
@@ -39,7 +41,7 @@ func main() {
 	}
 
 	// If we have a file, then read the content
-	if (len(flag.Args() ) > 0) {
+	if len(flag.Args()) > 0 {
 		content, err := os.ReadFile(flag.Args()[0])
 		if err != nil {
 			fmt.Printf("Error reading %s:%s\n", os.Args[1], err)
@@ -68,6 +70,34 @@ func main() {
 
 	// Populate the default primitives
 	builtins.PopulateEnvironment(environment)
+
+	// Show the help?
+	if *hlp {
+
+		// Build up a list of all things known in the environment
+		keys := []string{}
+
+		items := environment.Items()
+		for k := range items {
+			keys = append(keys, k)
+		}
+
+		// sort the items
+		sort.Strings(keys)
+
+		for _, key := range keys {
+
+			val, _ := environment.Get(key)
+
+			prc, ok := val.(*primitive.Procedure)
+			if ok && len(prc.Help) > 0 {
+				fmt.Printf("%s\n\t%s\n\n", key, prc.Help)
+			}
+
+		}
+
+		return
+	}
 
 	// Read the standard library
 	pre := stdlib.Contents()
