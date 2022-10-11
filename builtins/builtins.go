@@ -88,18 +88,33 @@ Example:  (type "string") (type 3) (type type)`})
 	env.Set("vals", &primitive.Procedure{F: valsFn})
 
 	// core
-	env.Set("arch", &primitive.Procedure{F: archFn})
-	env.Set("date", &primitive.Procedure{F: dateFn})
+	env.Set("arch", &primitive.Procedure{F: archFn, Help: `arch returns a simple string describing the architecture the current host is running upon.
+
+\tSee also: (arch)
+\t Example:  (print (arch))
+`})
+	env.Set("date", &primitive.Procedure{F: dateFn, Help: `date returns a list containing date-related fields; the day of the week, the day-number, the month-number, and the year.
+
+\tSee also: (date)
+`})
 	env.Set("error", &primitive.Procedure{F: errorFn})
 	env.Set("getenv", &primitive.Procedure{F: getenvFn})
 	env.Set("ms", &primitive.Procedure{F: msFn})
 	env.Set("now", &primitive.Procedure{F: nowFn})
-	env.Set("os", &primitive.Procedure{F: osFn})
+	env.Set("os", &primitive.Procedure{F: osFn, Help: `os returns a simple string describing the operating system the current host is running.
+
+\tSee also: (arch)
+\t Example: (print (os))
+`,
+	})
 	env.Set("print", &primitive.Procedure{F: printFn})
 	env.Set("sort", &primitive.Procedure{F: sortFn})
 	env.Set("sprintf", &primitive.Procedure{F: sprintfFn})
 	env.Set("slurp", &primitive.Procedure{F: slurpFn})
-	env.Set("time", &primitive.Procedure{F: timeFn})
+	env.Set("time", &primitive.Procedure{F: timeFn, Help: `time returns a list containing time-related entries; the current hour, the current minute past the hour, and the current value of the seconds.
+
+\tSee also: (date)
+`})
 
 	// string
 	env.Set("chr", &primitive.Procedure{F: chrFn})
