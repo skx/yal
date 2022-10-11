@@ -804,6 +804,13 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 					tmp.Set(":name", primitive.String(key))
 					tmp.Set(":value", v)
 
+					// Is this a procedure?  If so
+					// add the help-text
+					proc, ok := v.(*primitive.Procedure)
+					if ok {
+						tmp.Set(":help", primitive.String(proc.Help))
+					}
+
 					c = append(c, tmp)
 				}
 
