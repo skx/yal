@@ -1,12 +1,14 @@
 package primitive
 
-import "testing"
+import ( "testing"
+	"github.com/skx/yal/env"
+)
 
 func TestProcedure(t *testing.T) {
 
 	// built-in
 	b := Procedure{
-		F: func(args []Primitive) Primitive {
+		F: func(e *env.Environment,args []Primitive) Primitive {
 			return Nil{}
 		},
 	}

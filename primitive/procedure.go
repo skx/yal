@@ -2,15 +2,21 @@ package primitive
 
 import "github.com/skx/yal/env"
 
+// GolangPrimitiveFn is the type which represents a function signature for
+// a lisp-usable function implemented in golang.
+type GolangPrimitiveFn func(e *env.Environment, args []Primitive) Primitive
+
+
 // Procedure holds a user-defined function.
+//
+// This structure is used to hold both the built-in functions, implemented in
+// golang and those which are written in lisp - either as functions or macros.
 type Procedure struct {
 
 	// Arguments to this procedure.
 	Args []Symbol
 
 	// Body is the body to execute, in the case where F is nil.
-	//
-	// In this case the primitive is written in 100% pure lisp.
 	Body Primitive
 
 	// Env contains the environment within which this procedure is executed.
@@ -18,7 +24,7 @@ type Procedure struct {
 
 	// F contains a pointer to the golang implementation of this procedure,
 	// if it is a native one.
-	F func(args []Primitive) Primitive
+	F GolangPrimitiveFn
 
 	// Help contains some function-specific help text, ideally with
 	// an example usage of the function.
