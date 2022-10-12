@@ -42,10 +42,12 @@
 
 ;; Return the number of ms a function invokation took.
 (set! benchmark (fn* (fn)
-  (let* (start-ms (ms)
-         _ (fn)
-         end-ms (ms))
-    (- end-ms start-ms))))
+                     "Run the specified function, while recording the time
+it took to execute.  Return that time, in ms."
+                     (let* (start-ms (ms)
+                                     _ (fn)
+                                     end-ms (ms))
+                       (- end-ms start-ms))))
 
 ;; Invoke the factorial function, using apply
 ;;

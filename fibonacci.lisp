@@ -18,6 +18,7 @@
 ;;      21 -> 21st
 ;;     333 -> 333rd
 (set! add-numeric-suffix (fn* (n)
+                              "Add a trailing suffix to make a number readable."
                               (cond
                                 (match "(^|[^1]+)1$" n) (sprintf "%sst" n)
                                 (match "(^|[^1]+)2$" n) (sprintf "%snd" n)
@@ -27,9 +28,10 @@
 
 ;; Fibonacci function
 (set! fibonacci (fn* (n)
-               (if (<= n 1)
-                   n
-                 (+ (fibonacci (- n 1)) (fibonacci (- n 2))))))
+                     "Calculate the Nth fibonacci number."
+                     (if (<= n 1)
+                         n
+                       (+ (fibonacci (- n 1)) (fibonacci (- n 2))))))
 
 
 ;; Now call our function in a loop, twenty times.
