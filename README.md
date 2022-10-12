@@ -25,7 +25,7 @@ Another trivial/toy Lisp implementation in Go.
 
 ## Brief Overview
 
-To set a global variable use `set!`:
+To set the contents of a variable use `set!`:
 
     (set! foo "bar")
 
@@ -38,12 +38,32 @@ To start a new scope, with local variables, use `let*`:
       ;...
     )
 
+Inside a `let*` block, or a function, you'll only set the values of _local_
+variables.  If you wish to affect something globally use the three-argument
+form of `set!`:
+
+    (let* (foo "bar"
+           baz  "bart")
+      (set! global "updated" true)
+      ;..
+    )
+
 To define a function use `set!` with `fn*`:
 
     (set! fact (fn* (n)
       (if (<= n 1)
         1
           (* n (fact (- n 1))))))
+
+Optionally you may write some help/usage information in your definition:
+
+    (def! gcd (fn* (m n)
+      "Return the greatest common divisor between the two arguments."
+      (if (= (% m n) 0) n (gcd n (% m n)))))
+
+Help information can be retrieved at runtime, for usage:
+
+    (print (help print))
 
 To define a macro use `defmacro!`:
 
