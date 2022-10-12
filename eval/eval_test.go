@@ -310,7 +310,7 @@ a
 		{"(let* (a 3 b))", "ERROR{list for (len*) must have even length, got [a 3 b]}"},
 		{"(let* (a 3 3 b))", "ERROR{binding name is not a symbol, got 3}"},
 
-		{"(error )", "ERROR{arity-error: not enough arguments for (error}"},
+		{"(error )", "ERROR{wrong number of arguments}"},
 		{"(quote )", "ERROR{arity-error: not enough arguments for (quote}"},
 		{"(quasiquote )", "ERROR{arity-error: not enough arguments for (quasiquote}"},
 		{"(macroexpand )", "ERROR{arity-error: not enough arguments for (macroexpand}"},

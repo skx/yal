@@ -689,13 +689,6 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 				}
 				return ev.macroExpand(listExp[1], e)
 
-			// (error ..)
-			case primitive.Symbol("error"):
-				if len(listExp) < 2 {
-					return primitive.Error("arity-error: not enough arguments for (error")
-				}
-				return primitive.Error(listExp[1].ToString())
-
 			// (let
 			case primitive.Symbol("let"):
 				if len(listExp) < 2 {
@@ -984,7 +977,7 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 				if proc.F != nil {
 
 					// Then call it.
-					return proc.F(args)
+					return proc.F(e, args)
 				}
 
 				//
