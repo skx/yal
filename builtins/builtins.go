@@ -24,10 +24,6 @@ import (
 	"github.com/skx/yal/primitive"
 )
 
-// PrimitiveFn is the type which represents a function signature for
-// a lisp-usable function implemented in golang.
-type PrimitiveFn func(args []primitive.Primitive) primitive.Primitive
-
 // regCache is a cache of compiled regular expression objects.
 // These may persist between runs because a regular expression object
 // is essentially constant.
@@ -225,7 +221,7 @@ func expandStr(input string) string {
 }
 
 // plusFn implements "+"
-func plusFn(args []primitive.Primitive) primitive.Primitive {
+func plusFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 
 	// ensure we have at least one argument
 	if len(args) < 1 {
@@ -253,7 +249,7 @@ func plusFn(args []primitive.Primitive) primitive.Primitive {
 }
 
 // minusFn implements "-"
-func minusFn(args []primitive.Primitive) primitive.Primitive {
+func minusFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 
 	// ensure we have at least one argument
 	if len(args) < 1 {
@@ -281,7 +277,7 @@ func minusFn(args []primitive.Primitive) primitive.Primitive {
 }
 
 // multiplyFn implements "*"
-func multiplyFn(args []primitive.Primitive) primitive.Primitive {
+func multiplyFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 	// ensure we have at least one argument
 	if len(args) < 1 {
 		return primitive.Error("invalid argument count")
@@ -308,7 +304,7 @@ func multiplyFn(args []primitive.Primitive) primitive.Primitive {
 }
 
 // divideFn implements "/"
-func divideFn(args []primitive.Primitive) primitive.Primitive {
+func divideFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 	// ensure we have at least one argument
 	if len(args) < 1 {
 		return primitive.Error("invalid argument count")
@@ -339,7 +335,7 @@ func divideFn(args []primitive.Primitive) primitive.Primitive {
 }
 
 // modFn implements "%"
-func modFn(args []primitive.Primitive) primitive.Primitive {
+func modFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 	if len(args) != 2 {
 		return primitive.Error("wrong number of arguments")
 	}
@@ -359,7 +355,7 @@ func modFn(args []primitive.Primitive) primitive.Primitive {
 }
 
 // expnFn implements "#"
-func expnFn(args []primitive.Primitive) primitive.Primitive {
+func expnFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 	if len(args) != 2 {
 		return primitive.Error("wrong number of arguments")
 	}
@@ -373,7 +369,7 @@ func expnFn(args []primitive.Primitive) primitive.Primitive {
 }
 
 // ltFn implements "<"
-func ltFn(args []primitive.Primitive) primitive.Primitive {
+func ltFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 	if len(args) != 2 {
 		return primitive.Error("wrong number of arguments")
 	}
@@ -388,7 +384,7 @@ func ltFn(args []primitive.Primitive) primitive.Primitive {
 }
 
 // equalsFn implements "="
-func equalsFn(args []primitive.Primitive) primitive.Primitive {
+func equalsFn( env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 	if len(args) != 2 {
 		return primitive.Error("wrong number of arguments")
 	}
@@ -409,7 +405,7 @@ func equalsFn(args []primitive.Primitive) primitive.Primitive {
 }
 
 // eqFn implements "eq"
-func eqFn(args []primitive.Primitive) primitive.Primitive {
+func eqFn( env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 	if len(args) != 2 {
 		return primitive.Error("wrong number of arguments")
 	}
@@ -427,12 +423,12 @@ func eqFn(args []primitive.Primitive) primitive.Primitive {
 }
 
 // listFn implements "list"
-func listFn(args []primitive.Primitive) primitive.Primitive {
+func listFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 	return primitive.List(args)
 }
 
 // carFn implements "car"
-func carFn(args []primitive.Primitive) primitive.Primitive {
+func carFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 
 	if len(args) != 1 {
 		return primitive.Error("wrong number of arguments")
@@ -454,7 +450,7 @@ func carFn(args []primitive.Primitive) primitive.Primitive {
 }
 
 // cdrFn implements "cdr"
-func cdrFn(args []primitive.Primitive) primitive.Primitive {
+func cdrFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 
 	if len(args) != 1 {
 		return primitive.Error("wrong number of arguments")
@@ -473,7 +469,7 @@ func cdrFn(args []primitive.Primitive) primitive.Primitive {
 }
 
 // errorFn implements "error"
-func errorFn(args []primitive.Primitive) primitive.Primitive {
+func errorFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 	if len(args) != 1 {
 		return primitive.Error("wrong number of arguments")
 	}
@@ -481,7 +477,7 @@ func errorFn(args []primitive.Primitive) primitive.Primitive {
 }
 
 // typeFn implements "type"
-func typeFn(args []primitive.Primitive) primitive.Primitive {
+func typeFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 	if len(args) != 1 {
 		return primitive.Error("wrong number of arguments")
 	}
@@ -489,7 +485,7 @@ func typeFn(args []primitive.Primitive) primitive.Primitive {
 }
 
 // slurpFn returns the contents of the specified file
-func slurpFn(args []primitive.Primitive) primitive.Primitive {
+func slurpFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 	if len(args) != 1 {
 		return primitive.Error("wrong number of arguments")
 	}
@@ -503,7 +499,7 @@ func slurpFn(args []primitive.Primitive) primitive.Primitive {
 }
 
 // strFn implements "str"
-func strFn(args []primitive.Primitive) primitive.Primitive {
+func strFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 	if len(args) != 1 {
 		return primitive.Error("wrong number of arguments")
 	}
@@ -511,7 +507,7 @@ func strFn(args []primitive.Primitive) primitive.Primitive {
 }
 
 // nilFn implements nil?
-func nilFn(args []primitive.Primitive) primitive.Primitive {
+func nilFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 	if len(args) != 1 {
 		return primitive.Error("wrong number of arguments")
 	}
@@ -530,7 +526,7 @@ func nilFn(args []primitive.Primitive) primitive.Primitive {
 }
 
 // consFn implements (cons).
-func consFn(args []primitive.Primitive) primitive.Primitive {
+func consFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 	if len(args) < 1 {
 		return primitive.Error("wrong number of arguments")
 	}
@@ -548,17 +544,17 @@ func consFn(args []primitive.Primitive) primitive.Primitive {
 }
 
 // osFn implements (os)
-func osFn(args []primitive.Primitive) primitive.Primitive {
+func osFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 	return primitive.String(runtime.GOOS)
 }
 
 // archFn implements (os)
-func archFn(args []primitive.Primitive) primitive.Primitive {
+func archFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 	return primitive.String(runtime.GOARCH)
 }
 
 // dateFn returns the current (Weekday, DD, MM, YYYY) as a list.
-func dateFn(args []primitive.Primitive) primitive.Primitive {
+func dateFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 	var ret primitive.List
 
 	t := time.Now()
@@ -577,7 +573,7 @@ func dateFn(args []primitive.Primitive) primitive.Primitive {
 }
 
 // printFn implements (print).
-func printFn(args []primitive.Primitive) primitive.Primitive {
+func printFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 	// no args
 	if len(args) < 1 {
 		return primitive.Error("wrong number of arguments")
@@ -610,7 +606,7 @@ func printFn(args []primitive.Primitive) primitive.Primitive {
 }
 
 // (sprintf "fmt" "arg1" ... "argN")
-func sprintfFn(args []primitive.Primitive) primitive.Primitive {
+func sprintfFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 
 	// we need 2+ arguments
 	if len(args) < 2 {
@@ -633,7 +629,7 @@ func sprintfFn(args []primitive.Primitive) primitive.Primitive {
 }
 
 // (split "str" "by")
-func splitFn(args []primitive.Primitive) primitive.Primitive {
+func splitFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 
 	// We require two arguments
 	if len(args) != 2 {
@@ -661,7 +657,7 @@ func splitFn(args []primitive.Primitive) primitive.Primitive {
 }
 
 // timeFn returns the current (HH, MM, SS) as a list.
-func timeFn(args []primitive.Primitive) primitive.Primitive {
+func timeFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 	var ret primitive.List
 
 	t := time.Now()
@@ -678,7 +674,7 @@ func timeFn(args []primitive.Primitive) primitive.Primitive {
 }
 
 // (join (1 2 3)
-func joinFn(args []primitive.Primitive) primitive.Primitive {
+func joinFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 
 	// We require one argument
 	if len(args) != 1 {
@@ -700,7 +696,7 @@ func joinFn(args []primitive.Primitive) primitive.Primitive {
 }
 
 // sortFn implements (sort)
-func sortFn(args []primitive.Primitive) primitive.Primitive {
+func sortFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 	// If we have only a single argument
 	if len(args) != 1 {
 		return primitive.Error("invalid argument count")
@@ -743,7 +739,7 @@ func sortFn(args []primitive.Primitive) primitive.Primitive {
 }
 
 // getFn is the implementation of `(get hash key)`
-func getFn(args []primitive.Primitive) primitive.Primitive {
+func getFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 
 	// We need two arguments
 	if len(args) != 2 {
@@ -760,7 +756,7 @@ func getFn(args []primitive.Primitive) primitive.Primitive {
 }
 
 // helpFn is the implementation of `(help fn)`
-func helpFn(args []primitive.Primitive) primitive.Primitive {
+func helpFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 	// We need a single argument
 	if len(args) != 1 {
 		return primitive.Error("invalid argument count")
@@ -790,7 +786,7 @@ func helpFn(args []primitive.Primitive) primitive.Primitive {
 }
 
 // keysFn is the implementation of `(keys hash)`
-func keysFn(args []primitive.Primitive) primitive.Primitive {
+func keysFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 
 	// We need a single argument
 	if len(args) != 1 {
@@ -828,7 +824,7 @@ func keysFn(args []primitive.Primitive) primitive.Primitive {
 }
 
 // valsFn is the implementation of `(vals hash)`
-func valsFn(args []primitive.Primitive) primitive.Primitive {
+func valsFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 
 	// We need a single argument
 	if len(args) != 1 {
@@ -866,7 +862,7 @@ func valsFn(args []primitive.Primitive) primitive.Primitive {
 }
 
 // containsFn implements (contains?)
-func containsFn(args []primitive.Primitive) primitive.Primitive {
+func containsFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 
 	// We need a pair of arguments
 	if len(args) != 2 {
@@ -895,7 +891,7 @@ func containsFn(args []primitive.Primitive) primitive.Primitive {
 }
 
 // setFn is the implementation of `(set hash key val)`
-func setFn(args []primitive.Primitive) primitive.Primitive {
+func setFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 
 	// We need three arguments
 	if len(args) != 3 {
@@ -913,7 +909,7 @@ func setFn(args []primitive.Primitive) primitive.Primitive {
 }
 
 // getenvFn is the implementation of `(getenv "PATH")`
-func getenvFn(args []primitive.Primitive) primitive.Primitive {
+func getenvFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 
 	// If we have only a single argument
 	if len(args) != 1 {
@@ -931,17 +927,17 @@ func getenvFn(args []primitive.Primitive) primitive.Primitive {
 }
 
 // nowFn is the implementation of `(now)`
-func nowFn(args []primitive.Primitive) primitive.Primitive {
+func nowFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 	return primitive.Number(time.Now().Unix())
 }
 
 // msFn is the implementation of `(ms)`
-func msFn(args []primitive.Primitive) primitive.Primitive {
+func msFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 	return primitive.Number(time.Now().UnixNano() / int64(time.Millisecond))
 }
 
 // matchFn is the implementation of (match ..)
-func matchFn(args []primitive.Primitive) primitive.Primitive {
+func matchFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 
 	// We need two arguments
 	if len(args) != 2 {
@@ -996,7 +992,7 @@ func matchFn(args []primitive.Primitive) primitive.Primitive {
 }
 
 // chrFn is the implementation of (chr ..)
-func chrFn(args []primitive.Primitive) primitive.Primitive {
+func chrFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 
 	if len(args) != 1 {
 		return primitive.Error("wrong number of arguments")
@@ -1013,7 +1009,7 @@ func chrFn(args []primitive.Primitive) primitive.Primitive {
 }
 
 // ordFn is the implementation of (ord ..)
-func ordFn(args []primitive.Primitive) primitive.Primitive {
+func ordFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 
 	if len(args) != 1 {
 		return primitive.Error("wrong number of arguments")
