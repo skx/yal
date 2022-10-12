@@ -14,7 +14,6 @@ import (
 	"regexp"
 	"strconv"
 	"strings"
-	"time"
 
 	"github.com/skx/yal/env"
 	"github.com/skx/yal/primitive"
@@ -45,9 +44,6 @@ type Eval struct {
 
 // New constructs a new evaluator.
 func New(src string) *Eval {
-
-	// (gensym) needs a decent random seed
-	rand.Seed(time.Now().UnixNano())
 
 	// Create with a default context.
 	e := &Eval{

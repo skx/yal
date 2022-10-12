@@ -10,9 +10,11 @@ package main
 import (
 	"flag"
 	"fmt"
+	"math/rand"
 	"os"
 	"sort"
 	"strings"
+	"time"
 
 	"github.com/skx/yal/builtins"
 	"github.com/skx/yal/env"
@@ -22,6 +24,9 @@ import (
 )
 
 func main() {
+
+	// (gensym) needs a decent random seed
+	rand.Seed(time.Now().UnixNano())
 
 	// Look to see if we're gonna execute a statement
 	exp := flag.String("e", "", "A string to evaluate.")
