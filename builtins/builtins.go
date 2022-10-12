@@ -1,12 +1,8 @@
 // Package builtins contains the implementations of the lisp-callable
 // functions which are implemented in golang.
 //
-// Note that these builtings here don't have access to the run-time
-// environment, which is why things like "gensym" have to be implemented
-// in our core `eval.go` package.
-//
-// Updating the builtins to receive a references to the environment would
-// allow some of the implementations to be moved.
+// This package excludes the special forms, which have to be handled
+// specially - for example "(let*)", "(if)", and "(eval..)".
 package builtins
 
 import (
@@ -229,211 +225,11 @@ func expandStr(input string) string {
 	return out
 }
 
-// plusFn implements "+"
-func plusFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+// Built in functions
 
-	// ensure we have at least one argument
-	if len(args) < 1 {
-		return primitive.Error("invalid argument count")
-	}
-
-	// the first argument must be a number.
-	v, ok := args[0].(primitive.Number)
-	if !ok {
-		return primitive.Error(fmt.Sprintf("argument '%s' was not a number", args[0].ToString()))
-	}
-
-	// now process all the rest of the arguments
-	for _, i := range args[1:] {
-
-		// check we have a number
-		n, ok := i.(primitive.Number)
-		if ok {
-			v += n
-		} else {
-			return primitive.Error(fmt.Sprintf("argument %s was not a number", i.ToString()))
-		}
-	}
-	return primitive.Number(v)
-}
-
-// minusFn implements "-"
-func minusFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
-
-	// ensure we have at least one argument
-	if len(args) < 1 {
-		return primitive.Error("invalid argument count")
-	}
-
-	// the first argument must be a number.
-	v, ok := args[0].(primitive.Number)
-	if !ok {
-		return primitive.Error(fmt.Sprintf("argument '%s' was not a number", args[0].ToString()))
-	}
-
-	// now process all the rest of the arguments
-	for _, i := range args[1:] {
-
-		// check we have a number
-		n, ok := i.(primitive.Number)
-		if ok {
-			v -= n
-		} else {
-			return primitive.Error(fmt.Sprintf("argument %s was not a number", i.ToString()))
-		}
-	}
-	return primitive.Number(v)
-}
-
-// multiplyFn implements "*"
-func multiplyFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
-	// ensure we have at least one argument
-	if len(args) < 1 {
-		return primitive.Error("invalid argument count")
-	}
-
-	// the first argument must be a number.
-	v, ok := args[0].(primitive.Number)
-	if !ok {
-		return primitive.Error(fmt.Sprintf("argument '%s' was not a number", args[0].ToString()))
-	}
-
-	// now process all the rest of the arguments
-	for _, i := range args[1:] {
-
-		// check we have a number
-		n, ok := i.(primitive.Number)
-		if ok {
-			v *= n
-		} else {
-			return primitive.Error(fmt.Sprintf("argument %s was not a number", i.ToString()))
-		}
-	}
-	return primitive.Number(v)
-}
-
-// divideFn implements "/"
-func divideFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
-	// ensure we have at least one argument
-	if len(args) < 1 {
-		return primitive.Error("invalid argument count")
-	}
-
-	// the first argument must be a number.
-	v, ok := args[0].(primitive.Number)
-	if !ok {
-		return primitive.Error(fmt.Sprintf("argument '%s' was not a number", args[0].ToString()))
-	}
-
-	// now process all the rest of the arguments
-	for _, i := range args[1:] {
-
-		// check we have a number
-		n, ok := i.(primitive.Number)
-		if ok {
-			if n == 0 {
-				return primitive.Error("attempted division by zero")
-			}
-
-			v /= n
-		} else {
-			return primitive.Error(fmt.Sprintf("argument %s was not a number", i.ToString()))
-		}
-	}
-	return primitive.Number(v)
-}
-
-// modFn implements "%"
-func modFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
-	if len(args) != 2 {
-		return primitive.Error("wrong number of arguments")
-	}
-	if _, ok := args[0].(primitive.Number); !ok {
-		return primitive.Error("argument not a number")
-	}
-	if _, ok := args[1].(primitive.Number); !ok {
-		return primitive.Error("argument not a number")
-	}
-
-	a := int(args[0].(primitive.Number))
-	b := int(args[1].(primitive.Number))
-	if b == 0 {
-		return primitive.Error("attempted division by zero")
-	}
-	return primitive.Number(a % b)
-}
-
-// expnFn implements "#"
-func expnFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
-	if len(args) != 2 {
-		return primitive.Error("wrong number of arguments")
-	}
-	if _, ok := args[0].(primitive.Number); !ok {
-		return primitive.Error("argument not a number")
-	}
-	if _, ok := args[1].(primitive.Number); !ok {
-		return primitive.Error("argument not a number")
-	}
-	return primitive.Number(math.Pow(float64(args[0].(primitive.Number)), float64(args[1].(primitive.Number))))
-}
-
-// ltFn implements "<"
-func ltFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
-	if len(args) != 2 {
-		return primitive.Error("wrong number of arguments")
-	}
-
-	if _, ok := args[0].(primitive.Number); !ok {
-		return primitive.Error("argument not a number")
-	}
-	if _, ok := args[1].(primitive.Number); !ok {
-		return primitive.Error("argument not a number")
-	}
-	return primitive.Bool(args[0].(primitive.Number) < args[1].(primitive.Number))
-}
-
-// equalsFn implements "="
-func equalsFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
-	if len(args) != 2 {
-		return primitive.Error("wrong number of arguments")
-	}
-
-	a := args[0]
-	b := args[1]
-
-	if a.Type() != "number" {
-		return primitive.Error("argument was not a number")
-	}
-	if b.Type() != "number" {
-		return primitive.Error("argument was not a number")
-	}
-	if a.(primitive.Number) == b.(primitive.Number) {
-		return primitive.Bool(true)
-	}
-	return primitive.Bool(false)
-}
-
-// eqFn implements "eq"
-func eqFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
-	if len(args) != 2 {
-		return primitive.Error("wrong number of arguments")
-	}
-
-	a := args[0]
-	b := args[1]
-
-	if a.Type() != b.Type() {
-		return primitive.Bool(false)
-	}
-	if a.ToString() != b.ToString() {
-		return primitive.Bool(false)
-	}
-	return primitive.Bool(true)
-}
-
-// listFn implements "list"
-func listFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
-	return primitive.List(args)
+// archFn implements (os)
+func archFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+	return primitive.String(runtime.GOARCH)
 }
 
 // carFn implements "car"
@@ -477,61 +273,21 @@ func cdrFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive
 	return primitive.Nil{}
 }
 
-// errorFn implements "error"
-func errorFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
-	if len(args) != 1 {
-		return primitive.Error("wrong number of arguments")
-	}
-	return primitive.Error(args[0].ToString())
-}
+// chrFn is the implementation of (chr ..)
+func chrFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 
-// typeFn implements "type"
-func typeFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
-	if len(args) != 1 {
-		return primitive.Error("wrong number of arguments")
-	}
-	return primitive.String(args[0].Type())
-}
-
-// slurpFn returns the contents of the specified file
-func slurpFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 	if len(args) != 1 {
 		return primitive.Error("wrong number of arguments")
 	}
 
-	fName := args[0].ToString()
-	data, err := os.ReadFile(fName)
-	if err != nil {
-		return primitive.Error(fmt.Sprintf("error reading %s %s", fName, err))
-	}
-	return primitive.String(string(data))
-}
-
-// strFn implements "str"
-func strFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
-	if len(args) != 1 {
-		return primitive.Error("wrong number of arguments")
-	}
-	return primitive.String(args[0].ToString())
-}
-
-// nilFn implements nil?
-func nilFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
-	if len(args) != 1 {
-		return primitive.Error("wrong number of arguments")
+	if _, ok := args[0].(primitive.Number); !ok {
+		return primitive.Error("argument not a number")
 	}
 
-	// nil is nil (yeah, really)
-	if primitive.IsNil(args[0]) {
-		return primitive.Bool(true)
-	}
+	i := args[0].(primitive.Number)
+	rune := rune(i)
 
-	// an empty list is nil.
-	if list, ok := args[0].(primitive.List); ok {
-		return primitive.Bool(len(list) == 0)
-	}
-	return primitive.Bool(false)
-
+	return primitive.String(rune)
 }
 
 // consFn implements (cons).
@@ -552,14 +308,33 @@ func consFn(env *env.Environment, args []primitive.Primitive) primitive.Primitiv
 	return primitive.List{args[0], args[1]}
 }
 
-// osFn implements (os)
-func osFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
-	return primitive.String(runtime.GOOS)
-}
+// containsFn implements (contains?)
+func containsFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 
-// archFn implements (os)
-func archFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
-	return primitive.String(runtime.GOARCH)
+	// We need a pair of arguments
+	if len(args) != 2 {
+		return primitive.Error("invalid argument count")
+	}
+
+	// First is a Hash
+	hsh, ok := args[0].(primitive.Hash)
+	if !ok {
+		return primitive.Error("argument not a hash")
+	}
+
+	// The second should be a string, but other things can be converted
+	str, ok := args[1].(primitive.String)
+	if !ok {
+		str = primitive.String(args[1].ToString())
+	}
+
+	_, found := hsh.Entries[str.ToString()]
+	if found {
+		return primitive.Bool(true)
+	}
+
+	return primitive.Bool(false)
+
 }
 
 // dateFn returns the current (Weekday, DD, MM, YYYY) as a list.
@@ -581,170 +356,114 @@ func dateFn(env *env.Environment, args []primitive.Primitive) primitive.Primitiv
 	return ret
 }
 
-// printFn implements (print).
-func printFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
-	// no args
+// divideFn implements "/"
+func divideFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+	// ensure we have at least one argument
 	if len(args) < 1 {
-		return primitive.Error("wrong number of arguments")
-	}
-
-	// one arg
-	if len(args) == 1 {
-		// expand
-		str := expandStr(args[0].ToString())
-
-		// show & return
-		fmt.Println(str)
-		return primitive.String(str)
-	}
-
-	// OK format-string
-	frmt := expandStr(args[0].ToString())
-	parm := []any{}
-
-	for i, a := range args {
-		if i == 0 {
-			continue
-		}
-		parm = append(parm, a.ToString())
-	}
-
-	out := fmt.Sprintf(frmt, parm...)
-	fmt.Println(out)
-	return primitive.String(out)
-}
-
-// (sprintf "fmt" "arg1" ... "argN")
-func sprintfFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
-
-	// we need 2+ arguments
-	if len(args) < 2 {
-		return primitive.Error("wrong number of arguments")
-	}
-
-	// OK format-string
-	frmt := expandStr(args[0].ToString())
-	parm := []any{}
-
-	for i, a := range args {
-		if i == 0 {
-			continue
-		}
-		parm = append(parm, a.ToString())
-	}
-
-	out := fmt.Sprintf(frmt, parm...)
-	return primitive.String(out)
-}
-
-// (split "str" "by")
-func splitFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
-
-	// We require two arguments
-	if len(args) != 2 {
 		return primitive.Error("invalid argument count")
 	}
 
-	// Both arguments must be strings
-	if _, ok := args[0].(primitive.String); !ok {
-		return primitive.Error("argument not a string")
-	}
-	if _, ok := args[1].(primitive.String); !ok {
-		return primitive.Error("argument not a string")
+	// the first argument must be a number.
+	v, ok := args[0].(primitive.Number)
+	if !ok {
+		return primitive.Error(fmt.Sprintf("argument '%s' was not a number", args[0].ToString()))
 	}
 
-	// split
-	out := strings.Split(args[0].ToString(), args[1].ToString())
+	// now process all the rest of the arguments
+	for _, i := range args[1:] {
 
-	var c primitive.List
-
-	for _, x := range out {
-		c = append(c, primitive.String(x))
-	}
-
-	return c
-}
-
-// timeFn returns the current (HH, MM, SS) as a list.
-func timeFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
-	var ret primitive.List
-
-	t := time.Now()
-
-	hr := t.Hour()
-	mn := t.Minute()
-	sc := t.Second()
-
-	ret = append(ret, primitive.Number(hr))
-	ret = append(ret, primitive.Number(mn))
-	ret = append(ret, primitive.Number(sc))
-
-	return ret
-}
-
-// (join (1 2 3)
-func joinFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
-
-	// We require one argument
-	if len(args) != 1 {
-		return primitive.Error("invalid argument count")
-	}
-
-	// The argument must be a list
-	if _, ok := args[0].(primitive.List); !ok {
-		return primitive.Error("argument not a list")
-	}
-
-	tmp := ""
-
-	for _, t := range args[0].(primitive.List) {
-		tmp += t.ToString()
-	}
-
-	return primitive.String(tmp)
-}
-
-// sortFn implements (sort)
-func sortFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
-	// If we have only a single argument
-	if len(args) != 1 {
-		return primitive.Error("invalid argument count")
-	}
-
-	// Which is a list
-	if _, ok := args[0].(primitive.List); !ok {
-		return primitive.Error("argument not a list")
-	}
-
-	// Cast
-	l := args[0].(primitive.List)
-
-	// Copy
-	var c primitive.List
-	c = append(c, l...)
-
-	// Sort the copy of the list
-	sort.Slice(c, func(i, j int) bool {
-
-		// If we have numbers we can sort
-		if _, ok := c[i].(primitive.Number); ok {
-			if _, ok := c[j].(primitive.Number); ok {
-
-				a, _ := strconv.ParseFloat(c[i].ToString(), 64)
-				b, _ := strconv.ParseFloat(c[j].ToString(), 64)
-
-				return a < b
+		// check we have a number
+		n, ok := i.(primitive.Number)
+		if ok {
+			if n == 0 {
+				return primitive.Error("attempted division by zero")
 			}
+
+			v /= n
+		} else {
+			return primitive.Error(fmt.Sprintf("argument %s was not a number", i.ToString()))
 		}
+	}
+	return primitive.Number(v)
+}
 
-		// Otherwise we sort as strings
-		a := c[i].ToString()
-		b := c[j].ToString()
-		return a < b
-	})
+// errorFn implements "error"
+func errorFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+	if len(args) != 1 {
+		return primitive.Error("wrong number of arguments")
+	}
+	return primitive.Error(args[0].ToString())
+}
 
-	return c
+// eqFn implements "eq"
+func eqFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+	if len(args) != 2 {
+		return primitive.Error("wrong number of arguments")
+	}
 
+	a := args[0]
+	b := args[1]
+
+	if a.Type() != b.Type() {
+		return primitive.Bool(false)
+	}
+	if a.ToString() != b.ToString() {
+		return primitive.Bool(false)
+	}
+	return primitive.Bool(true)
+}
+
+// equalsFn implements "="
+func equalsFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+	if len(args) != 2 {
+		return primitive.Error("wrong number of arguments")
+	}
+
+	a := args[0]
+	b := args[1]
+
+	if a.Type() != "number" {
+		return primitive.Error("argument was not a number")
+	}
+	if b.Type() != "number" {
+		return primitive.Error("argument was not a number")
+	}
+	if a.(primitive.Number) == b.(primitive.Number) {
+		return primitive.Bool(true)
+	}
+	return primitive.Bool(false)
+}
+
+// expnFn implements "#"
+func expnFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+	if len(args) != 2 {
+		return primitive.Error("wrong number of arguments")
+	}
+	if _, ok := args[0].(primitive.Number); !ok {
+		return primitive.Error("argument not a number")
+	}
+	if _, ok := args[1].(primitive.Number); !ok {
+		return primitive.Error("argument not a number")
+	}
+	return primitive.Number(math.Pow(float64(args[0].(primitive.Number)), float64(args[1].(primitive.Number))))
+}
+
+// gensymFn is the implementation of (gensym ..)
+func gensymFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+	// symbol characters
+	var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+
+	// generate prefix
+	b := make([]rune, 5)
+	for i := range b {
+		b[i] = letters[rand.Intn(len(letters))]
+	}
+
+	// generate with count
+	symCount++
+	str := fmt.Sprintf("%s%06d", string(b), symCount)
+	sym := primitive.Symbol(str)
+	return sym
 }
 
 // getFn is the implementation of `(get hash key)`
@@ -762,6 +481,24 @@ func getFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive
 
 	tmp := args[0].(primitive.Hash)
 	return tmp.Get(args[1].ToString())
+}
+
+// getenvFn is the implementation of `(getenv "PATH")`
+func getenvFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+
+	// If we have only a single argument
+	if len(args) != 1 {
+		return primitive.Error("invalid argument count")
+	}
+
+	// Which is a string
+	if _, ok := args[0].(primitive.String); !ok {
+		return primitive.Error("argument not a string")
+	}
+
+	// Return the value
+	str := args[0].(primitive.String)
+	return primitive.String(os.Getenv(string(str)))
 }
 
 // helpFn is the implementation of `(help fn)`
@@ -792,6 +529,28 @@ func helpFn(env *env.Environment, args []primitive.Primitive) primitive.Primitiv
 	}
 	str += proc.Help
 	return primitive.String(str)
+}
+
+// (join (1 2 3)
+func joinFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+
+	// We require one argument
+	if len(args) != 1 {
+		return primitive.Error("invalid argument count")
+	}
+
+	// The argument must be a list
+	if _, ok := args[0].(primitive.List); !ok {
+		return primitive.Error("argument not a list")
+	}
+
+	tmp := ""
+
+	for _, t := range args[0].(primitive.List) {
+		tmp += t.ToString()
+	}
+
+	return primitive.String(tmp)
 }
 
 // keysFn is the implementation of `(keys hash)`
@@ -832,117 +591,24 @@ func keysFn(env *env.Environment, args []primitive.Primitive) primitive.Primitiv
 	return c
 }
 
-// valsFn is the implementation of `(vals hash)`
-func valsFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
-
-	// We need a single argument
-	if len(args) != 1 {
-		return primitive.Error("invalid argument count")
-	}
-
-	// First is a Hash
-	if _, ok := args[0].(primitive.Hash); !ok {
-		return primitive.Error("argument not a hash")
-	}
-
-	// Create the list to hold the result
-	var c primitive.List
-
-	// Cast the argument
-	tmp := args[0].(primitive.Hash)
-
-	// Get the keys as a list
-	keys := []string{}
-
-	// Add the keys
-	for x := range tmp.Entries {
-		keys = append(keys, x)
-	}
-
-	// Sort the list
-	sort.Strings(keys)
-
-	// Now append the value
-	for _, x := range keys {
-		c = append(c, tmp.Entries[x])
-	}
-
-	return c
+// listFn implements "list"
+func listFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+	return primitive.List(args)
 }
 
-// containsFn implements (contains?)
-func containsFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
-
-	// We need a pair of arguments
+// ltFn implements "<"
+func ltFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 	if len(args) != 2 {
-		return primitive.Error("invalid argument count")
+		return primitive.Error("wrong number of arguments")
 	}
 
-	// First is a Hash
-	hsh, ok := args[0].(primitive.Hash)
-	if !ok {
-		return primitive.Error("argument not a hash")
+	if _, ok := args[0].(primitive.Number); !ok {
+		return primitive.Error("argument not a number")
 	}
-
-	// The second should be a string, but other things can be converted
-	str, ok := args[1].(primitive.String)
-	if !ok {
-		str = primitive.String(args[1].ToString())
+	if _, ok := args[1].(primitive.Number); !ok {
+		return primitive.Error("argument not a number")
 	}
-
-	_, found := hsh.Entries[str.ToString()]
-	if found {
-		return primitive.Bool(true)
-	}
-
-	return primitive.Bool(false)
-
-}
-
-// setFn is the implementation of `(set hash key val)`
-func setFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
-
-	// We need three arguments
-	if len(args) != 3 {
-		return primitive.Error("invalid argument count")
-	}
-
-	// First is a Hash
-	if _, ok := args[0].(primitive.Hash); !ok {
-		return primitive.Error("argument not a hash")
-	}
-
-	tmp := args[0].(primitive.Hash)
-	tmp.Set(args[1].ToString(), args[2])
-	return args[2]
-}
-
-// getenvFn is the implementation of `(getenv "PATH")`
-func getenvFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
-
-	// If we have only a single argument
-	if len(args) != 1 {
-		return primitive.Error("invalid argument count")
-	}
-
-	// Which is a string
-	if _, ok := args[0].(primitive.String); !ok {
-		return primitive.Error("argument not a string")
-	}
-
-	// Return the value
-	str := args[0].(primitive.String)
-	return primitive.String(os.Getenv(string(str)))
-}
-
-// nowFn is the implementation of `(now)`
-func nowFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
-	return primitive.Number(time.Now().Unix())
-}
-
-// msFn is the implementation of `(ms)`
-func msFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
-	return primitive.Number(time.Now().UnixNano() / int64(time.Millisecond))
+	return primitive.Bool(args[0].(primitive.Number) < args[1].(primitive.Number))
 }
 
 // matchFn is the implementation of (match ..)
@@ -1000,21 +666,108 @@ func matchFn(env *env.Environment, args []primitive.Primitive) primitive.Primiti
 
 }
 
-// chrFn is the implementation of (chr ..)
-func chrFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+// minusFn implements "-"
+func minusFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 
+	// ensure we have at least one argument
+	if len(args) < 1 {
+		return primitive.Error("invalid argument count")
+	}
+
+	// the first argument must be a number.
+	v, ok := args[0].(primitive.Number)
+	if !ok {
+		return primitive.Error(fmt.Sprintf("argument '%s' was not a number", args[0].ToString()))
+	}
+
+	// now process all the rest of the arguments
+	for _, i := range args[1:] {
+
+		// check we have a number
+		n, ok := i.(primitive.Number)
+		if ok {
+			v -= n
+		} else {
+			return primitive.Error(fmt.Sprintf("argument %s was not a number", i.ToString()))
+		}
+	}
+	return primitive.Number(v)
+}
+
+// modFn implements "%"
+func modFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+	if len(args) != 2 {
+		return primitive.Error("wrong number of arguments")
+	}
+	if _, ok := args[0].(primitive.Number); !ok {
+		return primitive.Error("argument not a number")
+	}
+	if _, ok := args[1].(primitive.Number); !ok {
+		return primitive.Error("argument not a number")
+	}
+
+	a := int(args[0].(primitive.Number))
+	b := int(args[1].(primitive.Number))
+	if b == 0 {
+		return primitive.Error("attempted division by zero")
+	}
+	return primitive.Number(a % b)
+}
+
+// msFn is the implementation of `(ms)`
+func msFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+	return primitive.Number(time.Now().UnixNano() / int64(time.Millisecond))
+}
+
+// multiplyFn implements "*"
+func multiplyFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+	// ensure we have at least one argument
+	if len(args) < 1 {
+		return primitive.Error("invalid argument count")
+	}
+
+	// the first argument must be a number.
+	v, ok := args[0].(primitive.Number)
+	if !ok {
+		return primitive.Error(fmt.Sprintf("argument '%s' was not a number", args[0].ToString()))
+	}
+
+	// now process all the rest of the arguments
+	for _, i := range args[1:] {
+
+		// check we have a number
+		n, ok := i.(primitive.Number)
+		if ok {
+			v *= n
+		} else {
+			return primitive.Error(fmt.Sprintf("argument %s was not a number", i.ToString()))
+		}
+	}
+	return primitive.Number(v)
+}
+
+// nilFn implements nil?
+func nilFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 	if len(args) != 1 {
 		return primitive.Error("wrong number of arguments")
 	}
 
-	if _, ok := args[0].(primitive.Number); !ok {
-		return primitive.Error("argument not a number")
+	// nil is nil (yeah, really)
+	if primitive.IsNil(args[0]) {
+		return primitive.Bool(true)
 	}
 
-	i := args[0].(primitive.Number)
-	rune := rune(i)
+	// an empty list is nil.
+	if list, ok := args[0].(primitive.List); ok {
+		return primitive.Bool(len(list) == 0)
+	}
+	return primitive.Bool(false)
 
-	return primitive.String(rune)
+}
+
+// nowFn is the implementation of `(now)`
+func nowFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+	return primitive.Number(time.Now().Unix())
 }
 
 // ordFn is the implementation of (ord ..)
@@ -1039,20 +792,265 @@ func ordFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive
 	return primitive.Number(0)
 }
 
-// gensymFn is the implementation of (gensym ..)
-func gensymFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
-	// symbol characters
-	var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
+// osFn implements (os)
+func osFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+	return primitive.String(runtime.GOOS)
+}
 
-	// generate prefix
-	b := make([]rune, 5)
-	for i := range b {
-		b[i] = letters[rand.Intn(len(letters))]
+// plusFn implements "+"
+func plusFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+
+	// ensure we have at least one argument
+	if len(args) < 1 {
+		return primitive.Error("invalid argument count")
 	}
 
-	// generate with count
-	symCount++
-	str := fmt.Sprintf("%s%06d", string(b), symCount)
-	sym := primitive.Symbol(str)
-	return sym
+	// the first argument must be a number.
+	v, ok := args[0].(primitive.Number)
+	if !ok {
+		return primitive.Error(fmt.Sprintf("argument '%s' was not a number", args[0].ToString()))
+	}
+
+	// now process all the rest of the arguments
+	for _, i := range args[1:] {
+
+		// check we have a number
+		n, ok := i.(primitive.Number)
+		if ok {
+			v += n
+		} else {
+			return primitive.Error(fmt.Sprintf("argument %s was not a number", i.ToString()))
+		}
+	}
+	return primitive.Number(v)
+}
+
+// printFn implements (print).
+func printFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+	// no args
+	if len(args) < 1 {
+		return primitive.Error("wrong number of arguments")
+	}
+
+	// one arg
+	if len(args) == 1 {
+		// expand
+		str := expandStr(args[0].ToString())
+
+		// show & return
+		fmt.Println(str)
+		return primitive.String(str)
+	}
+
+	// OK format-string
+	frmt := expandStr(args[0].ToString())
+	parm := []any{}
+
+	for i, a := range args {
+		if i == 0 {
+			continue
+		}
+		parm = append(parm, a.ToString())
+	}
+
+	out := fmt.Sprintf(frmt, parm...)
+	fmt.Println(out)
+	return primitive.String(out)
+}
+
+// setFn is the implementation of `(set hash key val)`
+func setFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+
+	// We need three arguments
+	if len(args) != 3 {
+		return primitive.Error("invalid argument count")
+	}
+
+	// First is a Hash
+	if _, ok := args[0].(primitive.Hash); !ok {
+		return primitive.Error("argument not a hash")
+	}
+
+	tmp := args[0].(primitive.Hash)
+	tmp.Set(args[1].ToString(), args[2])
+	return args[2]
+}
+
+// slurpFn returns the contents of the specified file
+func slurpFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+	if len(args) != 1 {
+		return primitive.Error("wrong number of arguments")
+	}
+
+	fName := args[0].ToString()
+	data, err := os.ReadFile(fName)
+	if err != nil {
+		return primitive.Error(fmt.Sprintf("error reading %s %s", fName, err))
+	}
+	return primitive.String(string(data))
+}
+
+// sortFn implements (sort)
+func sortFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+	// If we have only a single argument
+	if len(args) != 1 {
+		return primitive.Error("invalid argument count")
+	}
+
+	// Which is a list
+	if _, ok := args[0].(primitive.List); !ok {
+		return primitive.Error("argument not a list")
+	}
+
+	// Cast
+	l := args[0].(primitive.List)
+
+	// Copy
+	var c primitive.List
+	c = append(c, l...)
+
+	// Sort the copy of the list
+	sort.Slice(c, func(i, j int) bool {
+
+		// If we have numbers we can sort
+		if _, ok := c[i].(primitive.Number); ok {
+			if _, ok := c[j].(primitive.Number); ok {
+
+				a, _ := strconv.ParseFloat(c[i].ToString(), 64)
+				b, _ := strconv.ParseFloat(c[j].ToString(), 64)
+
+				return a < b
+			}
+		}
+
+		// Otherwise we sort as strings
+		a := c[i].ToString()
+		b := c[j].ToString()
+		return a < b
+	})
+
+	return c
+
+}
+
+// (sprintf "fmt" "arg1" ... "argN")
+func sprintfFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+
+	// we need 2+ arguments
+	if len(args) < 2 {
+		return primitive.Error("wrong number of arguments")
+	}
+
+	// OK format-string
+	frmt := expandStr(args[0].ToString())
+	parm := []any{}
+
+	for i, a := range args {
+		if i == 0 {
+			continue
+		}
+		parm = append(parm, a.ToString())
+	}
+
+	out := fmt.Sprintf(frmt, parm...)
+	return primitive.String(out)
+}
+
+// (split "str" "by")
+func splitFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+
+	// We require two arguments
+	if len(args) != 2 {
+		return primitive.Error("invalid argument count")
+	}
+
+	// Both arguments must be strings
+	if _, ok := args[0].(primitive.String); !ok {
+		return primitive.Error("argument not a string")
+	}
+	if _, ok := args[1].(primitive.String); !ok {
+		return primitive.Error("argument not a string")
+	}
+
+	// split
+	out := strings.Split(args[0].ToString(), args[1].ToString())
+
+	var c primitive.List
+
+	for _, x := range out {
+		c = append(c, primitive.String(x))
+	}
+
+	return c
+}
+
+// strFn implements "str"
+func strFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+	if len(args) != 1 {
+		return primitive.Error("wrong number of arguments")
+	}
+	return primitive.String(args[0].ToString())
+}
+
+// timeFn returns the current (HH, MM, SS) as a list.
+func timeFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+	var ret primitive.List
+
+	t := time.Now()
+
+	hr := t.Hour()
+	mn := t.Minute()
+	sc := t.Second()
+
+	ret = append(ret, primitive.Number(hr))
+	ret = append(ret, primitive.Number(mn))
+	ret = append(ret, primitive.Number(sc))
+
+	return ret
+}
+
+// typeFn implements "type"
+func typeFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+	if len(args) != 1 {
+		return primitive.Error("wrong number of arguments")
+	}
+	return primitive.String(args[0].Type())
+}
+
+// valsFn is the implementation of `(vals hash)`
+func valsFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+
+	// We need a single argument
+	if len(args) != 1 {
+		return primitive.Error("invalid argument count")
+	}
+
+	// First is a Hash
+	if _, ok := args[0].(primitive.Hash); !ok {
+		return primitive.Error("argument not a hash")
+	}
+
+	// Create the list to hold the result
+	var c primitive.List
+
+	// Cast the argument
+	tmp := args[0].(primitive.Hash)
+
+	// Get the keys as a list
+	keys := []string{}
+
+	// Add the keys
+	for x := range tmp.Entries {
+		keys = append(keys, x)
+	}
+
+	// Sort the list
+	sort.Strings(keys)
+
+	// Now append the value
+	for _, x := range keys {
+		c = append(c, tmp.Entries[x])
+	}
+
+	return c
 }
