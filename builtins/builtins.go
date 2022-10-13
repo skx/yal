@@ -70,6 +70,9 @@ func init() {
 			term = line
 		} else {
 			// Otherwise add the text to it.
+			if len(text) > 0 {
+				text += "\n"
+			}
 			text += line
 		}
 	}

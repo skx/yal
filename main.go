@@ -108,8 +108,10 @@ func main() {
 			prc, ok := val.(*primitive.Procedure)
 			if ok && len(prc.Help) > 0 {
 				txt := prc.Help
-				txt = strings.Replace(txt, "\\t", "\t", -1)
-				fmt.Printf("%s\n\t%s\n\n", key, txt)
+
+				fmt.Printf("%s\n", key)
+				fmt.Printf("%s\n", strings.Repeat("=", len(key)))
+				fmt.Printf("%s\n\n\n\n", txt)
 			}
 
 		}
