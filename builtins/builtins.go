@@ -19,7 +19,17 @@ import (
 
 	"github.com/skx/yal/env"
 	"github.com/skx/yal/primitive"
+
+	_ "embed" // embedded-resource magic
 )
+
+//go:embed help.txt
+var helpText string
+
+// helpMap contains a map of help-text.
+//
+// it is populated at init-time, from helpText
+var helpMap map[string]string
 
 // regCache is a cache of compiled regular expression objects.
 // These may persist between runs because a regular expression object
@@ -30,152 +40,90 @@ var regCache map[string]*regexp.Regexp
 // function.
 var symCount int
 
-// init ensures that our regexp cache is populated
+// init ensures that our regexp cache is populated, and that we build
+// up a list of help-texts, keyed on function name.
 func init() {
+
+	// Create our maps.
 	regCache = make(map[string]*regexp.Regexp)
+	helpMap = make(map[string]string)
+
+	// Convert the help-text to a string
+	help := string(helpText)
+
+	term := ""
+	text := ""
+
+	// process the help-text, embedded, line by line
+	for _, line := range strings.Split(help, "\n") {
+
+		// end of an entry?  Save it away
+		if line == "%%" {
+			helpMap[term] = text
+
+			term = ""
+			text = ""
+			continue
+		}
+		if len(term) == 0 {
+			// no term?  Then save one
+			term = line
+		} else {
+			// Otherwise add the text to it.
+			text += line
+		}
+	}
+
+	// All done, our help text should be available at run-time now.
 }
 
 // PopulateEnvironment registers our default primitives
 func PopulateEnvironment(env *env.Environment) {
 
-	// maths
+	//
+	// bind the functions - sorted order
+	//
 	env.Set("#", &primitive.Procedure{F: expnFn})
 	env.Set("%", &primitive.Procedure{F: modFn})
 	env.Set("*", &primitive.Procedure{F: multiplyFn})
 	env.Set("+", &primitive.Procedure{F: plusFn})
 	env.Set("-", &primitive.Procedure{F: minusFn})
 	env.Set("/", &primitive.Procedure{F: divideFn})
-
-	// comparisons
-	//
-	// When it comes to comparisons there are several we could
-	// use:
-	//
-	//  <
-	//  <=
-	//  >
-	//  >=
-	//
-	// We only actually need to implement "<" in Golang, the rest
-	// can be added in lisp.
 	env.Set("<", &primitive.Procedure{F: ltFn})
-	env.Set("=", &primitive.Procedure{F: equalsFn, Help: `= returns true if supplied with two numerical values, of equal value.
-\tSee also: eq
-\t Example: (print (= 3 a))`})
-	env.Set("eq", &primitive.Procedure{F: eqFn, Help: `eq returns true if the two values supplied as parameters have the same type, and string representation.
 
-\tSee also: =
-\t Example: (print (eq "bob" 2))`})
-
-	// Types
-	env.Set("nil?", &primitive.Procedure{F: nilFn, Help: `nil? returns a true value if the specified argument is nil, or an empty list.`})
-	env.Set("type", &primitive.Procedure{F: typeFn, Help: `type returns a string describing the type of the specified object.
-
-Example:  (type "string") (type 3) (type type)`})
-
-	// List
-	env.Set("car", &primitive.Procedure{F: carFn, Help: `car returns the first item from the specified list.`})
-	env.Set("cdr", &primitive.Procedure{F: cdrFn, Help: `cdr returns all items from the specified list, except the first.`})
-	env.Set("cons", &primitive.Procedure{F: consFn, Help: `cons joins the two specified lists: FIXME`})
-	env.Set("join", &primitive.Procedure{F: joinFn, Help: `join returns a string formed by converting every element of the supplied list into a string and concatenating them.`})
-	env.Set("list", &primitive.Procedure{F: listFn, Help: `list creates and returns a list containing each of the specified arguments, in order.`})
-
-	// Hash
-	env.Set("contains?", &primitive.Procedure{F: containsFn, Help: `contains? returns true if the hash specified as the first argument contains the key specified as the second argument.`})
-	env.Set("get", &primitive.Procedure{F: getFn, Help: `get returns the specified field from the specified hash.
-
-\tSee also: set
-\t Example: (get {:name "steve" :location "Europe" } ":name")`})
-
-	env.Set("help", &primitive.Procedure{F: helpFn, Help: `help returns any help associated with the item specified as the single argument.
-
-\tExample: (print (help print))`})
-
-	env.Set("gensym", &primitive.Procedure{F: gensymFn, Help: `gensym returns a unique symbol, which is guaranteed to be unique.  This is most frequently used inside macro-definitions.
-
-\tExample: (print "%s %s" (gensym) (gensym))`})
-
-	env.Set("keys", &primitive.Procedure{F: keysFn, Help: `keys returns the keys which are present in the specified hash.
-
-NOTE: Keys are returned in sorted order.
-
-\tSee also: vals`})
-	env.Set("set", &primitive.Procedure{F: setFn, Help: `set updates the specified hash, setting the value given by name.
-
-\t: See also: get
-\t: Example:  (set! person {:name "Steve"})  (set person :name "Bobby")`})
-	env.Set("vals", &primitive.Procedure{F: valsFn, Help: `valus returns the values which are present in the specified hash.
-
-NOTE: Values are returned in the order of their sorted keys.
-
-\tSee also: keys`})
-
-	// core
-	env.Set("arch", &primitive.Procedure{F: archFn, Help: `arch returns a simple string describing the architecture the current host is running upon.
-
-\tSee also: (os)
-\t Example: (print (arch))`})
-	env.Set("date", &primitive.Procedure{F: dateFn, Help: `date returns a list containing date-related fields; the day of the week, the day-number, the month-number, and the year.
-
-\tSee also: (time)`})
-	env.Set("error", &primitive.Procedure{F: errorFn, Help: `error raises an error with the specified argument as the explaination.
-
-\t Example: (error "Expected foo to be bar!")`})
-	env.Set("getenv", &primitive.Procedure{F: getenvFn, Help: `getenv returns the contents of the environmental-variable which was specified as the first argument.
-
-\t Example: (print (getenv "HOME"))`})
-	env.Set("ms", &primitive.Procedure{F: msFn, Help: `ms returns the current time as a number of milliseconds, it is useful for benchmarking.
-
-\tSee also: now`})
-	env.Set("now", &primitive.Procedure{F: nowFn, Help: `now returns the number of seconds since the Unix Epoch.
-
-\tSee also: ms`})
-	env.Set("os", &primitive.Procedure{F: osFn, Help: `os returns a simple string describing the operating system the current host is running.
-
-\tSee also: (arch)
-\t Example: (print (os))`,
-	})
-	env.Set("print", &primitive.Procedure{F: printFn, Help: `print is used to output text to the console.  It can be called with either an object/string to print, or a format-string and list of parameters.
-
-\tSee also: sprintf
-\t Example: (print "Hello, world")
-\t Example: (print "Hello user %s you are %d" (getenv "USER") 32)`})
-	env.Set("sort", &primitive.Procedure{F: sortFn, Help: `sort will sort the items in the list specified as the single argument, and return them as a new list.
-
-\t Example: (print (sort 3 43  1 "Steve" "Adam"))
-`})
-	env.Set("sprintf", &primitive.Procedure{F: sprintfFn, Help: `sprintf allows formating values with a simple format-string.
-
-\tSee also: print
-\t Example: (sprintf "Today is %s" (weekday))`})
-	env.Set("slurp", &primitive.Procedure{F: slurpFn, Help: `slurp returns the contents of the specified file.`})
-	env.Set("time", &primitive.Procedure{F: timeFn, Help: `time returns a list containing time-related entries; the current hour, the current minute past the hour, and the current value of the seconds.
-
-\tSee also: (date)`})
-
-	// string
-	env.Set("chr", &primitive.Procedure{F: chrFn, Help: `chr returns a string containing the single character who's ASCII code was provided.
-
-\tSee also: ord
-\t Example: (chr 42) ; => "*"`})
-
-	env.Set("match", &primitive.Procedure{F: matchFn, Help: `match is used to perform regular expression matches.  The first parameter must be a suitable regular expression, supplied in string-form, and the second should be a value to test against.  If the second value is not a string it will be stringified prior to the test-attempt.
-
-Any matches found will be returned as a list, with nil being returned on no match.
-
-\t Example: (print (match "c.ke$" "cake"))`})
-	env.Set("ord", &primitive.Procedure{F: ordFn, Help: `ord returns the ASCII code for the character provided as the first input.
-
-\tSee also: chr
-\t Example: (ord "a") ; => 97`})
-
-	env.Set("split", &primitive.Procedure{F: splitFn, Help: `split accepts two string parameters, and splits the first string by the term specified as the second argument, returning a list of the results.
-
-\tSee also: join
-\t Example: (split "steve" "e") ; => ("st" "v")
-\t Example: (split "steve" "")  ; => ("s" "t" "e" "v" "e")`})
-
-	env.Set("str", &primitive.Procedure{F: strFn, Help: `str converts the parameter supplied to a string, and returns it.`})
+	env.Set("=", &primitive.Procedure{F: equalsFn, Help: helpMap["="]})
+	env.Set("arch", &primitive.Procedure{F: archFn, Help: helpMap["arch"]})
+	env.Set("car", &primitive.Procedure{F: carFn, Help: helpMap["car"]})
+	env.Set("cdr", &primitive.Procedure{F: cdrFn, Help: helpMap["cdr"]})
+	env.Set("chr", &primitive.Procedure{F: chrFn, Help: helpMap["chr"]})
+	env.Set("cons", &primitive.Procedure{F: consFn, Help: helpMap["cons"]})
+	env.Set("contains?", &primitive.Procedure{F: containsFn, Help: helpMap["contains?"]})
+	env.Set("date", &primitive.Procedure{F: dateFn, Help: helpMap["date"]})
+	env.Set("eq", &primitive.Procedure{F: eqFn, Help: helpMap["eq"]})
+	env.Set("error", &primitive.Procedure{F: errorFn, Help: helpMap["error"]})
+	env.Set("gensym", &primitive.Procedure{F: gensymFn, Help: helpMap["gensym"]})
+	env.Set("get", &primitive.Procedure{F: getFn, Help: helpMap["get"]})
+	env.Set("getenv", &primitive.Procedure{F: getenvFn, Help: helpMap["getenv"]})
+	env.Set("help", &primitive.Procedure{F: helpFn, Help: helpMap["help"]})
+	env.Set("join", &primitive.Procedure{F: joinFn, Help: helpMap["join"]})
+	env.Set("keys", &primitive.Procedure{F: keysFn, Help: helpMap["keys"]})
+	env.Set("list", &primitive.Procedure{F: listFn, Help: helpMap["list"]})
+	env.Set("match", &primitive.Procedure{F: matchFn, Help: helpMap["match"]})
+	env.Set("ms", &primitive.Procedure{F: msFn, Help: helpMap["ms"]})
+	env.Set("nil?", &primitive.Procedure{F: nilFn, Help: helpMap["nil?"]})
+	env.Set("now", &primitive.Procedure{F: nowFn, Help: helpMap["now"]})
+	env.Set("ord", &primitive.Procedure{F: ordFn, Help: helpMap["ord"]})
+	env.Set("os", &primitive.Procedure{F: osFn, Help: helpMap["os"]})
+	env.Set("print", &primitive.Procedure{F: printFn, Help: helpMap["print"]})
+	env.Set("set", &primitive.Procedure{F: setFn, Help: helpMap["set"]})
+	env.Set("slurp", &primitive.Procedure{F: slurpFn, Help: helpMap["slurp"]})
+	env.Set("sort", &primitive.Procedure{F: sortFn, Help: helpMap["sort"]})
+	env.Set("split", &primitive.Procedure{F: splitFn, Help: helpMap["split"]})
+	env.Set("sprintf", &primitive.Procedure{F: sprintfFn, Help: helpMap["sprintf"]})
+	env.Set("str", &primitive.Procedure{F: strFn, Help: helpMap["str"]})
+	env.Set("time", &primitive.Procedure{F: timeFn, Help: helpMap["time"]})
+	env.Set("type", &primitive.Procedure{F: typeFn, Help: helpMap["type"]})
+	env.Set("vals", &primitive.Procedure{F: valsFn, Help: helpMap["vals"]})
 }
 
 // Convert a string such as "steve\tkemp" into "steve<TAB>kemp"
