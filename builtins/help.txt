@@ -1,4 +1,200 @@
+=
+returns true if supplied with two numerical values, of equal value.
+
+See also: eq
+Example : (print (= 3 a))
+%%
+abs
+Return the absolute value of the supplied number.
+%%
 arch
-This is a test
-This is a test
-%
+arch returns a simple string describing the architecture the current host is running upon.
+
+See also: (os)
+Example : (print (arch))
+%%
+car
+car returns the first item from the specified list.
+%%
+cdr
+cdr returns all items from the specified list, except the first.
+%%
+chr
+chr returns a string containing the single character who's ASCII code was provided.
+
+See also: ord
+Example : (chr 42) ; => "*"
+%%
+cons
+
+cons joins the two specified lists: FIXME
+%%
+contains?
+
+contains? returns true if the hash specified as the first argument contains the key specified as the second argument.
+%%
+date
+
+date returns a list containing date-related fields; the day of the week, the day-number, the month-number, and the year.
+
+See also: (time)
+%%
+eq
+
+eq returns true if the two values supplied as parameters have the same type, and string representation.
+
+See also: =
+Example: (print (eq "bob" 2))
+%%
+error
+
+error raises an error with the specified argument as the explanation.
+
+Example: (error "Expected foo to be bar!")
+%%
+gensym
+
+gensym returns a symbol which is guaranteed to be unique.  It is primarily
+useful for macros.
+%%
+get
+
+get returns the specified field from the specified hash.
+
+See also: set
+Example: (get {:name "steve" :location "Europe" } ":name")
+%%
+getenv
+
+getenv returns the contents of the environmental-variable which was specified as the first argument.
+
+Example: (print (getenv "HOME"))
+%%
+help
+
+help returns any help associated with the item specified as the single argument.
+
+Example: (print (help print))
+%%
+join
+
+join returns a string formed by converting every element of the supplied list into a string and concatenating them.
+%%
+keys
+
+keys returns the keys which are present in the specified hash.
+
+NOTE: Keys are returned in sorted order.
+
+See also: vals
+%%
+list
+
+list creates and returns a list containing each of the specified arguments, in order.
+%%
+match
+
+match is used to perform regular expression matches.  The first parameter must be a suitable regular expression, supplied in string-form, and the second should be a value to test against.  If the second value is not a string it will be stringified prior to the test-attempt.
+
+Any matches found will be returned as a list, with nil being returned on no match.
+
+Example: (print (match "c.ke$" "cake"))
+%%
+ms
+
+ms returns the current time as a number of milliseconds, it is useful for benchmarking.
+
+See also: now
+%%
+nil?
+
+nil? returns true if the given parameter is nil, or an empty list.
+%%
+now
+
+now returns the number of seconds since the Unix Epoch.
+
+See also: ms
+%%
+ord
+
+ord returns the ASCII code for the character provided as the first input.
+
+See also: chr
+Example: (ord "a") ; => 97
+%%
+os
+
+os returns a simple string describing the operating system the current host is running.
+
+See also: (arch)
+Example: (print (os))
+%%
+print
+
+print is used to output text to the console.  It can be called with either an object/string to print, or a format-string and list of parameters.
+
+See also: sprintf
+Example: (print "Hello, world")
+Example: (print "Hello user %s you are %d" (getenv "USER") 32)
+%%
+set
+
+set updates the specified hash, setting the value given by name.
+
+See also: get
+
+Example: (set! person {:name "Steve"})
+         (set person :name "Bobby")
+%%
+slurp
+
+slurp returns the contents of the specified file.
+%%
+sort
+
+sort will sort the items in the list specified as the single argument, and return them as a new list.
+
+Example: (print (sort 3 43  1 "Steve" "Adam"))
+%%
+split
+
+split accepts two string parameters, and splits the first string by the term specified as the second argument, returning a list of the results.
+
+See also: join
+Example: (split "steve" "e") ; => ("st" "v")
+Example: (split "steve" "")  ; => ("s" "t" "e" "v" "e")
+%%
+sprintf
+
+sprintf allows formating values with a simple format-string.
+
+See also: print
+Example: (sprintf "Today is %s" (weekday))
+%%
+str
+
+str converts the parameter supplied to a string, and returns it.
+%%
+time
+
+time returns a list containing time-related entries; the current hour, the current minute past the hour, and the current value of the seconds.
+
+See also: (date)
+%%
+type
+
+type returns a string describing the type of the specified object.
+
+Example:  (print (type "string"))
+          (print (type 3))
+
+%%
+vals
+
+valus returns the values which are present in the specified hash.
+
+NOTE: Values are returned in the order of their sorted keys.
+
+See also: keys
+%%
