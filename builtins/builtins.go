@@ -129,53 +129,6 @@ func PopulateEnvironment(env *env.Environment) {
 	env.Set("vals", &primitive.Procedure{F: valsFn, Help: helpMap["vals"]})
 }
 
-// Convert a string such as "steve\tkemp" into "steve<TAB>kemp"
-func expandStr(input string) string {
-	out := ""
-
-	// Walk the string character by character
-	i := 0
-	l := len(input)
-
-	for i < l {
-
-		// current character
-		c := input[i]
-
-		// look for "\n", "\t", etc.
-		if c == '\\' && (i+1) < l {
-
-			next := input[i+1]
-			switch next {
-			case 'e':
-				out += string(rune(033))
-			case 't':
-				out += "\t"
-			case 'n':
-				out += "\n"
-			case 'r':
-				out += "\r"
-			case '\\':
-				out += "\\"
-			default:
-				// unknown escapes will be left alone
-				out += "\\" + string(next)
-			}
-
-			// Bump the count once, to skip the "\".
-			//
-			// At the end of the loop we bump again, which will
-			// skip the character after that
-			i++
-		} else {
-			out += string(c)
-		}
-		i++
-	}
-
-	return out
-}
-
 // Built in functions
 
 // archFn implements (os)
@@ -338,14 +291,6 @@ func divideFn(env *env.Environment, args []primitive.Primitive) primitive.Primit
 	return primitive.Number(v)
 }
 
-// errorFn implements "error"
-func errorFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
-	if len(args) != 1 {
-		return primitive.Error("wrong number of arguments")
-	}
-	return primitive.Error(args[0].ToString())
-}
-
 // eqFn implements "eq"
 func eqFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 	if len(args) != 2 {
@@ -383,6 +328,61 @@ func equalsFn(env *env.Environment, args []primitive.Primitive) primitive.Primit
 		return primitive.Bool(true)
 	}
 	return primitive.Bool(false)
+}
+
+// errorFn implements "error"
+func errorFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+	if len(args) != 1 {
+		return primitive.Error("wrong number of arguments")
+	}
+	return primitive.Error(args[0].ToString())
+}
+
+// Convert a string such as "steve\tkemp" into "steve<TAB>kemp"
+func expandStr(input string) string {
+	out := ""
+
+	// Walk the string character by character
+	i := 0
+	l := len(input)
+
+	for i < l {
+
+		// current character
+		c := input[i]
+
+		// look for "\n", "\t", etc.
+		if c == '\\' && (i+1) < l {
+
+			next := input[i+1]
+			switch next {
+			case 'e':
+				out += string(rune(033))
+			case 't':
+				out += "\t"
+			case 'n':
+				out += "\n"
+			case 'r':
+				out += "\r"
+			case '\\':
+				out += "\\"
+			default:
+				// unknown escapes will be left alone
+				out += "\\" + string(next)
+			}
+
+			// Bump the count once, to skip the "\".
+			//
+			// At the end of the loop we bump again, which will
+			// skip the character after that
+			i++
+		} else {
+			out += string(c)
+		}
+		i++
+	}
+
+	return out
 }
 
 // expnFn implements "#"
@@ -884,29 +884,6 @@ func sortFn(env *env.Environment, args []primitive.Primitive) primitive.Primitiv
 
 }
 
-// (sprintf "fmt" "arg1" ... "argN")
-func sprintfFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
-
-	// we need 2+ arguments
-	if len(args) < 2 {
-		return primitive.Error("wrong number of arguments")
-	}
-
-	// OK format-string
-	frmt := expandStr(args[0].ToString())
-	parm := []any{}
-
-	for i, a := range args {
-		if i == 0 {
-			continue
-		}
-		parm = append(parm, a.ToString())
-	}
-
-	out := fmt.Sprintf(frmt, parm...)
-	return primitive.String(out)
-}
-
 // (split "str" "by")
 func splitFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 
@@ -933,6 +910,29 @@ func splitFn(env *env.Environment, args []primitive.Primitive) primitive.Primiti
 	}
 
 	return c
+}
+
+// (sprintf "fmt" "arg1" ... "argN")
+func sprintfFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+
+	// we need 2+ arguments
+	if len(args) < 2 {
+		return primitive.Error("wrong number of arguments")
+	}
+
+	// OK format-string
+	frmt := expandStr(args[0].ToString())
+	parm := []any{}
+
+	for i, a := range args {
+		if i == 0 {
+			continue
+		}
+		parm = append(parm, a.ToString())
+	}
+
+	out := fmt.Sprintf(frmt, parm...)
+	return primitive.String(out)
 }
 
 // strFn implements "str"
