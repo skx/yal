@@ -356,3 +356,24 @@
 (set! lower (fn* (x:string)
                  "Convert each character from the supplied string to lower-case, and return that string."
                 (translate x lower-table)))
+
+
+;; Get the first N items from a list.
+(set! take (fn* (n l)
+                "Return the first N items from the specified list."
+                (cond (zero? n) nil
+                      (nil? l) nil
+                      true (cons (car l) (take (- n 1) (cdr l))))))
+
+;; Remove the first N items from a list.
+(set! drop (fn* (n l)
+                "Remove the first N items from the specified list."
+                (cond (zero? n) l
+                      (nil? l) nil
+                      true (drop (- n 1) (cdr l)))))
+
+;; Return everything but the last element.
+(set! butlast (fn* (l)
+                   "Return everything but the last element from the specified list."
+
+                   (take (dec (length l)) l)))

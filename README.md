@@ -103,7 +103,7 @@ We have a reasonable number of functions implemented, either in our golang core 
   * `help` will return the supplied help text for any functions which provide it - which includes all of our built-in functions and large parts of our standard-library.
   * **NOTE**: This does not (yet?) include help for special forms such as `(let* ..)`, `(if ..)`, etc.
 * List operations:
-  * `car`, `cdr`, `cons`, `first`, `last`, `list`, & `sort`.
+  * `butlast`, `car`, `cdr`, `cons`, `drop`, `first`, `last`, `list`,`sort`, & `take`.
 * Logical operations:
   * `and`, & `or`.
 * Mathematical operations:
