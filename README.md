@@ -117,6 +117,9 @@ We have a reasonable number of functions implemented, either in our golang core 
   * `chr`, `join`, `match` (regular-expression matching),`ord`, & `split`.
 * Special forms:
   * `define`, `do`, `env`, `eval`, `gensym`, `if`, `lambda`, `let*`, `macroexpand`, `read`, `set!`, `quote`, & `quasiquote`.
+* System functions:
+  * Run commands via `(shell)`, find files via `(glob)`
+  * Test files via `(directory?)`, `(exists?)` & `(file?)`.
 * Tail call optimization.
 * MAL compatability:
   * `def!` can be used as a synonym for `define`.

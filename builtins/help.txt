@@ -39,6 +39,14 @@ date returns a list containing date-related fields; the day of the week, the day
 
 See also: (time)
 %%
+directory?
+
+directory? returns true if the specified path exists, and is a directory.
+
+See also: exists? file?
+Example: (print (directory? "/etc"))
+
+%%
 eq
 
 eq returns true if the two values supplied as parameters have the same type, and string representation.
@@ -51,6 +59,22 @@ error
 error raises an error with the specified argument as the explanation.
 
 Example: (error "Expected foo to be bar!")
+%%
+exists?
+
+exists? returns true if the specified path exists, regardless of the type of path
+
+See also: directory? file?
+Example: (print (exists? "/etc"))
+%%
+file?
+
+file? returns true if the specified path exists, and is a file.
+
+More specifically something is regarded as a file if it is NOT a directory.
+
+See also: directory? exists?
+Example: (print (file? "/dev/null"))
 %%
 gensym
 
@@ -69,6 +93,12 @@ getenv
 getenv returns the contents of the environmental-variable which was specified as the first argument.
 
 Example: (print (getenv "HOME"))
+%%
+glob
+
+glob returns files matching the given pattern, as a list.
+
+Example: (print (glob "/etc/p*"))
 %%
 help
 
@@ -146,6 +176,15 @@ See also: get
 
 Example: (set! person {:name "Steve"})
          (set person :name "Bobby")
+%%
+shell
+
+shell allows you to run a command, via the shell.
+
+The return value is a list of two entries - the first is STDOUT, the second is STDERR
+
+Example: (print (car (shell '("ls" "-l" "-a")))
+Example: (print (cdr (shell '("ls" "/this /path /does - not EXIST!"))))
 %%
 slurp
 
