@@ -140,9 +140,10 @@ Note that offset starts from 0, rather than 1, for the first item."
 ;; (print (quasiquote (a (splice-unquote lst) d))) ; (a b c d)
 ;;
 (set! concat (fn* (seq1 seq2)
-  (if (nil? seq1)
-      seq2
-      (cons (car seq1) (concat (cdr seq1) seq2)))))
+                  "Join two lists"
+                  (if (nil? seq1)
+                      seq2
+                    (cons (car seq1) (concat (cdr seq1) seq2)))))
 
 
 
