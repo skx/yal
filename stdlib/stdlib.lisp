@@ -108,11 +108,12 @@
 ;; are the same then EVERY element was true so our AND result is true.
 ;;
 (set! and (fn* (xs:list)
-  (let* (res nil)
-    (set! res (filter xs (lambda (x) (if x true false))))
-    (if (= (length res) (length xs))
-        true
-      false))))
+               "Return true if every item in the specified list is true."
+               (let* (res nil)
+                 (set! res (filter xs (lambda (x) (if x true false))))
+                 (if (= (length res) (length xs))
+                     true
+                   false))))
 
 ;;
 ;; This is also a bit sneaky.  NOTE there is no short-circuiting here.
@@ -123,11 +124,12 @@
 ;; OR result is true.
 ;;
 (set! or (fn* (xs:list)
-  (let* (res nil)
-    (set! res (filter xs (lambda (x) (if x true false))))
-    (if (> (length res) 0)
-        true
-      false))))
+              "Return true if any value in the specified list contains a true value."
+              (let* (res nil)
+                (set! res (filter xs (lambda (x) (if x true false))))
+                (if (> (length res) 0)
+                    true
+                  false))))
 
 
 ;; inc/dec are useful primitives to have

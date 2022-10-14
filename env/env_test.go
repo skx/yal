@@ -25,6 +25,40 @@ func TestGetSet(t *testing.T) {
 
 }
 
+func TestItems(t *testing.T) {
+
+	// parent
+	p := New()
+	p.Set("FOO", "BAR")
+
+	// child
+	c := NewEnvironment(p)
+
+	items := c.Items()
+	if len(items) != 1 {
+		t.Fatalf("wrong number of items found")
+	}
+
+	// set in the child
+	c.Set("FOO", "BART")
+	items = c.Items()
+	if len(items) != 1 {
+		t.Fatalf("wrong number of items found")
+	}
+
+	if items["FOO"] != "BART" {
+		t.Fatalf("wrong value in items")
+	}
+
+	// set in parent
+	p.Set("NAME", "STEVE")
+
+	items = c.Items()
+	if len(items) != 2 {
+		t.Fatalf("wrong item count")
+	}
+}
+
 func TestScopedSet(t *testing.T) {
 
 	// parent
@@ -73,39 +107,5 @@ func TestScopedSet(t *testing.T) {
 	}
 	if val.(string) != "BART" {
 		t.Fatalf("parent-child set failed")
-	}
-}
-
-func TestItems(t *testing.T) {
-
-	// parent
-	p := New()
-	p.Set("FOO", "BAR")
-
-	// child
-	c := NewEnvironment(p)
-
-	items := c.Items()
-	if len(items) != 1 {
-		t.Fatalf("wrong number of items found")
-	}
-
-	// set in the child
-	c.Set("FOO", "BART")
-	items = c.Items()
-	if len(items) != 1 {
-		t.Fatalf("wrong number of items found")
-	}
-
-	if items["FOO"] != "BART" {
-		t.Fatalf("wrong value in items")
-	}
-
-	// set in parent
-	p.Set("NAME", "STEVE")
-
-	items = c.Items()
-	if len(items) != 2 {
-		t.Fatalf("wrong item count")
 	}
 }

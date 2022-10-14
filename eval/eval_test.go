@@ -12,93 +12,6 @@ import (
 	"github.com/skx/yal/stdlib"
 )
 
-// This tests an infinite loop is handled
-func TestTimeout(t *testing.T) {
-
-	// Test code - run an infinite loop, incrementing a variable.
-	tst := `
-(set! a 1)
-(while true
- (do
-   (set! a (+ a 1) true)))
-`
-	// Load our standard library
-	st := stdlib.Contents()
-	std := string(st)
-
-	// Timeout after a second
-	ctx, cancel := context.WithTimeout(context.Background(), 1000*time.Millisecond)
-	defer cancel()
-
-	// Create a new interpreter
-	l := New(std + "\n" + tst)
-
-	// Ensure we get a timeout
-	l.SetContext(ctx)
-
-	// With a new environment
-	env := env.New()
-
-	// Populate the default primitives
-	builtins.PopulateEnvironment(env)
-
-	// Run it
-	out := l.Evaluate(env)
-
-	// Test for both possible errors here.
-	//
-	// We should get the context error, but sometimes we don't
-	// the important thing is we DON'T hang forever
-	if !strings.Contains(out.ToString(), "deadline exceeded") &&
-		!strings.Contains(out.ToString(), "not a function") {
-		t.Fatalf("Didn't get the expected output.  Got: %s", out.ToString())
-	}
-
-}
-
-// TestStdlibHelp is designed to ensure that > 80% of our standard library
-// functions have help-documentation
-func TestStdlibHelp(t *testing.T) {
-
-	// Load our standard library
-	st := stdlib.Contents()
-	std := string(st)
-
-	// Create a new interpreter
-	l := New(std)
-
-	// With a new environment
-	env := env.New()
-
-	// Populate the default primitives
-	builtins.PopulateEnvironment(env)
-
-	// Run it
-	_ = l.Evaluate(env)
-
-	// Now we should have an environment which is
-	// populated with functions
-	for name, val := range env.Items() {
-
-		proc, ok := val.(*primitive.Procedure)
-
-		if !ok {
-			t.Skip("ignoring non-procedure entry in environment " + name)
-		}
-		if len(name) == 1 {
-			t.Skip("ignoring procedure with a single-character name " + name)
-		}
-
-		t.Run(name, func(t *testing.T) {
-
-			if len(proc.Help) == 0 {
-				t.Fatalf("empty help for %s", name)
-			}
-		})
-	}
-
-}
-
 // This function contains a bunch of table-driven tests which are
 // designed to be simple.
 func TestEvaluate(t *testing.T) {
@@ -310,7 +223,7 @@ a
 		{"(let* (a 3 b))", "ERROR{list for (len*) must have even length, got [a 3 b]}"},
 		{"(let* (a 3 3 b))", "ERROR{binding name is not a symbol, got 3}"},
 
-		{"(error )", "ERROR{arity-error: not enough arguments for (error}"},
+		{"(error )", "ERROR{wrong number of arguments}"},
 		{"(quote )", "ERROR{arity-error: not enough arguments for (quote}"},
 		{"(quasiquote )", "ERROR{arity-error: not enough arguments for (quasiquote}"},
 		{"(macroexpand )", "ERROR{arity-error: not enough arguments for (macroexpand}"},
@@ -483,5 +396,91 @@ func TestStartsWith(t *testing.T) {
 
 	if e.startsWith(l, "steve") {
 		t.Fatalf("unexpected match")
+	}
+}
+
+// TestStdlibHelp is designed to ensure that our standard library
+// functions have help-documentation.
+func TestStdlibHelp(t *testing.T) {
+
+	// Load our standard library
+	st := stdlib.Contents()
+	std := string(st)
+
+	// Create a new interpreter
+	l := New(std)
+
+	// With a new environment
+	env := env.New()
+
+	// Populate the default primitives
+	builtins.PopulateEnvironment(env)
+
+	// Run it
+	_ = l.Evaluate(env)
+
+	// Now we should have an environment which is
+	// populated with functions
+	for name, val := range env.Items() {
+
+		proc, ok := val.(*primitive.Procedure)
+
+		if !ok {
+			t.Skip("ignoring non-procedure entry in environment " + name)
+		}
+		if len(name) == 1 {
+			t.Skip("ignoring procedure with a single-character name " + name)
+		}
+
+		t.Run(name, func(t *testing.T) {
+
+			if len(proc.Help) == 0 {
+				t.Fatalf("empty help for %s", name)
+			}
+		})
+	}
+
+}
+
+// This tests an infinite loop is handled
+func TestTimeout(t *testing.T) {
+
+	// Test code - run an infinite loop, incrementing a variable.
+	tst := `
+(set! a 1)
+(while true
+ (do
+   (set! a (+ a 1) true)))
+`
+	// Load our standard library
+	st := stdlib.Contents()
+	std := string(st)
+
+	// Timeout after a second
+	ctx, cancel := context.WithTimeout(context.Background(), 1000*time.Millisecond)
+	defer cancel()
+
+	// Create a new interpreter
+	l := New(std + "\n" + tst)
+
+	// Ensure we get a timeout
+	l.SetContext(ctx)
+
+	// With a new environment
+	env := env.New()
+
+	// Populate the default primitives
+	builtins.PopulateEnvironment(env)
+
+	// Run it
+	out := l.Evaluate(env)
+
+	// Test for both possible errors here.
+	//
+	// We should get the context error, but sometimes we don't
+	// the important thing is we DON'T hang forever
+	if !strings.Contains(out.ToString(), "deadline exceeded") &&
+		!strings.Contains(out.ToString(), "not a function") {
+		t.Fatalf("Didn't get the expected output.  Got: %s", out.ToString())
 	}
 }

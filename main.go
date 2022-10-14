@@ -10,9 +10,11 @@ package main
 import (
 	"flag"
 	"fmt"
+	"math/rand"
 	"os"
 	"sort"
 	"strings"
+	"time"
 
 	"github.com/skx/yal/builtins"
 	"github.com/skx/yal/env"
@@ -22,6 +24,9 @@ import (
 )
 
 func main() {
+
+	// (gensym) needs a decent random seed
+	rand.Seed(time.Now().UnixNano())
 
 	// Look to see if we're gonna execute a statement
 	exp := flag.String("e", "", "A string to evaluate.")
@@ -103,8 +108,10 @@ func main() {
 			prc, ok := val.(*primitive.Procedure)
 			if ok && len(prc.Help) > 0 {
 				txt := prc.Help
-				txt = strings.Replace(txt, "\\t", "\t", -1)
-				fmt.Printf("%s\n\t%s\n\n", key, txt)
+
+				fmt.Printf("%s\n", key)
+				fmt.Printf("%s\n", strings.Repeat("=", len(key)))
+				fmt.Printf("%s\n\n\n\n", txt)
 			}
 
 		}

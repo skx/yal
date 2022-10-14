@@ -33,6 +33,35 @@ func TestError(t *testing.T) {
 	}
 }
 
+func TestIsNil(t *testing.T) {
+
+	var n Nil
+
+	if n.Type() != "nil" {
+		t.Fatalf("nil -> wrong type")
+	}
+	if n.ToString() != "nil" {
+		t.Fatalf("nil->string wrong result")
+	}
+
+	var s String
+	var f Number
+	var b Bool
+
+	if !IsNil(n) {
+		t.Fatalf("nil is supposed to be nil")
+	}
+	if IsNil(s) {
+		t.Fatalf("a string is not nil")
+	}
+	if IsNil(f) {
+		t.Fatalf("a number is not nil")
+	}
+	if IsNil(b) {
+		t.Fatalf("a bool is not nil")
+	}
+}
+
 func TestList(t *testing.T) {
 
 	lst := List([]Primitive{
@@ -85,34 +114,5 @@ func TestSymbol(t *testing.T) {
 	}
 	if sym.ToString() != "pi" {
 		t.Fatalf("symbol->String had wrong result")
-	}
-}
-
-func TestIsNil(t *testing.T) {
-
-	var n Nil
-
-	if n.Type() != "nil" {
-		t.Fatalf("nil -> wrong type")
-	}
-	if n.ToString() != "nil" {
-		t.Fatalf("nil->string wrong result")
-	}
-
-	var s String
-	var f Number
-	var b Bool
-
-	if !IsNil(n) {
-		t.Fatalf("nil is supposed to be nil")
-	}
-	if IsNil(s) {
-		t.Fatalf("a string is not nil")
-	}
-	if IsNil(f) {
-		t.Fatalf("a number is not nil")
-	}
-	if IsNil(b) {
-		t.Fatalf("a bool is not nil")
 	}
 }
