@@ -1982,6 +1982,7 @@ func TestPrint(t *testing.T) {
 	}
 }
 
+// TestSet tests set
 func TestSet(t *testing.T) {
 
 	// no arguments
@@ -2059,6 +2060,34 @@ func TestSetup(t *testing.T) {
 	}
 }
 
+// TestShell tests shell - but not fully
+func TestShell(t *testing.T) {
+
+	// calling with no argument
+	out := shellFn(ENV, []primitive.Primitive{})
+
+	// Will lead to an error
+	_, ok := out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+
+	// One argument, but the wrong type
+	out = shellFn(ENV, []primitive.Primitive{
+		primitive.Number(3),
+	})
+
+	var e primitive.Primitive
+	e, ok = out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if !strings.Contains(e.ToString(), "not a list") {
+		t.Fatalf("got error, but wrong one %v", out)
+	}
+}
+
+// TestSlurp tests slurp
 func TestSlurp(t *testing.T) {
 
 	// calling with no argument
