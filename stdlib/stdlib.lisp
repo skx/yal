@@ -56,9 +56,16 @@
 ;; <=
 ;; >=
 ;;
-(set! >  (fn* (a b) (< b a)))
-(set! >= (fn* (a b) (! (< a b))))
-(set! <= (fn* (a b) (! (> a b))))
+(set! >  (fn* (a b)
+              "Return true if the first value is greater than the second."
+              (< b a)))
+
+(set! >= (fn* (a b)
+              "Return true if the first value is greater than, or equal to the second."
+              (! (< a b))))
+(set! <= (fn* (a b)
+              "Return true if the first value is less than, or equal to, the second."
+              (! (> a b))))
 
 ;; We have a built in function "date" to return the current date
 ;; as a list (DD MM YYYY).  We also ahve a builtin function (time)
@@ -151,10 +158,14 @@
                      `(set! ~x (- ~x 1))))
 
 ;; Not is useful
-(set! !     (fn* (x) (if x #f #t)))
+(set! ! (fn* (x)
+             "Return the inverse/NOT of the given boolean value"
+             (if x #f #t)))
 
 ;; Square root
-(set! sqrt (fn* (x:number) (# x 0.5)))
+(set! sqrt (fn* (x:number)
+                "Calculate the square root of the given value."
+                (# x 0.5)))
 
 ;; Return the last element of a list
 (set! last (fn* (lst:list)
@@ -175,8 +186,9 @@
 
 ;; A helper to apply a function to each key/value pair of a hash
 (set! apply-hash (fn* (hs:hash fun:function)
-  (let* (lst (keys hs))
-    (apply lst (lambda (x) (fun x (get hs x)))))))
+                      "Apply given function to every key in the specified hash"
+                      (let* (lst (keys hs))
+                        (apply lst (lambda (x) (fun x (get hs x)))))))
 
 
 ;; Count the length of a string
@@ -225,20 +237,22 @@
 
 ;; Remove items from a list where the predicate function is not T
 (set! filter (fn* (xs:list f:function)
-  (if (nil? xs)
-     ()
-     (if (f (car xs))
-        (cons (car xs)(filter (cdr xs) f))
-           (filter (cdr xs) f)))))
+                  "Remove any items from the specified list, if the result of calling the provided function on that item is not true."
+                  (if (nil? xs)
+                      ()
+                      (if (f (car xs))
+                          (cons (car xs)(filter (cdr xs) f))
+                          (filter (cdr xs) f)))))
 
 
 
 
 ;; reduce function
 (set! reduce (fn* (xs f acc)
-  (if (nil? xs)
-    acc
-      (reduce (cdr xs) f (f acc (car xs))))))
+                  "Reduce"
+                  (if (nil? xs)
+                      acc
+                      (reduce (cdr xs) f (f acc (car xs))))))
 
 ;; Now define min/max using reduce
 (set! min (fn* (xs:list)
@@ -262,9 +276,10 @@
 
 ; O(n^2) behavior with linked lists
 (set! append (fn* (xs:list el)
-  (if (nil? xs)
-    (list el)
-      (cons (car xs) (append (cdr xs) el)))))
+                  "Append the given element to the specified list"
+                  (if (nil? xs)
+                      (list el)
+                      (cons (car xs) (append (cdr xs) el)))))
 
 
 (set! reverse (fn* (x:list)

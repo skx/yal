@@ -6,10 +6,13 @@
 package builtins
 
 import (
+	"bytes"
 	"fmt"
 	"math"
 	"math/rand"
 	"os"
+	"os/exec"
+	"path/filepath"
 	"regexp"
 	"runtime"
 	"sort"
@@ -102,11 +105,15 @@ func PopulateEnvironment(env *env.Environment) {
 	env.Set("cons", &primitive.Procedure{F: consFn, Help: helpMap["cons"]})
 	env.Set("contains?", &primitive.Procedure{F: containsFn, Help: helpMap["contains?"]})
 	env.Set("date", &primitive.Procedure{F: dateFn, Help: helpMap["date"]})
+	env.Set("directory?", &primitive.Procedure{F: directoryFn, Help: helpMap["directory?"]})
 	env.Set("eq", &primitive.Procedure{F: eqFn, Help: helpMap["eq"]})
 	env.Set("error", &primitive.Procedure{F: errorFn, Help: helpMap["error"]})
+	env.Set("exists?", &primitive.Procedure{F: existsFn, Help: helpMap["exists?"]})
+	env.Set("file?", &primitive.Procedure{F: fileFn, Help: helpMap["file?"]})
 	env.Set("gensym", &primitive.Procedure{F: gensymFn, Help: helpMap["gensym"]})
 	env.Set("get", &primitive.Procedure{F: getFn, Help: helpMap["get"]})
 	env.Set("getenv", &primitive.Procedure{F: getenvFn, Help: helpMap["getenv"]})
+	env.Set("glob", &primitive.Procedure{F: globFn, Help: helpMap["glob"]})
 	env.Set("help", &primitive.Procedure{F: helpFn, Help: helpMap["help"]})
 	env.Set("join", &primitive.Procedure{F: joinFn, Help: helpMap["join"]})
 	env.Set("keys", &primitive.Procedure{F: keysFn, Help: helpMap["keys"]})
@@ -119,6 +126,7 @@ func PopulateEnvironment(env *env.Environment) {
 	env.Set("os", &primitive.Procedure{F: osFn, Help: helpMap["os"]})
 	env.Set("print", &primitive.Procedure{F: printFn, Help: helpMap["print"]})
 	env.Set("set", &primitive.Procedure{F: setFn, Help: helpMap["set"]})
+	env.Set("shell", &primitive.Procedure{F: shellFn, Help: helpMap["shell"]})
 	env.Set("slurp", &primitive.Procedure{F: slurpFn, Help: helpMap["slurp"]})
 	env.Set("sort", &primitive.Procedure{F: sortFn, Help: helpMap["sort"]})
 	env.Set("split", &primitive.Procedure{F: splitFn, Help: helpMap["split"]})
@@ -260,6 +268,34 @@ func dateFn(env *env.Environment, args []primitive.Primitive) primitive.Primitiv
 	return ret
 }
 
+// directoryFn returns whether the given path exists, and is a directory
+func directoryFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+
+	// We only need a single argument
+	if len(args) != 1 {
+		return primitive.Error("invalid argument count")
+	}
+
+	// Which is a string
+	str, ok := args[0].(primitive.String)
+	if !ok {
+		return primitive.Error("argument not a string")
+	}
+
+	// Stat the entry
+	info, err := os.Stat(str.ToString())
+
+	// No error and isDir then true?  Otherwise false
+	//
+	// i.e. swallow errors
+	if err == nil {
+		if info.IsDir() {
+			return primitive.Bool(true)
+		}
+	}
+	return primitive.Bool(false)
+}
+
 // divideFn implements "/"
 func divideFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 	// ensure we have at least one argument
@@ -338,6 +374,30 @@ func errorFn(env *env.Environment, args []primitive.Primitive) primitive.Primiti
 	return primitive.Error(args[0].ToString())
 }
 
+
+// existsFn returns whether the given path exists.
+func existsFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+
+	// We only need a single argument
+	if len(args) != 1 {
+		return primitive.Error("invalid argument count")
+	}
+
+	// Which is a string
+	str, ok := args[0].(primitive.String)
+	if !ok {
+		return primitive.Error("argument not a string")
+	}
+
+	if _, err := os.Stat(str.ToString()); err == nil {
+		// path/to/whatever exists
+		return primitive.Bool(true)
+	}
+
+	return primitive.Bool(false)
+}
+
+
 // Convert a string such as "steve\tkemp" into "steve<TAB>kemp"
 func expandStr(input string) string {
 	out := ""
@@ -399,6 +459,33 @@ func expnFn(env *env.Environment, args []primitive.Primitive) primitive.Primitiv
 	return primitive.Number(math.Pow(float64(args[0].(primitive.Number)), float64(args[1].(primitive.Number))))
 }
 
+// fileFn returns whether the given path exists, and is a file (or rather is not a directory).
+func fileFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+	// We only need a single argument
+	if len(args) != 1 {
+		return primitive.Error("invalid argument count")
+	}
+
+	// Which is a string
+	str, ok := args[0].(primitive.String)
+	if !ok {
+		return primitive.Error("argument not a string")
+	}
+
+	// stat the path
+	info, err := os.Stat(str.ToString())
+
+	// no error then return true, unless we've got a directory
+	//
+	// i.e. swallow errors
+	if err == nil {
+		if !info.IsDir() {
+			return primitive.Bool(true)
+		}
+	}
+	return primitive.Bool(false)
+}
+
 // gensymFn is the implementation of (gensym ..)
 func gensymFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 	// symbol characters
@@ -450,6 +537,36 @@ func getenvFn(env *env.Environment, args []primitive.Primitive) primitive.Primit
 	// Return the value
 	str := args[0].(primitive.String)
 	return primitive.String(os.Getenv(string(str)))
+}
+
+// globFn is the implementation of `(glob "pattern")`
+func globFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+
+	// If we have only a single argument
+	if len(args) != 1 {
+		return primitive.Error("invalid argument count")
+	}
+
+	// Which is a string
+	str, ok := args[0].(primitive.String)
+	if !ok {
+		return primitive.Error("argument not a string")
+	}
+
+	// Run the glob
+	out, err := filepath.Glob(str.ToString())
+
+	if err != nil {
+		return primitive.Error(fmt.Sprintf("error running glob(%s): %s", str.ToString(), err))
+	}
+
+	var ret primitive.List
+
+	for _, ent := range(out) {
+		ret = append(ret, primitive.String(ent))
+	}
+
+	return ret
 }
 
 // helpFn is the implementation of `(help fn)`
@@ -825,6 +942,44 @@ func setFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive
 	tmp := args[0].(primitive.Hash)
 	tmp.Set(args[1].ToString(), args[2])
 	return args[2]
+}
+
+// shellFn runs a command via the shell
+// slurpFn returns the contents of the specified file
+func shellFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+
+	// We need one argument
+	if len(args) != 1 {
+		return primitive.Error("wrong number of arguments")
+	}
+
+	// The argument must be a list
+	lst, ok := args[0].(primitive.List);
+	if ! ok {
+		return primitive.Error("argument not a list")
+	}
+
+	// Command to  run, and arguments
+	cArgs := []string{}
+
+	for _, arg := range lst {
+		cArgs = append(cArgs, arg.ToString())
+	}
+
+	cmd := exec.Command(cArgs[0], cArgs[1:]...)
+	var outb, errb bytes.Buffer
+	cmd.Stdout = &outb
+	cmd.Stderr = &errb
+	err := cmd.Run()
+	if err != nil {
+		return primitive.Error(fmt.Sprintf("error running command %s:%s", lst, err))
+	}
+
+	var ret primitive.List
+	ret = append(ret, primitive.String(outb.String()))
+	ret = append(ret, primitive.String(errb.String()))
+
+	return ret
 }
 
 // slurpFn returns the contents of the specified file

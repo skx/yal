@@ -87,11 +87,12 @@
 
 ;; A useful helper to apply a given function to each element of a list.
 (set! apply (fn* (lst:list fun:function)
-  (if (nil? lst)
-      ()
-      (do
-         (fun (car lst))
-         (apply (cdr lst) fun)))))
+                 "Return the result of calling the specified function on every element in the given list"
+                 (if (nil? lst)
+                     ()
+                     (do
+                      (fun (car lst))
+                      (apply (cdr lst) fun)))))
 
 
 ;; Return the length of the given list.

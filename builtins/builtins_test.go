@@ -3,6 +3,7 @@ package builtins
 import (
 	"math"
 	"os"
+	"path/filepath"
 	"runtime"
 	"strings"
 	"testing"
@@ -390,6 +391,70 @@ func TestDateTime(t *testing.T) {
 
 }
 
+// TestDirectory tests directory?
+func TestDirectory(t *testing.T) {
+
+	// No arguments
+	out := directoryFn(ENV, []primitive.Primitive{})
+
+	// Will lead to an error
+	e, ok := out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if !strings.Contains(string(e), "argument count") {
+		t.Fatalf("got error, but wrong one %v", out)
+	}
+
+	// One argument, wrong type
+	out = directoryFn(ENV, []primitive.Primitive{primitive.Number(33)})
+
+	// Will lead to an error
+	e, ok = out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if !strings.Contains(string(e), "not a string") {
+		t.Fatalf("got error, but wrong one %v", out)
+	}
+
+	// Create a temporary directory
+	path, err := os.MkdirTemp("", "directory_")
+	if err != nil {
+		t.Fatalf("failed to create a temporary direcotry")
+	}
+
+	// directory? should return true
+	res := directoryFn(ENV, []primitive.Primitive{primitive.String(path)})
+
+	// So we need a boolean result
+	r, ok2 := res.(primitive.Bool)
+	if !ok2 {
+		t.Fatalf("found wrong type in result")
+	}
+
+	if r.ToString() != "#t" {
+		t.Fatalf("wrong result, got %v", r.ToString())
+	}
+
+	// Remove the file
+	os.RemoveAll(path)
+
+	// directory? should return false
+	res = directoryFn(ENV, []primitive.Primitive{primitive.String(path)})
+
+	// So we need a booelan result
+	r, ok2 = res.(primitive.Bool)
+	if !ok2 {
+		t.Fatalf("found wrong type in result, got %v", res)
+	}
+
+	if r.ToString() != "#f" {
+		t.Fatalf("wrong result, got %v", r.ToString())
+	}
+
+}
+
 // TestDivide tests "*"
 func TestDivide(t *testing.T) {
 
@@ -648,6 +713,7 @@ func TestEquals(t *testing.T) {
 	}
 }
 
+// TestError tests error.
 func TestError(t *testing.T) {
 
 	// No arguments
@@ -677,6 +743,70 @@ func TestError(t *testing.T) {
 	}
 }
 
+// TestExists tests exists?
+func TestExists(t *testing.T) {
+
+	// No arguments
+	out := existsFn(ENV, []primitive.Primitive{})
+
+	// Will lead to an error
+	e, ok := out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if !strings.Contains(string(e), "argument count") {
+		t.Fatalf("got error, but wrong one %v", out)
+	}
+
+	// One argument, wrong type
+	out = existsFn(ENV, []primitive.Primitive{primitive.Number(33)})
+
+	// Will lead to an error
+	e, ok = out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if !strings.Contains(string(e), "not a string") {
+		t.Fatalf("got error, but wrong one %v", out)
+	}
+
+	// Create a temporary file
+	tmpfile, err := os.CreateTemp("", "exists")
+	if err != nil {
+		t.Fatalf("failed to create a temporary file")
+	}
+
+	// Exists should return true
+	res := existsFn(ENV, []primitive.Primitive{primitive.String(tmpfile.Name())})
+
+	// So we need a booelan result
+	r, ok2 := res.(primitive.Bool)
+	if !ok2 {
+		t.Fatalf("found wrong type in result")
+	}
+
+	if r.ToString() != "#t" {
+		t.Fatalf("wrong result, got %v", r.ToString())
+	}
+
+	// Remove the file
+	os.Remove(tmpfile.Name())
+
+	// Exists should return false
+	res = existsFn(ENV, []primitive.Primitive{primitive.String(tmpfile.Name())})
+
+	// So we need a booelan result
+	r, ok2 = res.(primitive.Bool)
+	if !ok2 {
+		t.Fatalf("found wrong type in result")
+	}
+
+	if r.ToString() != "#f" {
+		t.Fatalf("wrong result, got %v", r.ToString())
+	}
+}
+
+// TestExpandString tests the escape-expansion of the various characters
 func TestExpandString(t *testing.T) {
 
 	type TC struct {
@@ -767,6 +897,78 @@ func TestExpn(t *testing.T) {
 	}
 }
 
+// TestFile tests file?
+func TestFile(t *testing.T) {
+
+	// No arguments
+	out := fileFn(ENV, []primitive.Primitive{})
+
+	// Will lead to an error
+	e, ok := out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if !strings.Contains(string(e), "argument count") {
+		t.Fatalf("got error, but wrong one %v", out)
+	}
+
+	// One argument, wrong type
+	out = fileFn(ENV, []primitive.Primitive{primitive.Number(33)})
+
+	// Will lead to an error
+	e, ok = out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if !strings.Contains(string(e), "not a string") {
+		t.Fatalf("got error, but wrong one %v", out)
+	}
+
+	// Create a temporary directory
+	path, err := os.MkdirTemp("", "directory_")
+	if err != nil {
+		t.Fatalf("failed to create a temporary directory")
+	}
+
+	// file? should return false
+	res := fileFn(ENV, []primitive.Primitive{primitive.String(path)})
+
+	// So we need a boolean result
+	r, ok2 := res.(primitive.Bool)
+	if !ok2 {
+		t.Fatalf("found wrong type in result")
+	}
+
+	if r.ToString() != "#f" {
+		t.Fatalf("wrong result, got %v", r.ToString())
+	}
+
+	// Remove the file
+	os.RemoveAll(path)
+
+	// Now create a file.
+	tmp, _ := os.CreateTemp("", "yal")
+	err = os.WriteFile(tmp.Name(), []byte("I like cake"), 0777)
+	if err != nil {
+		t.Fatalf("failed to write to file")
+	}
+	defer os.Remove(tmp.Name())
+
+	// file? should return true
+	res = fileFn(ENV, []primitive.Primitive{primitive.String(tmp.Name())})
+
+	// So we need a boolean result
+	r, ok2 = res.(primitive.Bool)
+	if !ok2 {
+		t.Fatalf("found wrong type in result, got %v", res)
+	}
+
+	if r.ToString() != "#t" {
+		t.Fatalf("wrong result, got %v", r.ToString())
+	}
+
+}
+
 // TestGenSym tests gensym
 func TestGenSym(t *testing.T) {
 
@@ -780,6 +982,7 @@ func TestGenSym(t *testing.T) {
 	}
 }
 
+// TestGet tests get
 func TestGet(t *testing.T) {
 
 	// no arguments
@@ -831,6 +1034,7 @@ func TestGet(t *testing.T) {
 	}
 }
 
+// TestGetenv tests getenv
 func TestGetenv(t *testing.T) {
 
 	// No arguments
@@ -873,6 +1077,82 @@ func TestGetenv(t *testing.T) {
 
 }
 
+// TestGlob tests glob
+func TestGlob(t *testing.T) {
+
+	// No arguments
+	out := globFn(ENV, []primitive.Primitive{})
+
+	// Will lead to an error
+	e, ok := out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if !strings.Contains(string(e), "argument count") {
+		t.Fatalf("got error, but wrong one %v", out)
+	}
+
+	// One argument, wrong type
+	out = globFn(ENV, []primitive.Primitive{primitive.Number(33)})
+
+	// Will lead to an error
+	e, ok = out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if !strings.Contains(string(e), "not a string") {
+		t.Fatalf("got error, but wrong one %v", out)
+	}
+
+	// Create a temporary directory
+	path, err := os.MkdirTemp("", "directory_")
+	if err != nil {
+		t.Fatalf("failed to create a temporary directory")
+	}
+
+	// Populate two files.
+	a := filepath.Join(path, "one.txt")
+	b := filepath.Join(path, "two.foo")
+
+	err = os.WriteFile(a, []byte("one.txt"), 0777)
+	if err != nil {
+		t.Fatalf("failed to write to file")
+	}
+	err = os.WriteFile(b, []byte("two.foo"), 0777)
+	if err != nil {
+		t.Fatalf("failed to write to file")
+	}
+
+	// Glob with two files
+	files := globFn(ENV, []primitive.Primitive{primitive.String(path + "/*.*")})
+	// Should get a list
+	lst, ok2 := files.(primitive.List)
+	if !ok2 {
+		t.Fatalf("expected a list, got %v", files)
+	}
+
+	if len(lst) != 2 {
+		t.Fatalf("expected two files, got %v", lst)
+	}
+
+	// Cleanup
+	os.RemoveAll(path)
+
+	// Finally an impossible glob
+	out = globFn(ENV, []primitive.Primitive{primitive.String("[]")})
+
+	// Will lead to an error
+	e, ok = out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if !strings.Contains(string(e), "error in pattern") {
+		t.Fatalf("got error, but wrong one %v", out)
+	}
+
+}
+
+// TestHelp tests help
 func TestHelp(t *testing.T) {
 	// no arguments
 	out := helpFn(ENV, []primitive.Primitive{})
@@ -925,6 +1205,7 @@ func TestHelp(t *testing.T) {
 	}
 }
 
+// TestJoin tests join
 func TestJoin(t *testing.T) {
 
 	// No arguments
@@ -970,6 +1251,7 @@ func TestJoin(t *testing.T) {
 	}
 }
 
+// TestKeys tests keys
 func TestKeys(t *testing.T) {
 
 	// no arguments
@@ -1032,6 +1314,7 @@ func TestKeys(t *testing.T) {
 	}
 }
 
+// TestList tests list
 func TestList(t *testing.T) {
 
 	// No arguments
@@ -1125,6 +1408,7 @@ func TestLt(t *testing.T) {
 	}
 }
 
+// TestMatches tests match
 func TestMatches(t *testing.T) {
 
 	// no arguments
@@ -1698,6 +1982,7 @@ func TestPrint(t *testing.T) {
 	}
 }
 
+// TestSet tests set
 func TestSet(t *testing.T) {
 
 	// no arguments
@@ -1775,6 +2060,34 @@ func TestSetup(t *testing.T) {
 	}
 }
 
+// TestShell tests shell - but not fully
+func TestShell(t *testing.T) {
+
+	// calling with no argument
+	out := shellFn(ENV, []primitive.Primitive{})
+
+	// Will lead to an error
+	_, ok := out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+
+	// One argument, but the wrong type
+	out = shellFn(ENV, []primitive.Primitive{
+		primitive.Number(3),
+	})
+
+	var e primitive.Primitive
+	e, ok = out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if !strings.Contains(e.ToString(), "not a list") {
+		t.Fatalf("got error, but wrong one %v", out)
+	}
+}
+
+// TestSlurp tests slurp
 func TestSlurp(t *testing.T) {
 
 	// calling with no argument
