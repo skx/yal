@@ -139,6 +139,21 @@
                   false))))
 
 
+;; every is useful and almost a logical operation
+(set! every (fn* (xs:list fun:function)
+                 "Return true if applying every element of the list through the specified function resulted in a true result"
+                 (let* (res (map xs fun))
+                   (if (and res)
+                       true
+                     false))))
+
+
+;; Useful for creating a list of numbers
+(set! repeated (fn* (n:number x)
+                  "Return a list of length n whose elements are all x"
+                  (when (pos? n)
+                    (cons x (repeated (dec n) x)))))
+
 ;; inc/dec are useful primitives to have
 (set! inc (fn* (n:number)
                "inc will add one to the supplied value, and return the result."
