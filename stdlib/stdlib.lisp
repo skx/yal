@@ -71,39 +71,47 @@
 ;; as a list (DD MM YYYY).  We also ahve a builtin function (time)
 ;; to return the time as a list (HH MM SS).
 ;;
-;; create some helper functions for retrieving the various parts of
-;; the date/time.
-(set! year (fn* ()
+;; Here we create some helper functions for retrieving the various
+;; parts of the date/time, as well as some aliases for ease of typing.
+(set! date:year (fn* ()
                 "Return the current year, as an integer."
                 (nth (date) 3)))
+(set! year date:year)
 
-(set! month (fn* ()
+(set! date:month (fn* ()
                  "Return the number of the current month, as an integer."
                  (nth (date) 2)))
+(set! month date:month)
 
-(set! day (fn* ()
+(set! date:day (fn* ()
                "Return the day of the current month, as an integer."
                (nth (date) 1)))
+(set! day date:day)
 
-(set! weekday (fn* ()
+(set! date:weekday (fn* ()
                    "Return a string containing the current day of the week."
                    (nth (date) 0)))
+(set! weekday date:weekday)
 
-(set! hour (fn* ()
+(set! time:hour (fn* ()
                 "Return the current hour, as an integer."
                 (nth (time) 0)))
+(set! hour time:hour)
 
-(set! minute (fn* ()
+(set! time:minute (fn* ()
                   "Return the current minute, as an integer."
                   (nth (time) 1)))
+(set! minute time:minute)
 
-(set! second (fn* ()
+(set! time:second (fn* ()
                   "Return the current seconds, as an integer."
                   (nth (time) 2)))
+(set! second time:second)
 
-(set! hms (fn* ()
+(set! time:hms (fn* ()
                "Return the current time, formatted as 'HH:MM:SS', as a string."
                (sprintf "%s:%s:%s" (hour) (minute) (second))))
+(set! hms time:hms)
 
 
 ;;
