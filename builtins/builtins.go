@@ -7,6 +7,7 @@ package builtins
 
 import (
 	"bytes"
+	"flag"
 	"fmt"
 	"math"
 	"math/rand"
@@ -374,7 +375,6 @@ func errorFn(env *env.Environment, args []primitive.Primitive) primitive.Primiti
 	return primitive.Error(args[0].ToString())
 }
 
-
 // existsFn returns whether the given path exists.
 func existsFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 
@@ -396,7 +396,6 @@ func existsFn(env *env.Environment, args []primitive.Primitive) primitive.Primit
 
 	return primitive.Bool(false)
 }
-
 
 // Convert a string such as "steve\tkemp" into "steve<TAB>kemp"
 func expandStr(input string) string {
@@ -562,7 +561,7 @@ func globFn(env *env.Environment, args []primitive.Primitive) primitive.Primitiv
 
 	var ret primitive.List
 
-	for _, ent := range(out) {
+	for _, ent := range out {
 		ret = append(ret, primitive.String(ent))
 	}
 
@@ -954,8 +953,8 @@ func shellFn(env *env.Environment, args []primitive.Primitive) primitive.Primiti
 	}
 
 	// The argument must be a list
-	lst, ok := args[0].(primitive.List);
-	if ! ok {
+	lst, ok := args[0].(primitive.List)
+	if !ok {
 		return primitive.Error("argument not a list")
 	}
 
@@ -964,6 +963,12 @@ func shellFn(env *env.Environment, args []primitive.Primitive) primitive.Primiti
 
 	for _, arg := range lst {
 		cArgs = append(cArgs, arg.ToString())
+	}
+
+	// If we're running a test-case we'll stop here, because
+	// fuzzing might run commands.
+	if flag.Lookup("test.v") != nil {
+		return primitive.List{}
 	}
 
 	cmd := exec.Command(cArgs[0], cArgs[1:]...)
