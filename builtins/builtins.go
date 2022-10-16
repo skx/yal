@@ -8,7 +8,6 @@ package builtins
 import (
 	"bufio"
 	"bytes"
-	"flag"
 	"fmt"
 	"math"
 	"math/rand"
@@ -542,7 +541,7 @@ func fileReadFn(env *env.Environment, args []primitive.Primitive) primitive.Prim
 	return primitive.String(string(data))
 }
 
-// fileStatFn implements (file:lines)
+// fileStatFn implements (file:stat)
 //
 // Return value is (NAME SIZE UID GID MODE)
 func fileStatFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
@@ -564,16 +563,15 @@ func fileStatFn(env *env.Environment, args []primitive.Primitive) primitive.Prim
 		return primitive.Nil{}
 	}
 
-	var UID int
-	var GID int
+	// If we're not on Linux the Stat_t type won't be available,
+	// so we'd default to the current user.
+	UID := os.Getuid()
+	GID := os.Getgid()
+
+	// But if we can get the "real" values, then use them.
 	if stat, ok := info.Sys().(*syscall.Stat_t); ok {
 		UID = int(stat.Uid)
 		GID = int(stat.Gid)
-	} else {
-		// we are not in linux, this won't work anyway in windows,
-		// but maybe you want to log warnings
-		UID = os.Getuid()
-		GID = os.Getgid()
 	}
 
 	var res primitive.List
@@ -1068,7 +1066,7 @@ func shellFn(env *env.Environment, args []primitive.Primitive) primitive.Primiti
 
 	// If we're running a test-case we'll stop here, because
 	// fuzzing might run commands.
-	if flag.Lookup("test.v") != nil {
+	if os.Getenv("FUZZ") != "" {
 		return primitive.List{}
 	}
 
