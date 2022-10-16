@@ -2,6 +2,7 @@ package eval
 
 import (
 	"context"
+	"fmt"
 	"strings"
 	"testing"
 	"time"
@@ -456,6 +457,7 @@ func TestTimeout(t *testing.T) {
 (set! a 1)
 (while true
  (do
+   (sleep)
    (set! a (+ a 1) true)))
 `
 	// Load our standard library
@@ -473,20 +475,29 @@ func TestTimeout(t *testing.T) {
 	l.SetContext(ctx)
 
 	// With a new environment
-	env := env.New()
+	ev := env.New()
+
+	// Add a new function
+	ev.Set("sleep",
+		&primitive.Procedure{
+			Help: "sleep delays for two seconds",
+			F: func(e *env.Environment, args []primitive.Primitive) primitive.Primitive {
+				fmt.Printf("Sleeping for two seconds")
+				time.Sleep(2 * time.Second)
+				return primitive.Nil{}
+			}})
 
 	// Populate the default primitives
-	builtins.PopulateEnvironment(env)
+	builtins.PopulateEnvironment(ev)
 
 	// Run it
-	out := l.Evaluate(env)
+	out := l.Evaluate(ev)
 
 	// Test for both possible errors here.
 	//
 	// We should get the context error, but sometimes we don't
 	// the important thing is we DON'T hang forever
-	if !strings.Contains(out.ToString(), "deadline exceeded") &&
-		!strings.Contains(out.ToString(), "not a function") {
+	if !strings.Contains(out.ToString(), "deadline exceeded") {
 		t.Fatalf("Didn't get the expected output.  Got: %s", out.ToString())
 	}
 }
