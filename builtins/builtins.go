@@ -317,7 +317,7 @@ func directoryEntriesFn(env *env.Environment, args []primitive.Primitive) primit
 
 	var res primitive.List
 
-	filepath.Walk(pth.ToString(), func(path string, info os.FileInfo, err error) error {
+	_ = filepath.Walk(pth.ToString(), func(path string, info os.FileInfo, err error) error {
 
 		if err != nil {
 			return nil
