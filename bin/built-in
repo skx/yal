@@ -1,0 +1,9 @@
+#!/bin/bash
+#
+# Show built-in functions
+#
+
+set -o noglob
+for i in $(grep "env.Set" builtins/builtins.go | awk -F\" '{print $2}' | sort -u) ; do
+    echo "* ${i}"
+done
