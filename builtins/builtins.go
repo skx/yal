@@ -131,6 +131,7 @@ func PopulateEnvironment(env *env.Environment) {
 	env.Set("ord", &primitive.Procedure{F: ordFn, Help: helpMap["ord"]})
 	env.Set("os", &primitive.Procedure{F: osFn, Help: helpMap["os"]})
 	env.Set("print", &primitive.Procedure{F: printFn, Help: helpMap["print"]})
+	env.Set("random", &primitive.Procedure{F: randomFn, Help: helpMap["random"]})
 	env.Set("set", &primitive.Procedure{F: setFn, Help: helpMap["set"]})
 	env.Set("shell", &primitive.Procedure{F: shellFn, Help: helpMap["shell"]})
 	env.Set("sort", &primitive.Procedure{F: sortFn, Help: helpMap["sort"]})
@@ -1053,6 +1054,23 @@ func printFn(env *env.Environment, args []primitive.Primitive) primitive.Primiti
 	out := fmt.Sprintf(frmt, parm...)
 	fmt.Println(out)
 	return primitive.String(out)
+}
+
+// randomFn implements (random).
+func randomFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+	if len(args) != 1 {
+		return primitive.Error("wrong number of arguments")
+	}
+
+	// ensure we received a number
+	num, ok := args[0].(primitive.Number)
+
+	if !ok {
+		return primitive.Error("argument not a number")
+	}
+
+	return primitive.Number(rand.Intn(int(num)))
+
 }
 
 // setFn is the implementation of `(set hash key val)`

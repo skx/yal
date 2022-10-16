@@ -200,6 +200,13 @@ See also: sprintf
 Example: (print "Hello, world")
 Example: (print "Hello user %s you are %d" (getenv "USER") 32)
 %%
+random
+
+random will return a number between zero and one less than the value specified.
+
+See also: random:char random:item
+Example: (random 100) ; A number between 0 and 99
+%%
 set
 
 set updates the specified hash, setting the value given by name.
