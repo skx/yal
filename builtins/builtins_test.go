@@ -454,6 +454,104 @@ func TestDirectory(t *testing.T) {
 	if r.ToString() != "#f" {
 		t.Fatalf("wrong result, got %v", r.ToString())
 	}
+}
+
+// TestDirectoryEntries tests directory:entries
+func TestDirectoryEntries(t *testing.T) {
+
+	// No arguments
+	out := directoryEntriesFn(ENV, []primitive.Primitive{})
+
+	// Will lead to an error
+	e, ok := out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if !strings.Contains(string(e), "argument count") {
+		t.Fatalf("got error, but wrong one %v", out)
+	}
+
+	// One argument, wrong type
+	out = directoryEntriesFn(ENV, []primitive.Primitive{primitive.Number(33)})
+
+	// Will lead to an error
+	e, ok = out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if !strings.Contains(string(e), "not a string") {
+		t.Fatalf("got error, but wrong one %v", out)
+	}
+
+	// Create a temporary directory
+	path, err := os.MkdirTemp("", "directory_")
+	if err != nil {
+		t.Fatalf("failed to create a temporary directory")
+	}
+
+	// Populate two files.
+	a := filepath.Join(path, "one.txt")
+	b := filepath.Join(path, "two.foo")
+
+	err = os.WriteFile(a, []byte("one.txt"), 0777)
+	if err != nil {
+		t.Fatalf("failed to write to file")
+	}
+	err = os.WriteFile(b, []byte("two.foo"), 0777)
+	if err != nil {
+		t.Fatalf("failed to write to file")
+	}
+
+	// Now we should find a list of two files if we walk the
+	// temporary directory.
+	res := directoryEntriesFn(ENV, []primitive.Primitive{
+		primitive.String(path),
+	})
+
+	// Will lead to a list
+	lst, ok2 := res.(primitive.List)
+	if !ok2 {
+		t.Fatalf("expected list, got %v", out)
+	}
+	if len(lst) != 3 {
+		t.Fatalf("failed to find expected file-count, got %v", lst)
+	}
+
+	// Delete one of the two files, and ensure we still find results
+	os.Remove(a)
+
+	// walk again
+	res = directoryEntriesFn(ENV, []primitive.Primitive{
+		primitive.String(path),
+	})
+
+	// Will lead to a list
+	lst, ok2 = res.(primitive.List)
+	if !ok2 {
+		t.Fatalf("expected list, got %v", out)
+	}
+	if len(lst) != 2 {
+		t.Fatalf("failed to find expected file-count, got %v", lst)
+	}
+
+	// Finally cleanup
+	os.RemoveAll(path)
+
+	// walk a missing directory
+	res = directoryEntriesFn(ENV, []primitive.Primitive{
+		primitive.String("/ fdsf dsf /this doesnt exist"),
+	})
+
+	// Will lead to a list still
+	lst, ok2 = res.(primitive.List)
+	if !ok2 {
+		t.Fatalf("expected list, got %v", out)
+	}
+
+	// but empty
+	if len(lst) != 0 {
+		t.Fatalf("failed to find expected file-count, got %v", lst)
+	}
 
 }
 

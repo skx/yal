@@ -108,6 +108,7 @@ func PopulateEnvironment(env *env.Environment) {
 	env.Set("contains?", &primitive.Procedure{F: containsFn, Help: helpMap["contains?"]})
 	env.Set("date", &primitive.Procedure{F: dateFn, Help: helpMap["date"]})
 	env.Set("directory?", &primitive.Procedure{F: directoryFn, Help: helpMap["directory?"]})
+	env.Set("directory:entries", &primitive.Procedure{F: directoryEntriesFn, Help: helpMap["directory:entries"]})
 	env.Set("eq", &primitive.Procedure{F: eqFn, Help: helpMap["eq"]})
 	env.Set("error", &primitive.Procedure{F: errorFn, Help: helpMap["error"]})
 	env.Set("exists?", &primitive.Procedure{F: existsFn, Help: helpMap["exists?"]})
@@ -270,6 +271,35 @@ func dateFn(env *env.Environment, args []primitive.Primitive) primitive.Primitiv
 	ret = append(ret, primitive.Number(year))
 
 	return ret
+}
+
+// directoryEntriesFn returns the files beneath given path, recursively.
+func directoryEntriesFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+
+	// We only need a single argument
+	if len(args) != 1 {
+		return primitive.Error("invalid argument count")
+	}
+
+	// Which is a string
+	pth, ok := args[0].(primitive.String)
+	if !ok {
+		return primitive.Error("argument not a string")
+	}
+
+	var res primitive.List
+
+	_ = filepath.Walk(pth.ToString(), func(path string, info os.FileInfo, err error) error {
+
+		if err != nil {
+			return nil
+		}
+
+		res = append(res, primitive.String(path))
+		return nil
+	})
+
+	return res
 }
 
 // directoryFn returns whether the given path exists, and is a directory

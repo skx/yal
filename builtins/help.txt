@@ -47,6 +47,13 @@ See also: exists? file?
 Example: (print (directory? "/etc"))
 
 %%
+directory:entries
+
+directory:entries returns the names of all files/directories beneath the given
+path, recursively.  It is a helper function used to implement directory:walk
+
+See also: directory:walk, glob
+%%
 eq
 
 eq returns true if the two values supplied as parameters have the same type, and string representation.
@@ -122,6 +129,7 @@ glob
 
 glob returns files matching the given pattern, as a list.
 
+See also: directory:entries directory:walk
 Example: (print (glob "/etc/p*"))
 %%
 help
