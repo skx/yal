@@ -6,7 +6,6 @@ import "github.com/skx/yal/env"
 // a lisp-usable function implemented in golang.
 type GolangPrimitiveFn func(e *env.Environment, args []Primitive) Primitive
 
-
 // Procedure holds a user-defined function.
 //
 // This structure is used to hold both the built-in functions, implemented in

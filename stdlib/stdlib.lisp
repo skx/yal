@@ -73,40 +73,45 @@
 ;;
 ;; Here we create some helper functions for retrieving the various
 ;; parts of the date/time, as well as some aliases for ease of typing.
-(set! date:year (fn* ()
-                "Return the current year, as an integer."
-                (nth (date) 3)))
-(set! year date:year)
+(set! date:day (fn* ()
+               "Return the day of the current month, as an integer."
+               (nth (date) 1)))
 
 (set! date:month (fn* ()
                  "Return the number of the current month, as an integer."
                  (nth (date) 2)))
-(set! month date:month)
 
-(set! date:day (fn* ()
-               "Return the day of the current month, as an integer."
-               (nth (date) 1)))
-(set! day date:day)
 
 (set! date:weekday (fn* ()
                    "Return a string containing the current day of the week."
                    (nth (date) 0)))
-(set! weekday date:weekday)
+
+(set! date:year (fn* ()
+                "Return the current year, as an integer."
+                (nth (date) 3)))
+
+;; define legacy aliases
+(alias day     date:day)
+(alias month   date:month)
+(alias weekday date:weekday)
+(alias year    date:year)
 
 (set! time:hour (fn* ()
                 "Return the current hour, as an integer."
                 (nth (time) 0)))
-(set! hour time:hour)
 
 (set! time:minute (fn* ()
                   "Return the current minute, as an integer."
                   (nth (time) 1)))
-(set! minute time:minute)
 
 (set! time:second (fn* ()
                   "Return the current seconds, as an integer."
                   (nth (time) 2)))
-(set! second time:second)
+
+;; define legacy aliases
+(alias hour time:hour)
+(alias minute time:minute)
+(alias second time:second)
 
 (set! time:hms (fn* ()
                "Return the current time, formatted as 'HH:MM:SS', as a string."
@@ -184,6 +189,8 @@
 (set! ! (fn* (x)
              "Return the inverse/NOT of the given boolean value"
              (if x #f #t)))
+
+(alias not !)
 
 ;; Square root
 (set! sqrt (fn* (x:number)
@@ -446,5 +453,5 @@
                              (nil? info) ""
                              true (nth info 4)))))
 
-; Slurp used to be a primitive for reading file contents
-(set! slurp file:read)
+;; Define a legacy alias
+(alias slurp file:read)
