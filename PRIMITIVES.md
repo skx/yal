@@ -39,7 +39,7 @@ We have a reasonable number of functions implemented, either in our golang core 
   * Run commands via `(shell)`, find files via `(glob)`
   * Test files via `(directory?)`, `(exists?)` & `(file?)`.
 * Tail call optimization.
-* MAL compatability:
+* MAL compatibility:
   * `def!` can be used as a synonym for `define`.
   * `defmacro!` is used to define macros.
   * `fn*` can be used as a synonym for `lambda`.
