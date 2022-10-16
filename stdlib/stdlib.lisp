@@ -462,3 +462,14 @@
                           "Invoke the specified callback on every file beneath the given path."
 
                           (apply (directory:entries path) fn)))
+
+
+;; Add some simple random functions, using our "random" primitive.
+(set! random:char (fn* ()
+                       "Return a random character, from the set a-z."
+                       (let* (chars (split "abcdefghijklmnopqrstuvwxyz" ""))
+                         (random:item chars))))
+
+(set! random:item (fn* (lst:list)
+                       "Return a random element from the specified list."
+                       (nth lst (random (length lst)))))
