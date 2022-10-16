@@ -158,79 +158,121 @@ The code in those files is essentially **prepended** to any script that is suppl
 
 Functions here include:
 
-* !
-* <=
-* >
-* >=
-* abs
-* and
-* append
-* apply
-* apply-hash
-* boolean?
-* butlast
-* concat
-* date:day
-* date:month
-* date:weekday
-* date:year
-* dec
-* directory:walk
-* drop
-* error?
-* even?
-* every
-* file:stat:gid
-* file:stat:mode
-* file:stat:size
-* file:stat:uid
-* filter
-* first
-* function?
-* hash?
-* hms
-* inc
-* last
-* length
-* list?
-* lower
-* lower-table
-* macro?
-* map
-* max
-* min
-* nat
-* neg
-* neg?
-* nth
-* number?
-* odd?
-* one?
-* or
-* pos?
-* range
-* reduce
-* repeat
-* repeated
-* rest
-* reverse
-* seq
-* (set!
-* sign
-* sqrt
-* string?
-* strlen
-* symbol?
-* take
-* time:hms
-* time:hour
-* time:minute
-* time:second
-* translate
-* upper
-* upper-table
-* zero?
-
+* `!`
+  * Logical "not".
+* `<=`
+  * Is the first number less than, or equal to, the second?
+* `>`
+  * Is the first number greater than the second?
+* `>=`
+  * Is the first number greater than, or equal to, the second?
+* `abs`
+  * Return the absolute value of the specified number.
+* `and`
+  * Logical operator, are all elements true?
+* `append`
+* `apply`
+* `apply-hash`
+* `boolean?`
+  * Is the given thing a boolean?
+* `butlast`
+  * Return all elements of the supplied list, except for the last.
+* `concat`
+* `date:day`
+  * Return the current day of the month, via the output of `date`.
+* `date:month`
+  * Return the current month, via the output of `date`.
+* `date:weekday`
+  * Return the current day of the week, via the output of `date`.
+* `date:year`
+  * Return the current year, via the output of `date`.
+* `dec`
+  * Decrease the given thing by one.
+* `directory:walk`
+  * Invoke the specified callback, with every path-name contained beneath the specified directory - recursively.
+* `drop`
+  * Remove the specified number of elements from the provided list.
+* `error?`
+  * Is the given thing an error?
+* `even?`
+  * Is the given number even?
+* `every`
+* `file:stat:gid`
+* `file:stat:mode`
+* `file:stat:size`
+* `file:stat:uid`
+* `filter`
+* `first`
+* `function?`
+* `hash?`
+  * Is the given thing a hash?
+* `inc`
+  * Increment the given variable.
+* `last`
+* `length`
+  * Return the length of the specified list.
+* `list?`
+* `lower`
+  * Return an lower-case version of the specified string.
+* `lower-table`
+  * A translation table for converting an upper-case character to lower-case.
+* `macro?`
+  * Is the given thing a macro?
+* `map`
+* `max`
+  * Return the maximum value in the specified list.
+* `min`
+  * Return the maximum value in the specified list.
+* `nat`
+* `neg`
+* `neg?`
+  * Is the given number negative?
+* `nth`
+* `number?`
+  * Is the given thing a number?
+* `odd?`
+  * Is the given number odd?
+* `one?`
+  * Is the given number equal to one?
+* `or`
+  * Logical operator, are any elements true?
+* `pos?`
+  * Is the given number positive?
+* `range`
+* `reduce`
+* `repeat`
+* `repeated`
+* `rest`
+* `reverse`
+* `seq`
+* `sign`
+* `sqrt`
+  * Return the square-root of the supplied number.
+* `string?`
+  * Is the given thing a string?
+* `strlen`
+  * Return the length of the specified string.
+* `symbol?`
+  * Is the given thing a symbol?
+* `take`
+  * Take only the first N items from the specified list.
+* `time:hms`
+  * Return the time in HH:MM:SS format, as a string.
+* `time:hour`
+  * Return the current hour, as found from `(time)`.
+* `time:minute`
+  * Return the current minute, as found from `(time)`.
+* `time:second`
+  * Return the current second, as found from `(time)`.
+* `translate`
+  * Translate a string of characters, via a lookup table.
+  * Used by `lower`, and `upper`.
+* `upper`
+  * Return an upper-case version of the specified string.
+* `upper-table`
+  * A translation table for converting a lower-case character to upper-case.
+* `zero?`
+  * Is the given number zero?
 
 
 # Old Content

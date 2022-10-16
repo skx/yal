@@ -7,5 +7,5 @@ set -o noglob
 
 for i in $(grep '(set!' stdlib/stdlib.lisp stdlib/mal.lisp | awk '{ print $2}' | sort -u); do
 
-    echo "* $i"
+    echo "* \`$i\`"
 done
