@@ -415,3 +415,36 @@
                    "Return everything but the last element from the specified list."
 
                    (take (dec (length l)) l)))
+
+;; Wrappers for our file functions
+(set! file:stat:size (fn* (path)
+                          "Return the size of the given file, return -1 on error."
+                          (let* (info (file:stat path))
+                            (cond
+                             (nil? info) -1
+                             true (nth info 1)))))
+
+(set! file:stat:uid (fn* (path)
+                          "Return the UID of the given file owner, return '' on error."
+                          (let* (info (file:stat path))
+                            (cond
+                             (nil? info) ""
+                             true (nth info 2)))))
+
+
+(set! file:stat:gid (fn* (path)
+                          "Return the GID of the given file owner, return '' on error."
+                          (let* (info (file:stat path))
+                            (cond
+                             (nil? info) ""
+                             true (nth info 3)))))
+
+(set! file:stat:mode (fn* (path)
+                          "Return the mode of the given file, return '' on error."
+                          (let* (info (file:stat path))
+                            (cond
+                             (nil? info) ""
+                             true (nth info 4)))))
+
+; Slurp used to be a primitive for reading file contents
+(set! slurp file:read)
