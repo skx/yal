@@ -44,102 +44,102 @@ Core primitives are those that can be overridden, and are implemented in golang,
 
 Things you'll find here include:
 
-* #
-  * Exponentional function.
-* %
+* `#`
+  * Exponent function.
+* `%`
   * Modulus function.
-* *
+* `*`
   * Multiplication function.
-* +
+* `+`
   * Addition function.
-* -
+* `-`
   * Subtraction function.
-* /
+* `/`
   * Division function.
-* <
+* `<`
   * Less-than function.
-* =
+* `=`
   * Numerical comparison function.
-* arch
+* `arch`
   * Return the operating system architecture.
-* car
+* `car`
   * Return the first item of a list.
-* cdr
+* `cdr`
   * Return all items of the list, except the first.
-* chr
+* `chr`
   * Return the ASCII character of the given number.
-* cons
+* `cons`
   * Join two specified lists.
-* contains?
+* `contains?`
   * Does the specified hash contain the given key?
-* date
+* `date`
   * Return details of today's date, as a list.
-* directory?
+* `directory?`
   * Does the given path represent something that exists, and is a directory?
-* directory:entries
+* `directory:entries`
   * Return all entries beneath a given directory, recursively.
-* eq
+* `eq`
   * Equality test, handling arbitrary types.
-* error
+* `error`
   * Return an error.
-* exists?
+* `exists?`
   * Does the given path exist?
-* file?
+* `file?`
   * Does the given path exist, and is it not a directory?
-* file:lines
+* `file:lines`
   * Return the contents of the given file, as a list of strings.
-* file:read
+* `file:read`
   * Return the contents of the given file, as a string.
-* file:stat
+* `file:stat`
   * Return details of the given path.
-* gensym
+* `gensym`
   * Generate, and return, a unique symbol.  Useful for macro definitions.
-* get
+* `get`
   * Get the given key from the specified hash.
-* getenv
+* `getenv`
   * Read and return the given value from the environment.
-* glob
+* `glob`
   * Return the list of filenames matching the specified pattern.
-* help
+* `help`
   * Return help for the specified function, either built-in or lisp.
-* join
+* `join`
   * Convert every element of the supplied list into a string, and return the joined result.
-* keys
+* `keys`
   * Return the keys present in the specified hash.
   * Note that these are returned in sorted order.
-* list
+* `list`
   * Create a new list.
-* match
+* `match`
   * Perform a regular expression test.
-* ms
+* `ms`
   * Return the time, in milliseconds.
-* nil?
+* `nil?`
   * Is the given value nil, or an empty list?
-* now
+* now`
   * Return the number of seconds past the Unix Epoch.
-* ord
+* `ord`
   * Return the ASCII code of the specified character.
-* os
+* `os`
   * Return a string describing the current operating-system.
-* print
+* `print`
   * Output the specified string, or format string + values.
-* set
+* `set`
   * Update the value of the specified hash-key.
-* shell
+* `shell`
   * Run a command via the shell, and return STDOUT and STDERR contents it generated.
-* sort
+* `sort`
   * Sort the given list.
-* split
+* `split`
   * Split the given string, by the specified character.
-* sprintf
+* `sprintf`
   * Generate a string, using a format-string.
-* str
+* `str`
   * Convert the specified parameter to a string.
-* time
+* `time`
   * Return values relating to the current time, as a list.
-* type
+* `type`
   * Return the type of the given object.
-* vals
+* `vals`
   * Return the values contained within the given hash.
   * Note that this returns things in the order of the sorted-keys.
 
