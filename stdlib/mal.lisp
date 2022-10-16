@@ -105,12 +105,7 @@
                     0
                     )))
 
-
-;; Alias to (length)
-(set! count (fn* (arg)
-                 "Return the length of the supplied list. This is an alias for (length)."
-                 (length arg)))
-
+(alias count length)
 
 ;; Find the Nth item of a list
 (set! nth (fn* (lst:list i:number)
