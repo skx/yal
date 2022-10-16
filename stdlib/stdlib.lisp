@@ -465,9 +465,13 @@
 
 
 ;; Add some simple random functions, using our "random" primitive.
-(set! random:char (fn* ()
-                       "Return a random character, from the set a-z."
+(set! random:char (fn* (&x)
+                       "Return a random character by default from the set a-z.
+
+If an optional string is provided it will be used as a list of characters to choose from."
                        (let* (chars (split "abcdefghijklmnopqrstuvwxyz" ""))
+                         (if (list? x)
+                             (set! chars (split (car x) "")))
                          (random:item chars))))
 
 (set! random:item (fn* (lst:list)
