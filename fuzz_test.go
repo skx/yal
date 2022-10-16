@@ -5,6 +5,7 @@ package main
 
 import (
 	"context"
+	"os"
 	"strings"
 	"testing"
 	"time"
@@ -17,6 +18,11 @@ import (
 )
 
 func FuzzYAL(f *testing.F) {
+
+	// We're running fuzzing, and that means we need
+	// to disable "shell".  That is done via the use
+	// of an environmental variable
+	os.Setenv("FUZZ", "FUZZ")
 
 	// empty string
 	f.Add([]byte(""))

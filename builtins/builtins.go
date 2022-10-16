@@ -8,7 +8,6 @@ package builtins
 import (
 	"bufio"
 	"bytes"
-	"flag"
 	"fmt"
 	"math"
 	"math/rand"
@@ -1067,7 +1066,7 @@ func shellFn(env *env.Environment, args []primitive.Primitive) primitive.Primiti
 
 	// If we're running a test-case we'll stop here, because
 	// fuzzing might run commands.
-	if flag.Lookup("test.v") != nil {
+	if os.Getenv("FUZZ") != "" {
 		return primitive.List{}
 	}
 
