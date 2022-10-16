@@ -1076,6 +1076,60 @@ func TestFileRead(t *testing.T) {
 	}
 }
 
+// TestFileStat tests file:stat
+func TestFileStat(t *testing.T) {
+
+	// calling with no argument
+	out := fileStatFn(ENV, []primitive.Primitive{})
+
+	// Will lead to an error
+	_, ok := out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+
+	// Call with the wrong type
+	out = fileStatFn(ENV, []primitive.Primitive{
+		primitive.Number(3)})
+
+	_, ok = out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+
+	// Call with a file that doesn't exist
+	out = fileStatFn(ENV, []primitive.Primitive{
+		primitive.String("path/not/found")})
+
+	_, ok = out.(primitive.Nil)
+	if !ok {
+		t.Fatalf("expected nil, got %v", out)
+	}
+
+	// Create a temporary file
+	tmp, _ := os.CreateTemp("", "yal")
+	err := os.WriteFile(tmp.Name(), []byte("42 is the answer"), 0777)
+	if err != nil {
+		t.Fatalf("failed to write to file")
+	}
+	defer os.Remove(tmp.Name())
+
+	// stat that
+	str := fileStatFn(ENV, []primitive.Primitive{
+		primitive.String(tmp.Name())})
+
+	// Will lead to a list
+	lst, ok2 := str.(primitive.List)
+	if !ok2 {
+		t.Fatalf("expected list, got %v", out)
+	}
+
+	// List will be: NAME SIZE ..
+	if lst[1].ToString() != "16" {
+		t.Fatalf("The size was wrong: %s", lst)
+	}
+}
+
 // TestGenSym tests gensym
 func TestGenSym(t *testing.T) {
 
