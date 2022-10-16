@@ -3,23 +3,20 @@
 [![license](https://img.shields.io/github/license/skx/yal.svg)](https://github.com/skx/yal/blob/master/LICENSE)
 
 * [yet another lisp](#yet-another-lisp)
-* [Special Features](#special-features)
 * [Building / Installing](#building--installing)
 * [Usage](#usage)
 * [Examples](#examples)
-* [Omissions](#omissions)
 * [Fuzz Testing](#fuzz-testing)
 * [Benchmark](#benchmark)
-* [References](#references)
 * [See Also](#see-also)
 
 
 # yet another lisp
 
 
-* [A brief introduction to using this lisp](INTRODUCTION.md)
+* [A brief introduction to using this lisp](INTRODUCTION.md).
   * Getting started setting variables, defining functions, etc.
-* [A list of primitives we have implemented](PRIMITIVES.md)
+* [A list of primitives we have implemented](PRIMITIVES.md).
   * This describes the functions we support, whether implemented in lisp or golang.
   * For example `(car)`, `(cdr)`, `(file:lines)`, `(shell)`, etc.
 
@@ -27,7 +24,7 @@
 
 ## Building / Installing
 
-If you have [this repository](https://github.com/skx/yal) cloned locally then
+If you have [the yal repository](https://github.com/skx/yal) cloned locally then
 you should be able to build and install in the standard way:
 
 ```sh
@@ -35,13 +32,13 @@ $ go build .
 $ go install .
 ```
 
-If you don't have the repository installed, but you have a working golang environment then installation should be as simple as:
+If you don't have the repository installed, but you have a working golang toolset then installation should be as simple as:
 
 ```sh
 $ go install github.com/skx/yal@latest
 ```
 
-Finally if neither of those options suit, you may download the most recent binary from our [release page](https://github.com/skx/yal/releases).
+If neither of those options suit, you may download the most recent binary from our [release page](https://github.com/skx/yal/releases).
 
 
 
@@ -50,16 +47,15 @@ Finally if neither of those options suit, you may download the most recent binar
 Once installed there are two ways to execute code:
 
 * By specifying an expressions on the command-line:
-  * `yal -e "(print (os))"`
+  * `yal -e '(print (os))'`
 * By passing the name of a file containing lisp code to read and execute:
   * `yal test.lisp`
 
-As our interpreter allows documentation to be attached to functions, both those implemented in golang and those written in lisp, we also have a flag to dump that information:
+The yal interpreter allows (optional) documentation to be attached to functions, both those implemented in golang and those written in lisp, there is another command-line flag to dump that information from the standard library and built-in functions:
 
 * `yal -h`
   * Shows all functions which contain help-text, in sorted order.
   * Examples are included where available.
-
 
 
 
@@ -151,26 +147,11 @@ $ go test -run=Bench -bench=.
 
 To run the benchmark for longer add `-benchtime=30s`, or similar, to the command-line.
 
-I also put together a small comparison of toy scripting languages available here:
+I also put together an external comparison of my toy scripting languages here:
 
 * [Toy Language Benchmarks](https://github.com/skx/toy-language-benchmarks)
 
 This shows that the Lisp implementation isn't so slow, although it is not the fasted of the scripting languages I've implemented.
-
-
-
-
-## References
-
-* https://github.com/thesephist/klisp/blob/main/lib/klisp.klisp
-  * Very helpful _inspiration_ for writing primitives in Lisp.
-* https://github.com/kanaka/mal/
-  * Make A Lisp, very helpful for the quoting, unquoting, and macro magic.
-* https://lispcookbook.github.io/cl-cookbook/macros.html
-  * The Common Lisp Cookbook – Macros
-* http://soft.vub.ac.be/~pcostanz/documents/08/macros.pdf
-  * The source of the cute "while" macro, and a good read beyond that.
-
 
 
 
@@ -184,3 +165,4 @@ I've also played around with a couple of compilers which might be interesting to
    * [https://github.com/skx/bfcc/](https://github.com/skx/bfcc/)
 * A math-compiler:
   * [https://github.com/skx/math-compiler](https://github.com/skx/math-compiler)
+
