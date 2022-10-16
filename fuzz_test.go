@@ -116,27 +116,23 @@ func FuzzYAL(f *testing.F) {
 	// Some programs are obviously invalid though, so we don't want to
 	// report those known-bad things.
 	known := []string{
-		"not a function",
+		"arityerror",
+		"deadline exceeded", // context timeout
 		"division by zero",
-		"arity-error",
-		"wrong number of arguments",
-		"invalid argument count",
-		"not a number",
-		"not a list",
-		"not a string",
-		"expected a symbol",
-		"expected a list",
 		"error expanding argument",
-		"is not a symbol",
-		"expected only a single argument", // (eval
-		"deadline exceeded",               // context timeout
-		"unexpected type for eval",        // (eval
-		"type-validation failed",
-		"unknown type-specification",
-		"not a hash",
-		"recursion limit",
 		"expected a function body",
+		"expected a list",
+		"expected a symbol",
+		"is not a symbol",
 		"must have even length",
+		"not a function",
+		"not a hash",
+		"not a list",
+		"not a number",
+		"not a string",
+		"recursion limit",
+		"type-validation failed",
+		"unexpected type",
 	}
 
 	f.Fuzz(func(t *testing.T, input []byte) {

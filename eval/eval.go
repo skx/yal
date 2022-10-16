@@ -503,7 +503,7 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 			// (alias ..)
 			case primitive.Symbol("alias"):
 				if len(listExp) != 3 {
-					return primitive.Error("Expected two arguments")
+					return primitive.ArityError()
 				}
 
 				// Name we'll use
@@ -529,7 +529,7 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 			// (read
 			case primitive.Symbol("read"):
 				if len(listExp) != 2 {
-					return primitive.Error("Expected only a single argument")
+					return primitive.ArityError()
 				}
 
 				arg := listExp[1].ToString()
@@ -556,7 +556,7 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 			case primitive.Symbol("eval"):
 
 				if len(listExp) != 2 {
-					return primitive.Error("Expected only a single argument")
+					return primitive.ArityError()
 				}
 
 				switch val := listExp[1].(type) {
@@ -600,7 +600,7 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 			// (define
 			case primitive.Symbol("define"), primitive.Symbol("def!"):
 				if len(listExp) < 3 {
-					return primitive.Error("arity-error: not enough arguments for (define ..)")
+					return primitive.ArityError()
 				}
 				symb, ok := listExp[1].(primitive.Symbol)
 				if ok {
@@ -614,7 +614,7 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 			// (defmacro!
 			case primitive.Symbol("defmacro!"):
 				if len(listExp) < 3 {
-					return primitive.Error("arity-error: not enough arguments for (defmacro! ..)")
+					return primitive.ArityError()
 				}
 
 				// name of macro
@@ -639,7 +639,7 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 			// (set!
 			case primitive.Symbol("set!"):
 				if len(listExp) < 3 {
-					return primitive.Error("arity-error: not enough arguments for (set! ..)")
+					return primitive.ArityError()
 				}
 
 				// Get the symbol we're gonna set
@@ -662,14 +662,14 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 			// (quote ..)
 			case primitive.Symbol("quote"):
 				if len(listExp) < 2 {
-					return primitive.Error("arity-error: not enough arguments for (quote")
+					return primitive.ArityError()
 				}
 				return listExp[1]
 
 			// (quasiquote ..)
 			case primitive.Symbol("quasiquote"):
 				if len(listExp) < 2 {
-					return primitive.Error("arity-error: not enough arguments for (quasiquote")
+					return primitive.ArityError()
 				}
 				exp = ev.quasiquote(listExp[1])
 				goto repeat_eval
@@ -677,14 +677,14 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 			// (macroexpand ..)
 			case primitive.Symbol("macroexpand"):
 				if len(listExp) < 2 {
-					return primitive.Error("arity-error: not enough arguments for (macroexpand")
+					return primitive.ArityError()
 				}
 				return ev.macroExpand(listExp[1], e)
 
 			// (let
 			case primitive.Symbol("let"):
 				if len(listExp) < 2 {
-					return primitive.Error("arity-error: not enough arguments for (let ..)")
+					return primitive.ArityError()
 				}
 
 				newEnv := env.NewEnvironment(e)
@@ -702,7 +702,7 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 					}
 
 					if len(bl) < 2 {
-						return primitive.Error("arity-error: binding list had missing arguments")
+						return primitive.ArityError()
 					}
 					// get the value
 					bindingVal := ev.eval(bl[1], newEnv, expandMacro)
@@ -732,7 +732,7 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 				// let should have two entries
 
 				if len(listExp) < 2 {
-					return primitive.Error("arity-error: not enough arguments for (let* ..)")
+					return primitive.ArityError()
 				}
 
 				newEnv := env.NewEnvironment(e)
@@ -806,7 +806,7 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 			// (if
 			case primitive.Symbol("if"):
 				if len(listExp) < 3 {
-					return primitive.Error("arity-error: not enough arguments for (if ..)")
+					return primitive.ArityError()
 				}
 
 				test := ev.eval(listExp[1], e, expandMacro)
@@ -834,7 +834,7 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 			// (try
 			case primitive.Symbol("try"):
 				if len(listExp) < 3 {
-					return primitive.Error("arity-error: not enough arguments for (try ..)")
+					return primitive.ArityError()
 				}
 
 				// first expression is what to execute: a list
@@ -883,7 +883,7 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 
 				// ensure we have arguments
 				if len(listExp) != 3 && len(listExp) != 4 {
-					return primitive.Error("wrong number of arguments")
+					return primitive.ArityError()
 				}
 
 				// ensure that our arguments are a list
@@ -1018,7 +1018,7 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 				// Unless variadic arguments are expected, because in that case "anything" is fine.
 				//
 				if len(args) < min && (variadic == "") {
-					return primitive.Error(fmt.Sprintf("arity-error - function '%s' requires %d argument(s), %d provided", listExp[0].ToString(), min, len(args)))
+					return primitive.ArityError()
 				}
 
 				// Create a new environment/scope to set the

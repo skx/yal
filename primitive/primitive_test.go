@@ -31,6 +31,11 @@ func TestError(t *testing.T) {
 	if error.ToString() != "ERROR{no-cheese}" {
 		t.Fatalf("error->String had wrong result")
 	}
+
+	if !strings.Contains(ArityError().ToString(), "Arity") {
+		t.Fatalf("arity-error is non-obvious")
+	}
+
 }
 
 func TestIsNil(t *testing.T) {

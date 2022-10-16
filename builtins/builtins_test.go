@@ -50,7 +50,7 @@ func TestCar(t *testing.T) {
 	if !ok {
 		t.Fatalf("expected error, got %v", out)
 	}
-	if !strings.Contains(string(e), "number of arguments") {
+	if e != primitive.ArityError() {
 		t.Fatalf("got error, but wrong one %v", out)
 	}
 
@@ -109,7 +109,7 @@ func TestCdr(t *testing.T) {
 	if !ok {
 		t.Fatalf("expected error, got %v", out)
 	}
-	if !strings.Contains(string(e), "number of arguments") {
+	if e != primitive.ArityError() {
 		t.Fatalf("got error, but wrong one %v", out)
 	}
 
@@ -167,7 +167,7 @@ func TestChr(t *testing.T) {
 	if !ok {
 		t.Fatalf("expected error, got %v", out)
 	}
-	if !strings.Contains(string(e), "wrong number of arguments") {
+	if e != primitive.ArityError() {
 		t.Fatalf("got error, but wrong one:%s", out)
 	}
 
@@ -210,7 +210,7 @@ func TestCons(t *testing.T) {
 	if !ok {
 		t.Fatalf("expected error, got %v", out)
 	}
-	if !strings.Contains(string(e), "wrong number of arguments") {
+	if e != primitive.ArityError() {
 		t.Fatalf("got error, but wrong one %v", out)
 	}
 
@@ -404,7 +404,7 @@ func TestDirectory(t *testing.T) {
 	if !ok {
 		t.Fatalf("expected error, got %v", out)
 	}
-	if !strings.Contains(string(e), "argument count") {
+	if e != primitive.ArityError() {
 		t.Fatalf("got error, but wrong one %v", out)
 	}
 
@@ -566,7 +566,7 @@ func TestDivide(t *testing.T) {
 	if !ok {
 		t.Fatalf("expected error, got %v", out)
 	}
-	if !strings.Contains(string(e), "invalid argument count") {
+	if e != primitive.ArityError() {
 		t.Fatalf("got error, but wrong one %v", out)
 	}
 
@@ -674,7 +674,7 @@ func TestEq(t *testing.T) {
 	if !ok {
 		t.Fatalf("expected error, got %v", out)
 	}
-	if !strings.Contains(string(e), "number of arguments") {
+	if e != primitive.ArityError() {
 		t.Fatalf("got error, but wrong one %v", out)
 	}
 
@@ -741,7 +741,7 @@ func TestEquals(t *testing.T) {
 	if !ok {
 		t.Fatalf("expected error, got %v", out)
 	}
-	if !strings.Contains(string(e), "number of arguments") {
+	if e != primitive.ArityError() {
 		t.Fatalf("got error, but wrong one %v", out)
 	}
 
@@ -824,7 +824,7 @@ func TestError(t *testing.T) {
 	if !ok {
 		t.Fatalf("expected error, got %v", out)
 	}
-	if !strings.Contains(string(e), "number of arguments") {
+	if e != primitive.ArityError() {
 		t.Fatalf("got error, but wrong one %v", out)
 	}
 
@@ -945,7 +945,7 @@ func TestExpn(t *testing.T) {
 	if !ok {
 		t.Fatalf("expected error, got %v", out)
 	}
-	if !strings.Contains(string(e), "number of arguments") {
+	if e != primitive.ArityError() {
 		t.Fatalf("got error, but wrong one %v", out)
 	}
 
@@ -1304,7 +1304,7 @@ func TestGetenv(t *testing.T) {
 	if !ok {
 		t.Fatalf("expected error, got %v", out)
 	}
-	if !strings.Contains(string(e), "invalid argument count") {
+	if e != primitive.ArityError() {
 		t.Fatalf("got error, but wrong one %v", out)
 	}
 
@@ -1484,7 +1484,7 @@ func TestJoin(t *testing.T) {
 	if !ok {
 		t.Fatalf("expected error, got %v", out)
 	}
-	if !strings.Contains(string(e), "invalid argument count") {
+	if e != primitive.ArityError() {
 		t.Fatalf("got error, but wrong one %v", out)
 	}
 
@@ -1624,7 +1624,7 @@ func TestLt(t *testing.T) {
 	if !ok {
 		t.Fatalf("expected error, got %v", out)
 	}
-	if !strings.Contains(string(e), "number of arguments") {
+	if e != primitive.ArityError() {
 		t.Fatalf("got error, but wrong one %v", out)
 	}
 
@@ -1687,7 +1687,7 @@ func TestMatches(t *testing.T) {
 	if !ok {
 		t.Fatalf("expected error, got %v", out)
 	}
-	if !strings.Contains(string(e), "invalid argument count") {
+	if e != primitive.ArityError() {
 		t.Fatalf("got error, but wrong one")
 	}
 
@@ -1784,7 +1784,7 @@ func TestMinus(t *testing.T) {
 	if !ok {
 		t.Fatalf("expected error, got %v", out)
 	}
-	if !strings.Contains(string(e), "invalid argument count") {
+	if e != primitive.ArityError() {
 		t.Fatalf("got error, but wrong one %v", out)
 	}
 
@@ -1846,7 +1846,7 @@ func TestMod(t *testing.T) {
 	if !ok {
 		t.Fatalf("expected error, got %v", out)
 	}
-	if !strings.Contains(string(e), "number of arguments") {
+	if e != primitive.ArityError() {
 		t.Fatalf("got error, but wrong one %v", out)
 	}
 
@@ -1946,7 +1946,7 @@ func TestMultiply(t *testing.T) {
 	if !ok {
 		t.Fatalf("expected error, got %v", out)
 	}
-	if !strings.Contains(string(e), "invalid argument count") {
+	if e != primitive.ArityError() {
 		t.Fatalf("got error, but wrong one %v", out)
 	}
 
@@ -2008,7 +2008,7 @@ func TestNil(t *testing.T) {
 	if !ok {
 		t.Fatalf("expected error, got %v", out)
 	}
-	if !strings.Contains(string(e), "number of arguments") {
+	if e != primitive.ArityError() {
 		t.Fatalf("got error, but wrong one %v", out)
 	}
 
@@ -2085,7 +2085,7 @@ func TestOrd(t *testing.T) {
 	if !ok {
 		t.Fatalf("expected error, got %v", out)
 	}
-	if !strings.Contains(string(e), "wrong number of arguments") {
+	if e != primitive.ArityError() {
 		t.Fatalf("got error, but wrong one:%s", out)
 	}
 
@@ -2157,7 +2157,7 @@ func TestPlus(t *testing.T) {
 	if !ok {
 		t.Fatalf("expected error, got %v", out)
 	}
-	if !strings.Contains(string(e), "invalid argument count") {
+	if e != primitive.ArityError() {
 		t.Fatalf("got error, but wrong one %v", out)
 	}
 
@@ -2218,7 +2218,7 @@ func TestPrint(t *testing.T) {
 	if !ok {
 		t.Fatalf("expected error, got %v", out)
 	}
-	if !strings.Contains(string(e), "wrong number of arguments") {
+	if e != primitive.ArityError() {
 		t.Fatalf("got error, but wrong one %v", out)
 	}
 
@@ -2261,7 +2261,7 @@ func TestRandom(t *testing.T) {
 	if !ok {
 		t.Fatalf("expected error, got %v", out)
 	}
-	if !strings.Contains(string(e), "wrong number of arguments") {
+	if e != primitive.ArityError() {
 		t.Fatalf("got error, but wrong one %v", out)
 	}
 
@@ -2376,7 +2376,7 @@ func TestSort(t *testing.T) {
 	if !ok {
 		t.Fatalf("expected error, got %v", out)
 	}
-	if !strings.Contains(string(e), "invalid argument count") {
+	if e != primitive.ArityError() {
 		t.Fatalf("got error, but wrong one %v", out)
 	}
 
@@ -2444,7 +2444,7 @@ func TestSplit(t *testing.T) {
 	if !ok {
 		t.Fatalf("expected error, got %v", out)
 	}
-	if !strings.Contains(string(e), "invalid argument count") {
+	if e != primitive.ArityError() {
 		t.Fatalf("got error, but wrong one %v", out)
 	}
 
@@ -2507,7 +2507,7 @@ func TestSprintf(t *testing.T) {
 	if !ok {
 		t.Fatalf("expected error, got %v", out)
 	}
-	if !strings.Contains(string(e), "wrong number of arguments") {
+	if e != primitive.ArityError() {
 		t.Fatalf("got error, but wrong one %v", out)
 	}
 
@@ -2562,7 +2562,7 @@ func TestType(t *testing.T) {
 	if !ok {
 		t.Fatalf("expected error, got %v", out)
 	}
-	if !strings.Contains(string(e), "number of arguments") {
+	if e != primitive.ArityError() {
 		t.Fatalf("got error, but wrong one %v", out)
 	}
 
