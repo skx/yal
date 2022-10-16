@@ -1,3 +1,13 @@
+
+* [Primitives](#primitives)
+  * [Symbols](#symbols)
+  * [Special Forms](#special-forms)
+  * [Core Primitives](#core-primitives)
+  * [Standard Library](#standard-library)
+* [Type Checking](#type-checking)
+* [See Also](#see-also)
+
+
 # Primitives
 
 Here is a list of all the primitives which are available to yal users.
@@ -21,11 +31,16 @@ The only notable special symbols are the strings which represent boolean values:
 Special forms are things that are built into the core interpreter, and include:
 
 * `alias`
+* `catch`.
+  * Demonstrated in [try.lisp](try.lisp).
 * `def!`
   * `define` is an alias.
 * `defmacro!`
+  * Demonstrated in [mtest.lisp](mtest.lisp).
 * `do`
 * `env`
+  * Env allows introspection of the current environment.
+  * Demonstrated in [dynamic.lisp](dynamic.lisp)
 * `eval`
 * `fn*`
   * `lambda` is an alias.
@@ -36,7 +51,7 @@ Special forms are things that are built into the core interpreter, and include:
 * `read`
 * `set!`
 * `try`
-
+  * Demonstrated in [try.lisp](try.lisp).
 
 ## Core Primitives
 
@@ -74,6 +89,7 @@ Things you'll find here include:
   * Does the specified hash contain the given key?
 * `date`
   * Return details of today's date, as a list.
+  * Demonstrated in [time.lisp](time.lisp).
 * `directory?`
   * Does the given path represent something that exists, and is a directory?
 * `directory:entries`
@@ -115,7 +131,7 @@ Things you'll find here include:
   * Return the time, in milliseconds.
 * `nil?`
   * Is the given value nil, or an empty list?
-* now`
+* `now`
   * Return the number of seconds past the Unix Epoch.
 * `ord`
   * Return the ASCII code of the specified character.
@@ -126,7 +142,7 @@ Things you'll find here include:
 * `set`
   * Update the value of the specified hash-key.
 * `shell`
-  * Run a command via the shell, and return STDOUT and STDERR contents it generated.
+  * Run a command via the shell, and return STDOUT and STDERR it generated.
 * `sort`
   * Sort the given list.
 * `split`
@@ -137,6 +153,7 @@ Things you'll find here include:
   * Convert the specified parameter to a string.
 * `time`
   * Return values relating to the current time, as a list.
+  * Demonstrated in [time.lisp](time.lisp).
 * `type`
   * Return the type of the given object.
 * `vals`
@@ -298,80 +315,9 @@ Functions here include:
   * Is the given number zero?
 
 
-# Old Content
+# Type Checking
 
-* **TODO** Revisit this, and probably remove.
-
-We have a reasonable number of functions implemented, either in our golang core or in the standard-library which is loaded ahead of all user-scripts (the standard-library is implemented in lisp).
-
-* Basic types include strings, numbers, errors, lists, hashes, etc.
-  * `#t` is the true symbol, `#f` is false.
-  * `true` and `false` are available as synonyms.
-* Comparison functions:
-  * `<`, `<=`, `>`, `>=`, `=`, & `eq`.
-* Date and time functions:
-  * `(date)` and `(time)` are implemented in our core application, but individual fields are made available via our standard-library:
-    * `(year)`, `(month)`, `(day)`, `(weekday)`, `(hour)`, `(minute)`, `(second)` ‚ `(hms)`.
-  * Each of these are demonstrated in [time.lisp](time.lisp).
-* Error handling:
-  * `error`, `try`, and `catch` - as demonstrated in [try.lisp](try.lisp).
-* Hash operations:
-  * Hashes are literals like this `{ :name "Steve" :location "Helsinki" }`
-  * Hash functions are `contains?`, `get`, `keys`, `set`, & `vals`.
-    * Note that keys are returned in sorted order.  Values are returned in order of their sorted keys too.
-* Help functions:
-  * `help` will return the supplied help text for any functions which provide it - which includes all of our built-in functions and large parts of our standard-library.
-  * **NOTE**: This does not (yet?) include help for special forms such as `(let* ..)`, `(if ..)`, etc.
-* List operations:
-  * `butlast`, `car`, `cdr`, `cons`, `drop`, `every`, `first`, `last`, `list`, `repeated`, `sort`, & `take`.
-* Logical operations:
-  * `and`, & `or`.
-* Mathematical operations:
-  * `+`, `-`, `*`, `/`, `#`, & `%`.
-* Macro support.
-  * See [mtest.lisp](mtest.lisp) for some simple tests/usage examples.
-  * The standard library uses macros to implement `(cond)`, `(while)`, and other functions.
-* Platform features:
-  * `arch`, `getenv`, `os`, `print`, `slurp`, `sprintf`, `str` & `type`
-* String operations:
-  * `chr`, `join`, `match` (regular-expression matching),`ord`, & `split`.
-* Special forms:
-  * `define`, `do`, `env`, `eval`, `gensym`, `if`, `lambda`, `let*`, `macroexpand`, `read`, `set!`, `quote`, & `quasiquote`.
-* System functions:
-  * Run commands via `(shell)`, find files via `(glob)`
-  * Test files via `(directory?)`, `(exists?)` & `(file?)`.
-* Tail call optimization.
-* MAL compatibility:
-  * `def!` can be used as a synonym for `define`.
-  * `defmacro!` is used to define macros.
-  * `fn*` can be used as a synonym for `lambda`.
-  * `let*` can be used to define a local scope.
-  * Several functions/macros that are expected to be present can be found in [stdlib/mal.lisp](stdlib/mal.lisp).
-
-Building upon those primitives we have a larger standard-library of functions written in Lisp such as:
-
-* `abs`, `apply`, `append`, `cond`, `count`, `false?`, `filter`, `lower`, `map`, `min`, `max`, `ms`, `nat`, `neg`, `now`, `nth`, `reduce`, `repeat`, `reverse`, `seq`, `strlen`, `true?`, `upper`, `when`, `while`, etc.
-
-Although the lists above should be up to date you can check the definitions to see what is currently available:
-
-
-
-## Special Features
-
-There are a couple of areas where we've implemented special/unusual things:
-
-* Access to command-line arguments, when used via a shebang.
-  * See [args.lisp](args.lisp) for an example.
-* Introspection via the `(env)` function, which will return details of all variables/functions in the environment.
-  * Allowing dynamic invocation shown in [dynamic.lisp](dynamic.lisp) and other neat things.
-  * This includes help-information for both built-in and user-written functions.
-* Support for hashes as well as lists/strings/numbers/etc.
-  * A hash looks like this `{ :name "Steve" :location "Helsinki" }`
-  * Sample code is visible in [hash.lisp](hash.lisp).
-* Type checking for function parameters.
-  * Via a `:type` suffix.  For example `(lambda (a:string b:number) ..`.
-
-Here's an example of type-checking on a parameter value, in this case a list is required, via the `:list` suffix:
+Type checking is optional, but supported for function parameters via a `:type` suffix.  Here's an example of type-checking on a parameter value, in this case a list is required, via the `:list` suffix:
 
 ```lisp
 (set! blah (fn* (a:list) (print "I received the list %s" a)))
@@ -400,8 +346,7 @@ If multiple types are permitted then just keep appending things, for example:
   * Allows either a list, or a number.
 
 
-
-## See Also
+# See Also
 
 * [README.md](README.md)
   * More details of the project.
