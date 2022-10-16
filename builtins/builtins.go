@@ -6,6 +6,7 @@
 package builtins
 
 import (
+	"bufio"
 	"bytes"
 	"flag"
 	"fmt"
@@ -19,6 +20,7 @@ import (
 	"sort"
 	"strconv"
 	"strings"
+	"syscall"
 	"time"
 
 	"github.com/skx/yal/env"
@@ -111,6 +113,9 @@ func PopulateEnvironment(env *env.Environment) {
 	env.Set("error", &primitive.Procedure{F: errorFn, Help: helpMap["error"]})
 	env.Set("exists?", &primitive.Procedure{F: existsFn, Help: helpMap["exists?"]})
 	env.Set("file?", &primitive.Procedure{F: fileFn, Help: helpMap["file?"]})
+	env.Set("file:lines", &primitive.Procedure{F: fileLinesFn, Help: helpMap["file:lines"]})
+	env.Set("file:read", &primitive.Procedure{F: fileReadFn, Help: helpMap["file:read"]})
+	env.Set("file:stat", &primitive.Procedure{F: fileStatFn, Help: helpMap["file:stat"]})
 	env.Set("gensym", &primitive.Procedure{F: gensymFn, Help: helpMap["gensym"]})
 	env.Set("get", &primitive.Procedure{F: getFn, Help: helpMap["get"]})
 	env.Set("getenv", &primitive.Procedure{F: getenvFn, Help: helpMap["getenv"]})
@@ -128,7 +133,6 @@ func PopulateEnvironment(env *env.Environment) {
 	env.Set("print", &primitive.Procedure{F: printFn, Help: helpMap["print"]})
 	env.Set("set", &primitive.Procedure{F: setFn, Help: helpMap["set"]})
 	env.Set("shell", &primitive.Procedure{F: shellFn, Help: helpMap["shell"]})
-	env.Set("slurp", &primitive.Procedure{F: slurpFn, Help: helpMap["slurp"]})
 	env.Set("sort", &primitive.Procedure{F: sortFn, Help: helpMap["sort"]})
 	env.Set("split", &primitive.Procedure{F: splitFn, Help: helpMap["split"]})
 	env.Set("sprintf", &primitive.Procedure{F: sprintfFn, Help: helpMap["sprintf"]})
@@ -483,6 +487,104 @@ func fileFn(env *env.Environment, args []primitive.Primitive) primitive.Primitiv
 		}
 	}
 	return primitive.Bool(false)
+}
+
+// fileLinesFn implements (file:lines)
+func fileLinesFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+	// We only need a single argument
+	if len(args) != 1 {
+		return primitive.Error("invalid argument count")
+	}
+
+	// Which is a string
+	fName, ok := args[0].(primitive.String)
+	if !ok {
+		return primitive.Error("argument not a string")
+	}
+
+	// Return value,
+	var res primitive.List
+
+	// Open the file
+	file, err := os.Open(fName.ToString())
+	if err != nil {
+		return primitive.Error(fmt.Sprintf("failed to open %s:%s", fName.ToString(), err))
+	}
+	defer file.Close()
+
+	// Read each line, and append to our list.
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		res = append(res, primitive.String(scanner.Text()))
+	}
+
+	// All done.
+	return res
+}
+
+// fileReadFn implements (file:read)
+func fileReadFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+	// We only need a single argument
+	if len(args) != 1 {
+		return primitive.Error("invalid argument count")
+	}
+
+	// Which is a string
+	fName, ok := args[0].(primitive.String)
+	if !ok {
+		return primitive.Error("argument not a string")
+	}
+
+	data, err := os.ReadFile(fName.ToString())
+	if err != nil {
+		return primitive.Error(fmt.Sprintf("error reading %s %s", fName.ToString(), err))
+	}
+	return primitive.String(string(data))
+}
+
+// fileStatFn implements (file:lines)
+//
+// Return value is (NAME SIZE UID GID MODE)
+func fileStatFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+	// We only need a single argument
+	if len(args) != 1 {
+		return primitive.Error("invalid argument count")
+	}
+
+	// Which is a string
+	fName, ok := args[0].(primitive.String)
+	if !ok {
+		return primitive.Error("argument not a string")
+	}
+
+	// Stat the entry
+	info, err := os.Stat(fName.ToString())
+
+	if err != nil {
+		return primitive.Nil{}
+	}
+
+	var UID int
+	var GID int
+	if stat, ok := info.Sys().(*syscall.Stat_t); ok {
+		UID = int(stat.Uid)
+		GID = int(stat.Gid)
+	} else {
+		// we are not in linux, this won't work anyway in windows,
+		// but maybe you want to log warnings
+		UID = os.Getuid()
+		GID = os.Getgid()
+	}
+
+	var res primitive.List
+
+	res = append(res, primitive.String(info.Name()))
+	res = append(res, primitive.Number(info.Size()))
+	res = append(res, primitive.Number(UID))
+	res = append(res, primitive.Number(GID))
+	res = append(res, primitive.String(info.Mode().String()))
+
+	return res
 }
 
 // gensymFn is the implementation of (gensym ..)
@@ -944,7 +1046,6 @@ func setFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive
 }
 
 // shellFn runs a command via the shell
-// slurpFn returns the contents of the specified file
 func shellFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 
 	// We need one argument
@@ -985,20 +1086,6 @@ func shellFn(env *env.Environment, args []primitive.Primitive) primitive.Primiti
 	ret = append(ret, primitive.String(errb.String()))
 
 	return ret
-}
-
-// slurpFn returns the contents of the specified file
-func slurpFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
-	if len(args) != 1 {
-		return primitive.Error("wrong number of arguments")
-	}
-
-	fName := args[0].ToString()
-	data, err := os.ReadFile(fName)
-	if err != nil {
-		return primitive.Error(fmt.Sprintf("error reading %s %s", fName, err))
-	}
-	return primitive.String(string(data))
 }
 
 // sortFn implements (sort)
