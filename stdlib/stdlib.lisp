@@ -176,15 +176,6 @@
                "dec will subtract one from the supplied value, and return the result."
                (- n 1)))
 
-;; We could also define the incr/decr operations as macros.
-(defmacro! incr (fn* (x)
-                     "incr is a macro which will return the given value, incremented by one."
-                     `(set! ~x (+ ~x 1))))
-
-(defmacro! decr (fn* (x)
-                     "decr is a macro which will return the given value, decremented by one."
-                     `(set! ~x (- ~x 1))))
-
 ;; Not is useful
 (set! ! (fn* (x)
              "Return the inverse/NOT of the given boolean value"
