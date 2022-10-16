@@ -197,21 +197,32 @@ Functions here include:
 * `even?`
   * Is the given number even?
 * `every`
+  * Return true if applying the specified function to every element of the list returns a true result.
 * `file:stat:gid`
+  * Return the GID of the path, from the information provided by `(file:stat)`.
 * `file:stat:mode`
+  * Return the mode of the path, from the information provided by `(file:stat)`.
 * `file:stat:size`
+  * Return the size of the path, from the information provided by `(file:stat)`.
 * `file:stat:uid`
+  * Return the UID of the path, from the information provided by `(file:stat)`.
 * `filter`
+  * Remove every element from the given list, unless the function returns true.
 * `first`
+  * Return the first element of the given list.
+  * This is the same as `car`.
 * `function?`
+  * Is the given thing a function?
 * `hash?`
   * Is the given thing a hash?
 * `inc`
   * Increment the given variable.
 * `last`
+  * Return the last element of the specified list.
 * `length`
   * Return the length of the specified list.
 * `list?`
+  * Is the given thing a list?
 * `lower`
   * Return an lower-case version of the specified string.
 * `lower-table`
@@ -219,15 +230,19 @@ Functions here include:
 * `macro?`
   * Is the given thing a macro?
 * `map`
+  * Return the results of applying the specified function to every element of the given list.
 * `max`
   * Return the maximum value in the specified list.
 * `min`
   * Return the maximum value in the specified list.
 * `nat`
+  * Return the list of natural numbers 1 to N.
 * `neg`
+  * Negate the given number, and return it.
 * `neg?`
   * Is the given number negative?
 * `nth`
+  * Return the Nth element of the list.
 * `number?`
   * Is the given thing a number?
 * `odd?`
@@ -239,13 +254,21 @@ Functions here include:
 * `pos?`
   * Is the given number positive?
 * `range`
+  * Return a list of numbers between the given start/end, using the specified step-size.
 * `reduce`
 * `repeat`
+  * Run the given body N times.
 * `repeated`
+  * Return a list of length N whose elements are all X.
 * `rest`
+  * Return the rest of the list, except the first element.
+  * This is the same as `cdr`.
 * `reverse`
+  * Reverse the contents of the specified list.
 * `seq`
+  * Return a list of numbers from 0 to N.
 * `sign`
+  * Return the sign of the given number.  (1 for positive, -1 for negative).
 * `sqrt`
   * Return the square-root of the supplied number.
 * `string?`
