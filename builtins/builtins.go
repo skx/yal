@@ -154,7 +154,7 @@ func archFn(env *env.Environment, args []primitive.Primitive) primitive.Primitiv
 func carFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 
 	if len(args) != 1 {
-		return primitive.Error("wrong number of arguments")
+		return primitive.ArityError()
 	}
 
 	// ensure we received a list
@@ -176,7 +176,7 @@ func carFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive
 func cdrFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 
 	if len(args) != 1 {
-		return primitive.Error("wrong number of arguments")
+		return primitive.ArityError()
 	}
 
 	// ensure we received a list
@@ -195,7 +195,7 @@ func cdrFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive
 func chrFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 
 	if len(args) != 1 {
-		return primitive.Error("wrong number of arguments")
+		return primitive.ArityError()
 	}
 
 	if _, ok := args[0].(primitive.Number); !ok {
@@ -211,7 +211,7 @@ func chrFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive
 // consFn implements (cons).
 func consFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 	if len(args) < 1 {
-		return primitive.Error("wrong number of arguments")
+		return primitive.ArityError()
 	}
 
 	if len(args) == 1 {
@@ -231,7 +231,7 @@ func containsFn(env *env.Environment, args []primitive.Primitive) primitive.Prim
 
 	// We need a pair of arguments
 	if len(args) != 2 {
-		return primitive.Error("invalid argument count")
+		return primitive.ArityError()
 	}
 
 	// First is a Hash
@@ -279,7 +279,7 @@ func directoryEntriesFn(env *env.Environment, args []primitive.Primitive) primit
 
 	// We only need a single argument
 	if len(args) != 1 {
-		return primitive.Error("invalid argument count")
+		return primitive.ArityError()
 	}
 
 	// Which is a string
@@ -308,7 +308,7 @@ func directoryFn(env *env.Environment, args []primitive.Primitive) primitive.Pri
 
 	// We only need a single argument
 	if len(args) != 1 {
-		return primitive.Error("invalid argument count")
+		return primitive.ArityError()
 	}
 
 	// Which is a string
@@ -335,7 +335,7 @@ func directoryFn(env *env.Environment, args []primitive.Primitive) primitive.Pri
 func divideFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 	// ensure we have at least one argument
 	if len(args) < 1 {
-		return primitive.Error("invalid argument count")
+		return primitive.ArityError()
 	}
 
 	// the first argument must be a number.
@@ -365,7 +365,7 @@ func divideFn(env *env.Environment, args []primitive.Primitive) primitive.Primit
 // eqFn implements "eq"
 func eqFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 	if len(args) != 2 {
-		return primitive.Error("wrong number of arguments")
+		return primitive.ArityError()
 	}
 
 	a := args[0]
@@ -383,7 +383,7 @@ func eqFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive 
 // equalsFn implements "="
 func equalsFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 	if len(args) != 2 {
-		return primitive.Error("wrong number of arguments")
+		return primitive.ArityError()
 	}
 
 	a := args[0]
@@ -404,7 +404,7 @@ func equalsFn(env *env.Environment, args []primitive.Primitive) primitive.Primit
 // errorFn implements "error"
 func errorFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 	if len(args) != 1 {
-		return primitive.Error("wrong number of arguments")
+		return primitive.ArityError()
 	}
 	return primitive.Error(args[0].ToString())
 }
@@ -414,7 +414,7 @@ func existsFn(env *env.Environment, args []primitive.Primitive) primitive.Primit
 
 	// We only need a single argument
 	if len(args) != 1 {
-		return primitive.Error("invalid argument count")
+		return primitive.ArityError()
 	}
 
 	// Which is a string
@@ -481,8 +481,9 @@ func expandStr(input string) string {
 // expnFn implements "#"
 func expnFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 	if len(args) != 2 {
-		return primitive.Error("wrong number of arguments")
+		return primitive.ArityError()
 	}
+
 	if _, ok := args[0].(primitive.Number); !ok {
 		return primitive.Error("argument not a number")
 	}
@@ -496,7 +497,7 @@ func expnFn(env *env.Environment, args []primitive.Primitive) primitive.Primitiv
 func fileFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 	// We only need a single argument
 	if len(args) != 1 {
-		return primitive.Error("invalid argument count")
+		return primitive.ArityError()
 	}
 
 	// Which is a string
@@ -523,7 +524,7 @@ func fileFn(env *env.Environment, args []primitive.Primitive) primitive.Primitiv
 func fileLinesFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 	// We only need a single argument
 	if len(args) != 1 {
-		return primitive.Error("invalid argument count")
+		return primitive.ArityError()
 	}
 
 	// Which is a string
@@ -556,7 +557,7 @@ func fileLinesFn(env *env.Environment, args []primitive.Primitive) primitive.Pri
 func fileReadFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 	// We only need a single argument
 	if len(args) != 1 {
-		return primitive.Error("invalid argument count")
+		return primitive.ArityError()
 	}
 
 	// Which is a string
@@ -578,7 +579,7 @@ func fileReadFn(env *env.Environment, args []primitive.Primitive) primitive.Prim
 func fileStatFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 	// We only need a single argument
 	if len(args) != 1 {
-		return primitive.Error("invalid argument count")
+		return primitive.ArityError()
 	}
 
 	// Which is a string
@@ -639,7 +640,7 @@ func getFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive
 
 	// We need two arguments
 	if len(args) != 2 {
-		return primitive.Error("invalid argument count")
+		return primitive.ArityError()
 	}
 
 	// First is a Hash
@@ -656,7 +657,7 @@ func getenvFn(env *env.Environment, args []primitive.Primitive) primitive.Primit
 
 	// If we have only a single argument
 	if len(args) != 1 {
-		return primitive.Error("invalid argument count")
+		return primitive.ArityError()
 	}
 
 	// Which is a string
@@ -674,7 +675,7 @@ func globFn(env *env.Environment, args []primitive.Primitive) primitive.Primitiv
 
 	// If we have only a single argument
 	if len(args) != 1 {
-		return primitive.Error("invalid argument count")
+		return primitive.ArityError()
 	}
 
 	// Which is a string
@@ -703,7 +704,7 @@ func globFn(env *env.Environment, args []primitive.Primitive) primitive.Primitiv
 func helpFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 	// We need a single argument
 	if len(args) != 1 {
-		return primitive.Error("invalid argument count")
+		return primitive.ArityError()
 	}
 
 	// Which is a function
@@ -734,7 +735,7 @@ func joinFn(env *env.Environment, args []primitive.Primitive) primitive.Primitiv
 
 	// We require one argument
 	if len(args) != 1 {
-		return primitive.Error("invalid argument count")
+		return primitive.ArityError()
 	}
 
 	// The argument must be a list
@@ -756,7 +757,7 @@ func keysFn(env *env.Environment, args []primitive.Primitive) primitive.Primitiv
 
 	// We need a single argument
 	if len(args) != 1 {
-		return primitive.Error("invalid argument count")
+		return primitive.ArityError()
 	}
 
 	// First is a Hash
@@ -797,7 +798,7 @@ func listFn(env *env.Environment, args []primitive.Primitive) primitive.Primitiv
 // ltFn implements "<"
 func ltFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 	if len(args) != 2 {
-		return primitive.Error("wrong number of arguments")
+		return primitive.ArityError()
 	}
 
 	if _, ok := args[0].(primitive.Number); !ok {
@@ -814,7 +815,7 @@ func matchFn(env *env.Environment, args []primitive.Primitive) primitive.Primiti
 
 	// We need two arguments
 	if len(args) != 2 {
-		return primitive.Error("invalid argument count")
+		return primitive.ArityError()
 	}
 
 	// First argument is a string (which is a regexp)
@@ -869,7 +870,7 @@ func minusFn(env *env.Environment, args []primitive.Primitive) primitive.Primiti
 
 	// ensure we have at least one argument
 	if len(args) < 1 {
-		return primitive.Error("invalid argument count")
+		return primitive.ArityError()
 	}
 
 	// the first argument must be a number.
@@ -895,7 +896,7 @@ func minusFn(env *env.Environment, args []primitive.Primitive) primitive.Primiti
 // modFn implements "%"
 func modFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 	if len(args) != 2 {
-		return primitive.Error("wrong number of arguments")
+		return primitive.ArityError()
 	}
 	if _, ok := args[0].(primitive.Number); !ok {
 		return primitive.Error("argument not a number")
@@ -921,7 +922,7 @@ func msFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive 
 func multiplyFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 	// ensure we have at least one argument
 	if len(args) < 1 {
-		return primitive.Error("invalid argument count")
+		return primitive.ArityError()
 	}
 
 	// the first argument must be a number.
@@ -947,7 +948,7 @@ func multiplyFn(env *env.Environment, args []primitive.Primitive) primitive.Prim
 // nilFn implements nil?
 func nilFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 	if len(args) != 1 {
-		return primitive.Error("wrong number of arguments")
+		return primitive.ArityError()
 	}
 
 	// nil is nil (yeah, really)
@@ -972,7 +973,7 @@ func nowFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive
 func ordFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 
 	if len(args) != 1 {
-		return primitive.Error("wrong number of arguments")
+		return primitive.ArityError()
 	}
 
 	if _, ok := args[0].(primitive.String); !ok {
@@ -1000,7 +1001,7 @@ func plusFn(env *env.Environment, args []primitive.Primitive) primitive.Primitiv
 
 	// ensure we have at least one argument
 	if len(args) < 1 {
-		return primitive.Error("invalid argument count")
+		return primitive.ArityError()
 	}
 
 	// the first argument must be a number.
@@ -1027,7 +1028,7 @@ func plusFn(env *env.Environment, args []primitive.Primitive) primitive.Primitiv
 func printFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 	// no args
 	if len(args) < 1 {
-		return primitive.Error("wrong number of arguments")
+		return primitive.ArityError()
 	}
 
 	// one arg
@@ -1059,7 +1060,7 @@ func printFn(env *env.Environment, args []primitive.Primitive) primitive.Primiti
 // randomFn implements (random).
 func randomFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 	if len(args) != 1 {
-		return primitive.Error("wrong number of arguments")
+		return primitive.ArityError()
 	}
 
 	// ensure we received a number
@@ -1078,7 +1079,7 @@ func setFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive
 
 	// We need three arguments
 	if len(args) != 3 {
-		return primitive.Error("invalid argument count")
+		return primitive.ArityError()
 	}
 
 	// First is a Hash
@@ -1096,7 +1097,7 @@ func shellFn(env *env.Environment, args []primitive.Primitive) primitive.Primiti
 
 	// We need one argument
 	if len(args) != 1 {
-		return primitive.Error("wrong number of arguments")
+		return primitive.ArityError()
 	}
 
 	// The argument must be a list
@@ -1138,7 +1139,7 @@ func shellFn(env *env.Environment, args []primitive.Primitive) primitive.Primiti
 func sortFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 	// If we have only a single argument
 	if len(args) != 1 {
-		return primitive.Error("invalid argument count")
+		return primitive.ArityError()
 	}
 
 	// Which is a list
@@ -1182,7 +1183,7 @@ func splitFn(env *env.Environment, args []primitive.Primitive) primitive.Primiti
 
 	// We require two arguments
 	if len(args) != 2 {
-		return primitive.Error("invalid argument count")
+		return primitive.ArityError()
 	}
 
 	// Both arguments must be strings
@@ -1210,7 +1211,7 @@ func sprintfFn(env *env.Environment, args []primitive.Primitive) primitive.Primi
 
 	// we need 2+ arguments
 	if len(args) < 2 {
-		return primitive.Error("wrong number of arguments")
+		return primitive.ArityError()
 	}
 
 	// OK format-string
@@ -1231,7 +1232,7 @@ func sprintfFn(env *env.Environment, args []primitive.Primitive) primitive.Primi
 // strFn implements "str"
 func strFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 	if len(args) != 1 {
-		return primitive.Error("wrong number of arguments")
+		return primitive.ArityError()
 	}
 	return primitive.String(args[0].ToString())
 }
@@ -1256,7 +1257,7 @@ func timeFn(env *env.Environment, args []primitive.Primitive) primitive.Primitiv
 // typeFn implements "type"
 func typeFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 	if len(args) != 1 {
-		return primitive.Error("wrong number of arguments")
+		return primitive.ArityError()
 	}
 	return primitive.String(args[0].Type())
 }
@@ -1266,7 +1267,7 @@ func valsFn(env *env.Environment, args []primitive.Primitive) primitive.Primitiv
 
 	// We need a single argument
 	if len(args) != 1 {
-		return primitive.Error("invalid argument count")
+		return primitive.ArityError()
 	}
 
 	// First is a Hash

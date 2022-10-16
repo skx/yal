@@ -12,3 +12,9 @@ func (e Error) ToString() string {
 func (e Error) Type() string {
 	return "error"
 }
+
+// ArityError is the error raised when a function, or special form,
+// is invoked with the wrong number of arguments.
+func ArityError() Error {
+	return Error("ArityError - Unexpected argument count")
+}

@@ -216,33 +216,33 @@ a
 		// errors
 		{"(invalid)", "ERROR{argument 'invalid' not a function}"},
 		{"(set! 3 4)", "ERROR{tried to set a non-symbol 3}"},
-		{"(eval 'foo 'bar)", "ERROR{Expected only a single argument}"},
+		{"(eval 'foo 'bar)", primitive.ArityError().ToString()},
 		{"(eval 3)", "ERROR{unexpected type for eval %!V(primitive.Number=3).}"},
 		{"(let 3)", "ERROR{argument is not a list, got 3}"},
 		{"(let ((0 0)) )", "ERROR{binding name is not a symbol, got 0}"},
-		{"(let ((0 )) )", "ERROR{arity-error: binding list had missing arguments}"},
+		{"(let ((0 )) )", primitive.ArityError().ToString()},
 		{"(let (3 3) )", "ERROR{binding value is not a list, got 3}"},
 
-		{"(let*)", "ERROR{arity-error: not enough arguments for (let* ..)}"},
+		{"(let*)", primitive.ArityError().ToString()},
 		{"(let* 32)", "ERROR{argument is not a list, got 32}"},
 		{"(let* (a 3 b))", "ERROR{list for (len*) must have even length, got [a 3 b]}"},
 		{"(let* (a 3 3 b))", "ERROR{binding name is not a symbol, got 3}"},
 
-		{"(error )", "ERROR{wrong number of arguments}"},
-		{"(quote )", "ERROR{arity-error: not enough arguments for (quote}"},
-		{"(quasiquote )", "ERROR{arity-error: not enough arguments for (quasiquote}"},
-		{"(macroexpand )", "ERROR{arity-error: not enough arguments for (macroexpand}"},
-		{"(if )", "ERROR{arity-error: not enough arguments for (if ..)}"},
+		{"(error )", primitive.ArityError().ToString()},
+		{"(quote )", primitive.ArityError().ToString()},
+		{"(quasiquote )", primitive.ArityError().ToString()},
+		{"(macroexpand )", primitive.ArityError().ToString()},
+		{"(if )", primitive.ArityError().ToString()},
 		{"(if (/ 1 0) #t #f)", "ERROR{attempted division by zero}"},
-		{"(define )", "ERROR{arity-error: not enough arguments for (define ..)}"},
+		{"(define )", primitive.ArityError().ToString()},
 		{"(define \"steve\" 3)}", "ERROR{Expected a symbol, got steve}"},
-		{"(lambda )}", "ERROR{wrong number of arguments}"},
+		{"(lambda )}", primitive.ArityError().ToString()},
 		{"(lambda 3 4)}", "ERROR{expected a list for arguments, got 3}"},
 		{"(define sq (lambda (x) (* x x))) (sq)", "ERROR{arity-error - function 'sq' requires 1 argument(s), 0 provided}"},
 		{"(print (/ 3 0))", "ERROR{error expanding argument [/ 3 0] for call to (print ..): ERROR{attempted division by zero}}"},
 		{"(lambda (x 3) (nil))}", "ERROR{expected a symbol for an argument, got 3}"},
-		{"(set! )", "ERROR{arity-error: not enough arguments for (set! ..)}"},
-		{"(let )", "ERROR{arity-error: not enough arguments for (let ..)}"},
+		{"(set! )", primitive.ArityError().ToString()},
+		{"(let )", primitive.ArityError().ToString()},
 		{`
 (define fizz (lambda (n:number)
   (cond
@@ -253,11 +253,11 @@ a
 `, "ERROR{attempted division by zero}"},
 		{"(error \"CAKE-FAIL\")", "ERROR{CAKE-FAIL}"},
 
-		{"(defmacro!)", "ERROR{arity-error: not enough arguments for (defmacro! ..)}"},
+		{"(defmacro!)", primitive.ArityError().ToString()},
 		{"(defmacro! 1 2)", "ERROR{Expected a symbol, got 1}"},
 		{"(defmacro! foo 2)", "ERROR{expected a function body for (defmacro..), got 2}"},
 
-		{"(read foo bar)", "ERROR{Expected only a single argument}"},
+		{"(read foo bar)", primitive.ArityError().ToString()},
 		{"(read \")\")", "ERROR{failed to read ):unexpected ')'}"},
 		{"(read \"}\")", "ERROR{failed to read }:unexpected '}'}"},
 		{"'", "nil"},
@@ -271,10 +271,10 @@ a
 		{"{ :age 333  ", "nil"},
 		{"}}}}}}", "nil"},
 
-		{"(alias foo)", "ERROR{Expected two arguments}"},
+		{"(alias foo)", primitive.ArityError().ToString()},
 
 		// try / catch
-		{"(try 3)", "ERROR{arity-error: not enough arguments for (try ..)}"},
+		{"(try 3)", primitive.ArityError().ToString()},
 		{"(try 3 3)", "ERROR{expected a list for argument, got 3}"},
 		{"(try (/ 1 0) 3)", "ERROR{expected a list for argument, got 3}"},
 		{"(try (/ 1 0) (/ 1 0) (/ 3 9))", "ERROR{catch list should begin with 'catch', got [/ 1 0]}"},
