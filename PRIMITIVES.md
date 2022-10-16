@@ -103,3 +103,12 @@ If multiple types are permitted then just keep appending things, for example:
 
 * `(set! blah (fn* (a:list:number)  (print "I was given a list OR a number: %s" a)))`
   * Allows either a list, or a number.
+
+
+
+## See Also
+
+* [README.md](README.md)
+  * More details of the project.
+* [INTRODUCTION.md](INTRODUCTION.md)
+  * Getting started setting variables, defining functions, etc.

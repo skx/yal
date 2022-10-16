@@ -41,15 +41,17 @@ If you don't have the repository installed, but you have a working golang enviro
 $ go install github.com/skx/yal@latest
 ```
 
+Finally if neither of those options suit, you may download the most recent binary from our [release page](https://github.com/skx/yal/releases).
+
 
 
 ## Usage
 
-Once you've built, and optinall installed, the CLI driver there are two ways to execute code:
+Once installed there are two ways to execute code:
 
-* By specifying sexpressions on the command-line.
+* By specifying an expressions on the command-line:
   * `yal -e "(print (os))"`
-* By passing the name of a file to read and execute.
+* By passing the name of a file containing lisp code to read and execute:
   * `yal test.lisp`
 
 As our interpreter allows documentation to be attached to functions, both those implemented in golang and those written in lisp, we also have a flag to dump that information:
@@ -108,15 +110,15 @@ $ yal fibonacci.lisp
 
 ## Fuzz Testing
 
-The project has 100% test-coverage of all the internal packages, using the standard facilities you can run those test-cases:
+The project has 100% test-coverage of all the internal packages, using the standard go facilities you can run those test-cases:
 
 ```sh
 go test ./...
 ```
 
-In addition to that there is support for the integrated fuzz-testing which is available with go 1.18+, which essentially feeds the interpreter random input and hopes to discover crashes.
+In addition to the static-tests there is also support for the integrated fuzz-testing facility which became available with go 1.18+.  Fuzz-testing essentially feeds the interpreter random input and hopes to discover crashes.
 
-You can launch the fuzz-testing like so:
+You can launch a series of fuzz-tests like so:
 
 ```sh
 go test -fuzztime=300s -parallel=1 -fuzz=FuzzYAL -v
@@ -141,23 +143,15 @@ If you find a crash then it is either a bug which needs to be fixed, or a false-
 
 ## Benchmark
 
-There is a simple benchmark included within this repository, computing the factorial of 100, to run this execute:
+There is a simple benchmark included within this repository, computing the factorial of 100, to run this execute execute:
 
 ```sh
 $ go test -run=Bench -bench=.
-goos: linux
-goarch: amd64
-pkg: github.com/skx/yal
-cpu: AMD A10-6800K APU with Radeon(tm) HD Graphics
-BenchmarkGoFactorial-4    	 4752786	       248.1 ns/op
-BenchmarkYALFactorial-4   	    1250	    908525 ns/op
-PASS
-ok  	github.com/skx/yal	2.679s
 ```
 
-For longer runs add `-benchtime=30s`, or similar, to the command-line.
+To run the benchmark for longer add `-benchtime=30s`, or similar, to the command-line.
 
-Here you see that the lisp version is approximately 3000% slower than the pure golang implementation.  I put together a small comparison of toy scripting languages available here:
+I also put together a small comparison of toy scripting languages available here:
 
 * [Toy Language Benchmarks](https://github.com/skx/toy-language-benchmarks)
 
@@ -169,7 +163,7 @@ This shows that the Lisp implementation isn't so slow, although it is not the fa
 ## References
 
 * https://github.com/thesephist/klisp/blob/main/lib/klisp.klisp
-  * Very helpful "inspiration" for writing primitives in Lisp.
+  * Very helpful _inspiration_ for writing primitives in Lisp.
 * https://github.com/kanaka/mal/
   * Make A Lisp, very helpful for the quoting, unquoting, and macro magic.
 * https://lispcookbook.github.io/cl-cookbook/macros.html
