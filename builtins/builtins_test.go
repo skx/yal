@@ -10,7 +10,9 @@ import (
 	"time"
 
 	"github.com/skx/yal/env"
+	"github.com/skx/yal/eval"
 	"github.com/skx/yal/primitive"
+	"github.com/skx/yal/stdlib"
 )
 
 // ENV contains a local environment for the test functions
@@ -969,6 +971,59 @@ func TestFile(t *testing.T) {
 
 }
 
+// TestFileLines tests file:lines
+func TestFileLines(t *testing.T) {
+
+	// calling with no argument
+	out := fileLinesFn(ENV, []primitive.Primitive{})
+
+	// Will lead to an error
+	_, ok := out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+
+	// calling with the wrong argument type.
+	out = fileLinesFn(ENV, []primitive.Primitive{
+		primitive.Number(3)})
+
+	// Will lead to an error
+	_, ok = out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+
+	// Call with a file that doesn't exist
+	out = fileLinesFn(ENV, []primitive.Primitive{
+		primitive.String("path/not/found")})
+
+	_, ok = out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+
+	// Create a temporary file, and read the contents
+	tmp, _ := os.CreateTemp("", "yal")
+	err := os.WriteFile(tmp.Name(), []byte("I like cake\nAnd pie."), 0777)
+	if err != nil {
+		t.Fatalf("failed to write to file")
+	}
+	defer os.Remove(tmp.Name())
+
+	str := fileLinesFn(ENV, []primitive.Primitive{
+		primitive.String(tmp.Name())})
+
+	// Will lead to a list
+	lst, ok2 := str.(primitive.List)
+	if !ok2 {
+		t.Fatalf("expected list, got %v", out)
+	}
+
+	if len(lst) != 2 {
+		t.Fatalf("re-reading the temporary file gave bogus contents")
+	}
+}
+
 // TestFileRead tests file:read
 func TestFileRead(t *testing.T) {
 
@@ -977,6 +1032,15 @@ func TestFileRead(t *testing.T) {
 
 	// Will lead to an error
 	_, ok := out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+
+	// Call with the wrong type
+	out = fileReadFn(ENV, []primitive.Primitive{
+		primitive.Number(3)})
+
+	_, ok = out.(primitive.Error)
 	if !ok {
 		t.Fatalf("expected error, got %v", out)
 	}
@@ -1001,7 +1065,7 @@ func TestFileRead(t *testing.T) {
 	str := fileReadFn(ENV, []primitive.Primitive{
 		primitive.String(tmp.Name())})
 
-	// Will lead to an error
+	// Will lead to a string
 	txt, ok2 := str.(primitive.String)
 	if !ok2 {
 		t.Fatalf("expected string, got %v", out)
@@ -1229,7 +1293,16 @@ func TestHelp(t *testing.T) {
 	env := env.New()
 	PopulateEnvironment(env)
 
-	for _, name := range []string{"print", "sprintf"} {
+	for _, name := range []string{"print", "sprintf", "length"} {
+
+		// Load our standard library
+		st := stdlib.Contents()
+		std := string(st)
+
+		// Create a new interpreter
+		l := eval.New(std + "\n")
+
+		l.Evaluate(env)
 
 		fn, ok := env.Get(name)
 		if !ok {
@@ -1242,7 +1315,7 @@ func TestHelp(t *testing.T) {
 		if !ok2 {
 			t.Fatalf("expected a string, got %v", result)
 		}
-		if !strings.Contains(txt.ToString(), "print") {
+		if !strings.Contains(txt.ToString(), name) {
 			t.Fatalf("got help text, but didn't find expected content: %v", result)
 		}
 	}
