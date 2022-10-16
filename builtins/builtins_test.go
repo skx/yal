@@ -969,6 +969,49 @@ func TestFile(t *testing.T) {
 
 }
 
+// TestFileRead tests file:read
+func TestFileRead(t *testing.T) {
+
+	// calling with no argument
+	out := fileReadFn(ENV, []primitive.Primitive{})
+
+	// Will lead to an error
+	_, ok := out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+
+	// Call with a file that doesn't exist
+	out = fileReadFn(ENV, []primitive.Primitive{
+		primitive.String("path/not/found")})
+
+	_, ok = out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+
+	// Create a temporary file, and read the contents
+	tmp, _ := os.CreateTemp("", "yal")
+	err := os.WriteFile(tmp.Name(), []byte("I like cake"), 0777)
+	if err != nil {
+		t.Fatalf("failed to write to file")
+	}
+	defer os.Remove(tmp.Name())
+
+	str := fileReadFn(ENV, []primitive.Primitive{
+		primitive.String(tmp.Name())})
+
+	// Will lead to an error
+	txt, ok2 := str.(primitive.String)
+	if !ok2 {
+		t.Fatalf("expected string, got %v", out)
+	}
+
+	if txt.ToString() != "I like cake" {
+		t.Fatalf("re-reading the temporary file gave bogus contents")
+	}
+}
+
 // TestGenSym tests gensym
 func TestGenSym(t *testing.T) {
 
@@ -2085,50 +2128,6 @@ func TestShell(t *testing.T) {
 	if !strings.Contains(e.ToString(), "not a list") {
 		t.Fatalf("got error, but wrong one %v", out)
 	}
-}
-
-// TestSlurp tests slurp
-func TestSlurp(t *testing.T) {
-
-	// calling with no argument
-	out := slurpFn(ENV, []primitive.Primitive{})
-
-	// Will lead to an error
-	_, ok := out.(primitive.Error)
-	if !ok {
-		t.Fatalf("expected error, got %v", out)
-	}
-
-	// Call with a file that doesn't exist
-	out = slurpFn(ENV, []primitive.Primitive{
-		primitive.String("path/not/found")})
-
-	_, ok = out.(primitive.Error)
-	if !ok {
-		t.Fatalf("expected error, got %v", out)
-	}
-
-	// Create a temporary file, and read the contents
-	tmp, _ := os.CreateTemp("", "yal")
-	err := os.WriteFile(tmp.Name(), []byte("I like cake"), 0777)
-	if err != nil {
-		t.Fatalf("failed to write to file")
-	}
-	defer os.Remove(tmp.Name())
-
-	str := slurpFn(ENV, []primitive.Primitive{
-		primitive.String(tmp.Name())})
-
-	// Will lead to an error
-	txt, ok2 := str.(primitive.String)
-	if !ok2 {
-		t.Fatalf("expected string, got %v", out)
-	}
-
-	if txt.ToString() != "I like cake" {
-		t.Fatalf("re-reading the temporary file gave bogus contents")
-	}
-
 }
 
 func TestSort(t *testing.T) {

@@ -76,6 +76,20 @@ More specifically something is regarded as a file if it is NOT a directory.
 See also: directory? exists?
 Example: (print (file? "/dev/null"))
 %%
+file:lines
+
+file:lines returns the contents of the given file, as a list of lines
+
+See also: file:read
+%%
+file:read
+
+file:read returns the contents of the given file, as a string.
+
+See also: file:lines
+%%
+
+
 file:stat
 
 file:stat returns a list containing details of the given file/directory,
