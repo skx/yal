@@ -273,34 +273,6 @@ func dateFn(env *env.Environment, args []primitive.Primitive) primitive.Primitiv
 	return ret
 }
 
-// directoryFn returns whether the given path exists, and is a directory
-func directoryFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
-
-	// We only need a single argument
-	if len(args) != 1 {
-		return primitive.Error("invalid argument count")
-	}
-
-	// Which is a string
-	str, ok := args[0].(primitive.String)
-	if !ok {
-		return primitive.Error("argument not a string")
-	}
-
-	// Stat the entry
-	info, err := os.Stat(str.ToString())
-
-	// No error and isDir then true?  Otherwise false
-	//
-	// i.e. swallow errors
-	if err == nil {
-		if info.IsDir() {
-			return primitive.Bool(true)
-		}
-	}
-	return primitive.Bool(false)
-}
-
 // directoryEntriesFn returns the files beneath given path, recursively.
 func directoryEntriesFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 
@@ -328,6 +300,34 @@ func directoryEntriesFn(env *env.Environment, args []primitive.Primitive) primit
 	})
 
 	return res
+}
+
+// directoryFn returns whether the given path exists, and is a directory
+func directoryFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+
+	// We only need a single argument
+	if len(args) != 1 {
+		return primitive.Error("invalid argument count")
+	}
+
+	// Which is a string
+	str, ok := args[0].(primitive.String)
+	if !ok {
+		return primitive.Error("argument not a string")
+	}
+
+	// Stat the entry
+	info, err := os.Stat(str.ToString())
+
+	// No error and isDir then true?  Otherwise false
+	//
+	// i.e. swallow errors
+	if err == nil {
+		if info.IsDir() {
+			return primitive.Bool(true)
+		}
+	}
+	return primitive.Bool(false)
 }
 
 // divideFn implements "/"
