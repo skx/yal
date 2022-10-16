@@ -500,6 +500,24 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 			// first token/symbol
 			switch listExp[0] {
 
+			// (alias ..)
+			case primitive.Symbol("alias"):
+				if len(listExp) != 3 {
+					return primitive.Error("Expected two arguments")
+				}
+
+				// Name we'll use
+				name := listExp[1]
+
+				// Existing function.
+				val := listExp[2]
+
+				old, ok := e.Get(val.ToString())
+				if ok {
+					e.Set(name.ToString(), old)
+				}
+				return primitive.Nil{}
+
 			// (do ..)
 			case primitive.Symbol("do"):
 				var ret primitive.Primitive

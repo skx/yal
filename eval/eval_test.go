@@ -194,6 +194,10 @@ a
 		{`(split "steve" "")`, `(s t e v e)`},
 		{`(join (list "s" "t" "e" "v" "e"))`, `steve`},
 
+		// alias
+		{`(alias explode split) (explode "steve" "")`, `(s t e v e)`},
+		{`(alias ** #) (** 3 3)`, `27`},
+
 		// comparison
 		{"(< 1 3)", "#t"},
 		{"(< 10 3)", "#f"},
@@ -203,7 +207,7 @@ a
 		{"(= 10 10)", "#t"},
 		{"(= -1 -1)", "#t"},
 
-		// we have a LOT of built ins, but not 100
+		// we have a LOT of built ins, but not 200
 		{"(> (length (env))  10)", "#t"},
 		{"(> (length (env))  50)", "#t"},
 		{"(< (length (env)) 200)", "#t"},
@@ -265,6 +269,8 @@ a
 		{"{ :name { ", "nil"},
 		{"{ :age 333  ", "nil"},
 		{"}}}}}}", "nil"},
+
+		{"(alias foo)", "ERROR{Expected two arguments}"},
 
 		// try / catch
 		{"(try 3)", "ERROR{arity-error: not enough arguments for (try ..)}"},
