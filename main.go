@@ -12,6 +12,7 @@ import (
 	"fmt"
 	"math/rand"
 	"os"
+	"regexp"
 	"sort"
 	"strings"
 	"time"
@@ -47,7 +48,7 @@ func main() {
 	}
 
 	// If we have a file, then read the content
-	if len(flag.Args()) > 0 {
+	if len(flag.Args()) > 0 && !*hlp {
 		content, err := os.ReadFile(flag.Args()[0])
 		if err != nil {
 			fmt.Printf("Error reading %s:%s\n", os.Args[1], err)
@@ -79,6 +80,9 @@ func main() {
 
 	// Show the help?
 	if *hlp {
+
+		// Are we just showing a specific thing?
+		show := flag.Args()
 
 		// Read the standard library
 		pre := stdlib.Contents()
@@ -114,28 +118,53 @@ func main() {
 			// Is it a procedure?
 			prc, ok := val.(*primitive.Procedure)
 
-			// Does it have help too?
-			if ok && len(prc.Help) > 0 {
+			// If it isn't a procedure skip it
+			if !ok {
+				continue
+			}
 
-				txt := prc.Help
+			// No help? skip it
+			if len(prc.Help) == 0 {
+				continue
+			}
 
-				// Show the arguments for functions,
-				// if these are not builtin.
-				args := ""
+			// Get the text
+			txt := prc.Help
 
-				if len(prc.Args) > 0 {
+			// Build up the arguments
+			args := ""
 
-					for _, arg := range prc.Args {
-						args += " " + arg.ToString()
-					}
-					args = strings.TrimSpace(args)
-					args = " (" + args + ")"
+			if len(prc.Args) > 0 {
+
+				for _, arg := range prc.Args {
+					args += " " + arg.ToString()
+				}
+				args = strings.TrimSpace(args)
+				args = " (" + args + ")"
+			}
+
+			entry := key + args + "\n"
+			entry += strings.Repeat("=", len(key+args)) + "\n"
+			entry += txt + "\n\n\n"
+
+			// Are we going to show this?
+			match := false
+			for _, x := range show {
+
+				r, er := regexp.Compile(x)
+				if er != nil {
+					fmt.Printf("Error compiling regexp %s:%s", show, er)
+					return
 				}
 
-				// Name
-				fmt.Printf("%s%s\n", key, args)
-				fmt.Printf("%s\n", strings.Repeat("=", len(key+args)))
-				fmt.Printf("%s\n\n\n\n", txt)
+				res := r.FindStringSubmatch(entry)
+				if len(res) > 0 {
+					match = true
+				}
+			}
+
+			if (len(show) == 0) || match {
+				fmt.Printf("%s", entry)
 			}
 
 		}
