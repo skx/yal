@@ -54,7 +54,9 @@
 ;;  (when (= 1 1) (print "OK") (print "Still OK") (print "final statement"))
 ;;
 (defmacro! when (fn* (pred &rest)
-                     "when is a macro which runs the specified body, providing the specified predicate is true.    It is similar to an if-statement, however there is no provision for an 'else' clause, and the body specified may contain more than once expression to be evaluated."
+                     "when is a macro which runs the specified body, providing the specified predicate is true.
+
+It is similar to an if-statement, however there is no provision for an 'else' clause, and the body specified may contain more than once expression to be evaluated."
                      `(if ~pred (do ~@rest))))
 
 ;;

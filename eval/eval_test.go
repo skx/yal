@@ -238,7 +238,7 @@ a
 		{"(define \"steve\" 3)}", "ERROR{Expected a symbol, got steve}"},
 		{"(lambda )}", primitive.ArityError().ToString()},
 		{"(lambda 3 4)}", "ERROR{expected a list for arguments, got 3}"},
-		{"(define sq (lambda (x) (* x x))) (sq)", "ERROR{arity-error - function 'sq' requires 1 argument(s), 0 provided}"},
+		{"(define sq (lambda (x) (* x x))) (sq)", primitive.ArityError().ToString()},
 		{"(print (/ 3 0))", "ERROR{error expanding argument [/ 3 0] for call to (print ..): ERROR{attempted division by zero}}"},
 		{"(lambda (x 3) (nil))}", "ERROR{expected a symbol for an argument, got 3}"},
 		{"(set! )", primitive.ArityError().ToString()},
@@ -434,9 +434,6 @@ func TestStdlibHelp(t *testing.T) {
 
 		if !ok {
 			t.Skip("ignoring non-procedure entry in environment " + name)
-		}
-		if len(name) == 1 {
-			t.Skip("ignoring procedure with a single-character name " + name)
 		}
 
 		t.Run(name, func(t *testing.T) {

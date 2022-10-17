@@ -25,17 +25,17 @@ import (
 
 func main() {
 
-	// (gensym) needs a decent random seed
+	// (gensym) needs a decent random seed, as does (random).
 	rand.Seed(time.Now().UnixNano())
 
-	// Look to see if we're gonna execute a statement
+	// Look to see if we're gonna execute a statement, or dump our help.
 	exp := flag.String("e", "", "A string to evaluate.")
 	hlp := flag.Bool("h", false, "Should we show help information, and exit?")
 	flag.Parse()
 
-	// Ensure we have an argument
+	// Ensure we have an argument, if we don't have flags.
 	if len(flag.Args()) < 1 && (*exp == "") && !*hlp {
-		fmt.Printf("Usage: yal [-e expr] file.lisp\n")
+		fmt.Printf("Usage: yal [-e expr] [-h] file.lisp\n")
 		return
 	}
 
@@ -86,13 +86,17 @@ func main() {
 		// Create a new interpreter with that source
 		interpreter := eval.New(string(pre))
 
-		// Now evaluate the library, so we get the help for the
-		// built-in functions
+		// Now evaluate the library, so that all our core
+		// functions are defined.
+		//
+		// We can only get help for functions which are present.
 		interpreter.Evaluate(environment)
 
 		// Build up a list of all things known in the environment
 		keys := []string{}
 
+		// Save the known "things", because we want show them
+		// in sorted-order.
 		items := environment.Items()
 		for k := range items {
 			keys = append(keys, k)
@@ -101,16 +105,36 @@ func main() {
 		// sort the items
 		sort.Strings(keys)
 
+		// Now we have a list of sorted things.
 		for _, key := range keys {
 
+			// get the item.
 			val, _ := environment.Get(key)
 
+			// Is it a procedure?
 			prc, ok := val.(*primitive.Procedure)
+
+			// Does it have help too?
 			if ok && len(prc.Help) > 0 {
+
 				txt := prc.Help
 
-				fmt.Printf("%s\n", key)
-				fmt.Printf("%s\n", strings.Repeat("=", len(key)))
+				// Show the arguments for functions,
+				// if these are not builtin.
+				args := ""
+
+				if len(prc.Args) > 0 {
+
+					for _, arg := range prc.Args {
+						args += " " + arg.ToString()
+					}
+					args = strings.TrimSpace(args)
+					args = " (" + args + ")"
+				}
+
+				// Name
+				fmt.Printf("%s%s\n", key, args)
+				fmt.Printf("%s\n", strings.Repeat("=", len(key+args)))
 				fmt.Printf("%s\n\n\n\n", txt)
 			}
 

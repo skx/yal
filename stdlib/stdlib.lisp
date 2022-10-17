@@ -57,14 +57,14 @@
 ;; >=
 ;;
 (set! >  (fn* (a b)
-              "Return true if the first value is greater than the second."
+              "Return true if a is greater than b."
               (< b a)))
 
 (set! >= (fn* (a b)
-              "Return true if the first value is greater than, or equal to the second."
+              "Return true if a is greater than, or equal to b."
               (! (< a b))))
 (set! <= (fn* (a b)
-              "Return true if the first value is less than, or equal to, the second."
+              "Return true if a is less than, or equal to, b."
               (! (> a b))))
 
 ;; We have a built in function "date" to return the current date
@@ -114,7 +114,9 @@
 (alias second time:second)
 
 (set! zero-pad-single-number (fn* (num)
-                                  "Prefix the given number with zero, if the number is less than ten"
+                                  "Prefix the given number with zero, if the number is less than ten.
+
+This is designed to pad the hours, minutes, and seconds in (hms)."
                                   (if (< num 10)
                                       (sprintf "0%s" num)
                                     num)))
@@ -163,7 +165,7 @@
 
 ;; every is useful and almost a logical operation
 (set! every (fn* (xs:list fun:function)
-                 "Return true if applying every element of the list through the specified function resulted in a true result"
+                 "Return true if applying every element of the list through the specified function resulted in a true result."
                  (let* (res (map xs fun))
                    (if (and res)
                        true
@@ -172,7 +174,7 @@
 
 ;; Useful for creating a list of numbers
 (set! repeated (fn* (n:number x)
-                  "Return a list of length n whose elements are all x"
+                    "Return a list of length n whose elements are all x."
                   (when (pos? n)
                     (cons x (repeated (dec n) x)))))
 
@@ -187,7 +189,7 @@
 
 ;; Not is useful
 (set! ! (fn* (x)
-             "Return the inverse/NOT of the given boolean value"
+             "Return the inverse of the given boolean value."
              (if x #f #t)))
 
 (alias not !)
@@ -258,7 +260,7 @@
 
 ;; Create sequences from 0/1 to N
 (set! seq (fn* (n:number)
-               "Create, and return, list of number ranging from 0-N"
+               "Create, and return, list of number ranging from 0-N."
                (range 0 n 1)))
 (set! nat (fn* (n:number)
                "Create, and return, a list of numbers ranging from 1 to N."
@@ -279,7 +281,7 @@
 
 ;; reduce function
 (set! reduce (fn* (xs f acc)
-                  "Reduce"
+                  "This is our reduce function, which uses a list, a function, and the accumulator."
                   (if (nil? xs)
                       acc
                       (reduce (cdr xs) f (f acc (car xs))))))
@@ -306,7 +308,7 @@
 
 ; O(n^2) behavior with linked lists
 (set! append (fn* (xs:list el)
-                  "Append the given element to the specified list"
+                  "Append the given element to the specified list."
                   (if (nil? xs)
                       (list el)
                       (cons (car xs) (append (cdr xs) el)))))
@@ -385,7 +387,9 @@
 
 ;; Translate the elements of the string using the specified hash
 (set! translate (fn* (x:string hsh:hash)
-                     "Translate each character in the given string, via the means of the supplied lookup-table.  This is used by 'upper' and 'lower'."
+                     "Translate each character in the given string, via the means of the supplied lookup-table.
+
+This is used by both 'upper' and 'lower'."
                      (let* (chrs (split x ""))
                        (join (map chrs (lambda (x)
                                          (if (get hsh x)
