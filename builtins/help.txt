@@ -1,3 +1,19 @@
++
+Adds all arguments present to the first number.
+%%
+-
+Subtracts all arguments present from the first number.
+%%
+*
+Multiplies all arguments present with the first number.
+%%
+/
+Divides all arguments present with the first number.
+%%
+<
+
+Return true if a is less than b.
+%%
 =
 returns true if supplied with two numerical values, of equal value.
 

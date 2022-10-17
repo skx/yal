@@ -93,11 +93,11 @@ func PopulateEnvironment(env *env.Environment) {
 	//
 	env.Set("#", &primitive.Procedure{F: expnFn})
 	env.Set("%", &primitive.Procedure{F: modFn})
-	env.Set("*", &primitive.Procedure{F: multiplyFn})
-	env.Set("+", &primitive.Procedure{F: plusFn})
-	env.Set("-", &primitive.Procedure{F: minusFn})
-	env.Set("/", &primitive.Procedure{F: divideFn})
-	env.Set("<", &primitive.Procedure{F: ltFn})
+	env.Set("*", &primitive.Procedure{F: multiplyFn, Help: helpMap["*"], Args: []primitive.Symbol{primitive.Symbol("N"), primitive.Symbol("arg1..argN")}})
+	env.Set("+", &primitive.Procedure{F: plusFn, Help: helpMap["+"], Args: []primitive.Symbol{primitive.Symbol("N"), primitive.Symbol("arg1..argN")}})
+	env.Set("-", &primitive.Procedure{F: minusFn, Help: helpMap["-"], Args: []primitive.Symbol{primitive.Symbol("N"), primitive.Symbol("arg1..argN")}})
+	env.Set("/", &primitive.Procedure{F: divideFn, Help: helpMap["-"], Args: []primitive.Symbol{primitive.Symbol("N"), primitive.Symbol("arg1..argN")}})
+	env.Set("<", &primitive.Procedure{F: ltFn, Help: helpMap["<"], Args: []primitive.Symbol{primitive.Symbol("a"), primitive.Symbol("b")}})
 
 	env.Set("=", &primitive.Procedure{F: equalsFn, Help: helpMap["="]})
 	env.Set("arch", &primitive.Procedure{F: archFn, Help: helpMap["arch"]})
