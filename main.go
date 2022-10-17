@@ -48,7 +48,7 @@ func main() {
 
 	// Ensure we have an argument, if we don't have flags.
 	if len(flag.Args()) < 1 && (*exp == "") && !*hlp {
-		fmt.Printf("Usage: yal [-e expr] [-h] file.lisp\n")
+		fmt.Printf("Usage: yal [-e expr] [-h] [-v] file.lisp\n")
 		return
 	}
 
