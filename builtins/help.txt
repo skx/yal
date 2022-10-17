@@ -16,6 +16,10 @@ Multiplies all arguments present with the first number.
 /
 Divides all arguments present with the first number.
 %%
+/=
+Numerical inequality testing.   If any argument is identical
+to any other argument return false.  Otherwise return true.
+%%
 <
 
 Return true if a is less than b.

@@ -1610,6 +1610,115 @@ func TestHelp(t *testing.T) {
 	}
 }
 
+// TestInequality tests /=
+func TestInequality(t *testing.T) {
+
+	// No arguments
+	out := inequalityFn(ENV, []primitive.Primitive{})
+
+	// Will lead to an error
+	e, ok := out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if e != primitive.ArityError() {
+		t.Fatalf("got error, but wrong one %v", out)
+	}
+
+	//
+	// Now a real one: unequal
+	//
+	out = inequalityFn(ENV, []primitive.Primitive{
+		primitive.Number(9),
+		primitive.Number(8),
+	})
+
+	// Will work
+	n, ok2 := out.(primitive.Bool)
+	if !ok2 {
+		t.Fatalf("expected bool, got %v", out)
+	}
+	if n != true {
+		t.Fatalf("got wrong result")
+	}
+
+	//
+	// Now a real one: unequal - but multiple values
+	//
+	out = inequalityFn(ENV, []primitive.Primitive{
+		primitive.Number(1),
+		primitive.Number(2),
+		primitive.Number(3),
+		primitive.Number(4),
+		primitive.Number(5),
+		primitive.Number(6),
+	})
+
+	// Will work
+	n, ok2 = out.(primitive.Bool)
+	if !ok2 {
+		t.Fatalf("expected bool, got %v", out)
+	}
+	if n != true {
+		t.Fatalf("got wrong result")
+	}
+
+	//
+	// Now a real one: unequal values
+	//
+	out = inequalityFn(ENV, []primitive.Primitive{
+		primitive.Number(1),
+		primitive.Number(2),
+		primitive.Number(2),
+		primitive.Number(1),
+	})
+
+	// Will work
+	n, ok2 = out.(primitive.Bool)
+	if !ok2 {
+		t.Fatalf("expected bool, got %v", out)
+	}
+	if n != false {
+		t.Fatalf("got wrong result")
+	}
+
+	//
+	// Now with wrong types - last one is wrong
+	//
+	out = inequalityFn(ENV, []primitive.Primitive{
+		primitive.Number(1),
+		primitive.Number(2),
+		primitive.Number(3),
+		primitive.Number(4),
+		primitive.String("5"),
+	})
+
+	e, ok = out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if !strings.Contains(string(e), "was not a number") {
+		t.Fatalf("got error, but wrong one '%v'", e)
+	}
+
+	//
+	// Now with wrong types
+	//
+	out = inequalityFn(ENV, []primitive.Primitive{
+		primitive.String("9"),
+		primitive.Number(9),
+	})
+
+	// Will report an error
+	e, ok = out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if !strings.Contains(string(e), "was not a number") {
+		t.Fatalf("got error, but wrong one %v", out)
+	}
+}
+
 // TestJoin tests join
 func TestJoin(t *testing.T) {
 

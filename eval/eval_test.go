@@ -187,7 +187,6 @@ a
 		//
 		{"(+ 3)", "3"},
 		{"(- 3)", "3"},
-		{"(/ 3)", "3"},
 		{"(* 3)", "3"},
 
 		// strings
@@ -358,12 +357,12 @@ func TestStandardLibrary(t *testing.T) {
 			output: "(1 4 9 16 25)"},
 
 		// range
-		{input: "(range -5 5 1)", output: "(-5 -4 -3 -2 -1 0 1 2 3 4)"},
-		{input: "(range 1 11 2)", output: "(1 3 5 7 9)"},
+		{input: "(range -5 5 1)", output: "(-5 -4 -3 -2 -1 0 1 2 3 4 5)"},
+		{input: "(range 1 11 2)", output: "(1 3 5 7 9 11)"},
 
 		// seq/nat
-		{input: "(seq 10)", output: "(0 1 2 3 4 5 6 7 8 9)"},
-		{input: "(nat 10)", output: "(1 2 3 4 5 6 7 8 9)"},
+		{input: "(seq 10)", output: "(0 1 2 3 4 5 6 7 8 9 10)"},
+		{input: "(nat 10)", output: "(1 2 3 4 5 6 7 8 9 10)"},
 
 		{input: "(join (reverse (split \"Steve\" \"\")))", output: "evetS"},
 	}
