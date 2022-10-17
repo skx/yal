@@ -697,7 +697,7 @@ func TestEnsureHelpPresent(t *testing.T) {
 	}
 }
 
-// TestEq tests "eq"
+// TestEq tests "eq" (non-numerical equality)
 func TestEq(t *testing.T) {
 
 	// No arguments
@@ -764,7 +764,7 @@ func TestEq(t *testing.T) {
 	}
 }
 
-// TestEquals tests "="
+// TestEquals tests "=" (numerical equality)
 func TestEquals(t *testing.T) {
 
 	// No arguments
@@ -797,9 +797,32 @@ func TestEquals(t *testing.T) {
 	}
 
 	//
+	// Now a real one: equal - but multiple values
+	//
+	out = equalsFn(ENV, []primitive.Primitive{
+		primitive.Number(9),
+		primitive.Number(9),
+		primitive.Number(9),
+		primitive.Number(9),
+		primitive.Number(9),
+		primitive.Number(9),
+	})
+
+	// Will work
+	n, ok2 = out.(primitive.Bool)
+	if !ok2 {
+		t.Fatalf("expected bool, got %v", out)
+	}
+	if n != true {
+		t.Fatalf("got wrong result")
+	}
+
+	//
 	// Now a real one: unequal values
 	//
 	out = equalsFn(ENV, []primitive.Primitive{
+		primitive.Number(99),
+		primitive.Number(9),
 		primitive.Number(99),
 		primitive.Number(9),
 	})
@@ -814,11 +837,14 @@ func TestEquals(t *testing.T) {
 	}
 
 	//
-	// Now with wrong types
+	// Now with wrong types - last one is wrong
 	//
 	out = equalsFn(ENV, []primitive.Primitive{
-		primitive.Number(9),
-		primitive.String("9"),
+		primitive.Number(1),
+		primitive.Number(2),
+		primitive.Number(3),
+		primitive.Number(4),
+		primitive.String("5"),
 	})
 
 	e, ok = out.(primitive.Error)
@@ -837,7 +863,7 @@ func TestEquals(t *testing.T) {
 		primitive.Number(9),
 	})
 
-	// Will work
+	// Will report an error
 	e, ok = out.(primitive.Error)
 	if !ok {
 		t.Fatalf("expected error, got %v", out)

@@ -71,10 +71,12 @@ Things you'll find here include:
   * Subtraction function.
 * `/`
   * Division function.
+  * Note that if only a single value is specified the reciprocal is returned - i.e. "(/ 3)" is equal to "1/3".
 * `<`
   * Less-than function.
 * `=`
   * Numerical comparison function.
+  * Note that multiple arguments are supported, not just two.
 * `arch`
   * Return the operating system architecture.
 * `car`

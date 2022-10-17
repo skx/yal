@@ -98,7 +98,7 @@ func PopulateEnvironment(env *env.Environment) {
 	env.Set("-", &primitive.Procedure{F: minusFn, Help: helpMap["-"], Args: []primitive.Symbol{primitive.Symbol("N"), primitive.Symbol("arg1..argN")}})
 	env.Set("/", &primitive.Procedure{F: divideFn, Help: helpMap["-"], Args: []primitive.Symbol{primitive.Symbol("N"), primitive.Symbol("arg1..argN")}})
 	env.Set("<", &primitive.Procedure{F: ltFn, Help: helpMap["<"], Args: []primitive.Symbol{primitive.Symbol("a"), primitive.Symbol("b")}})
-	env.Set("=", &primitive.Procedure{F: equalsFn, Help: helpMap["="], Args: []primitive.Symbol{primitive.Symbol("a"), primitive.Symbol("b")}})
+	env.Set("=", &primitive.Procedure{F: equalsFn, Help: helpMap["="], Args: []primitive.Symbol{primitive.Symbol("arg1"), primitive.Symbol("arg2 .. argN")}})
 	env.Set("arch", &primitive.Procedure{F: archFn, Help: helpMap["arch"]})
 	env.Set("car", &primitive.Procedure{F: carFn, Help: helpMap["car"], Args: []primitive.Symbol{primitive.Symbol("list")}})
 	env.Set("cdr", &primitive.Procedure{F: cdrFn, Help: helpMap["cdr"], Args: []primitive.Symbol{primitive.Symbol("list")}})
@@ -390,23 +390,45 @@ func eqFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive 
 
 // equalsFn implements "="
 func equalsFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
-	if len(args) != 2 {
+
+	// We need at least two arguments
+	if len(args) < 2 {
 		return primitive.ArityError()
 	}
 
-	a := args[0]
-	b := args[1]
+	// First argument must be a number.
+	nA, ok := args[0].(primitive.Number)
+	if !ok {
+		return primitive.Error("argument was not a number")
+	}
 
-	if a.Type() != "number" {
-		return primitive.Error("argument was not a number")
+	// Now we'll loop over all other numbers
+	//
+	// If we got something that was NOT the same as our
+	// initial number we can terminate early but we don't
+	// because it is important to also report on failures to
+	// validate types - which we can't do if we bail.
+	//
+	ret := primitive.Bool(true)
+
+	for _, i := range args[1:] {
+
+		// check we have a number
+		nB, ok2 := i.(primitive.Number)
+
+		if !ok2 {
+			return primitive.Error("argument was not a number")
+		}
+
+		// Record our failure, but keep testing in case
+		// we have a type violation to report in a later
+		// argument.
+		if nB != nA {
+			ret = primitive.Bool(false)
+		}
 	}
-	if b.Type() != "number" {
-		return primitive.Error("argument was not a number")
-	}
-	if a.(primitive.Number) == b.(primitive.Number) {
-		return primitive.Bool(true)
-	}
-	return primitive.Bool(false)
+
+	return ret
 }
 
 // errorFn implements "error"
