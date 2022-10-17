@@ -113,10 +113,19 @@
 (alias minute time:minute)
 (alias second time:second)
 
+(set! zero-pad-single-number (fn* (num)
+                                  "Prefix the given number with zero, if the number is less than ten"
+                                  (if (< num 10)
+                                      (sprintf "0%s" num)
+                                    num)))
+
 (set! time:hms (fn* ()
                "Return the current time, formatted as 'HH:MM:SS', as a string."
-               (sprintf "%s:%s:%s" (hour) (minute) (second))))
-(set! hms time:hms)
+               (sprintf "%s:%s:%s"
+                        (zero-pad-single-number (hour))
+                        (zero-pad-single-number (minute))
+                        (zero-pad-single-number (second)))))
+(alias hms time:hms)
 
 
 ;;
