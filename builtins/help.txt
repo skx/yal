@@ -1,3 +1,9 @@
+#
+calculate the exponent of a to the power of b.
+%%
+%
+calculate a modulus b.
+%%
 +
 Adds all arguments present to the first number.
 %%
@@ -15,7 +21,7 @@ Divides all arguments present with the first number.
 Return true if a is less than b.
 %%
 =
-returns true if supplied with two numerical values, of equal value.
+returns true if the numerical values a and b are equal.
 
 See also: eq
 Example : (print (= 3 a))
@@ -43,7 +49,7 @@ Example : (chr 42) ; => "*"
 %%
 cons
 
-cons adds the item to the start of the given list.
+cons adds a to the start of the list b, which might be empty.
 %%
 contains?
 
@@ -57,7 +63,7 @@ See also: (time)
 %%
 directory?
 
-directory? returns true if the specified path exists, and is a directory.
+Return true if the specified path exists, and is a directory.
 
 See also: exists? file?
 Example: (print (directory? "/etc"))
@@ -79,7 +85,7 @@ Example: (print (eq "bob" 2))
 %%
 error
 
-error raises an error with the specified argument as the explanation.
+error raises an error with the specified message as the detail.
 
 Example: (error "Expected foo to be bar!")
 %%
@@ -101,7 +107,7 @@ Example: (print (file? "/dev/null"))
 %%
 file:lines
 
-file:lines returns the contents of the given file, as a list of lines
+file:lines returns the contents of the given file, as a list of lines.
 
 See also: file:read
 %%
@@ -236,7 +242,7 @@ shell
 
 shell allows you to run a command, via the shell.
 
-The return value is a list of two entries - the first is STDOUT, the second is STDERR
+The return value is a list of two entries - the first is STDOUT, the second is STDERR.
 
 Example: (print (car (shell '("ls" "-l" "-a")))
 Example: (print (cdr (shell '("ls" "/this /path /does - not EXIST!"))))
