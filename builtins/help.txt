@@ -27,7 +27,7 @@ Example : (chr 42) ; => "*"
 %%
 cons
 
-cons joins the two specified lists: FIXME
+cons adds the item to the start of the given list.
 %%
 contains?
 
