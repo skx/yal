@@ -457,6 +457,23 @@ This is used by both 'upper' and 'lower'."
                              (nil? info) ""
                              true (nth info 4)))))
 
+(set! file:which (fn* (binary)
+                 "Return the complete path to the specified binary, found via the users' PATH setting.
+
+If the binary does not exist in a directory located upon the PATH nil will be returned.
+
+NOTE: This is a non-portable function!
+
+      1.  It assumes that the environmental variable PATH exists.
+      2.  It assumes $PATH can be split by ':'
+      3.  It assumes '/' works as a directory separator.
+"
+                 (let* (path (split (getenv "PATH") ":")
+                             res (filter path (lambda (dir) (exists? (join (list dir "/" binary))))))
+                   (if res
+                       (join (list (car res) "/" binary))))))
+
+
 ;; Define a legacy alias
 (alias slurp file:read)
 
