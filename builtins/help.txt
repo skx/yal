@@ -21,10 +21,14 @@ Divides all arguments present with the first number.
 Return true if a is less than b.
 %%
 =
-returns true if the numerical values a and b are equal.
+returns true if the numerical values supplied are all equal to each other.
+
+Note that multiple values may be specified, so it is possible to compare
+three, or more, values as per the second example below.
 
 See also: eq
 Example : (print (= 3 a))
+Example : (print (= 3 a b))
 %%
 abs
 Return the absolute value of the supplied number.
