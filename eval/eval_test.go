@@ -435,9 +435,6 @@ func TestStdlibHelp(t *testing.T) {
 		if !ok {
 			t.Skip("ignoring non-procedure entry in environment " + name)
 		}
-		if len(name) == 1 {
-			t.Skip("ignoring procedure with a single-character name " + name)
-		}
 
 		t.Run(name, func(t *testing.T) {
 

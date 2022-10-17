@@ -650,11 +650,6 @@ func TestEnsureHelpPresent(t *testing.T) {
 
 			t.Run("Testing "+name, func(t *testing.T) {
 
-				// We ignore one-character long names.
-				if len(name) == 1 {
-					t.Skip("Ignoring built-in function for the moment")
-				}
-
 				if len(proc.Help) == 0 {
 					t.Fatalf("help text is unset")
 				}
