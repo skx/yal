@@ -109,16 +109,14 @@ file:lines
 
 file:lines returns the contents of the given file, as a list of lines.
 
-See also: file:read
+See also: file:read, file:write
 %%
 file:read
 
 file:read returns the contents of the given file, as a string.
 
-See also: file:lines
+See also: file:lines, file:write
 %%
-
-
 file:stat
 
 file:stat returns a list containing details of the given file/directory,
@@ -128,6 +126,12 @@ The return value is (NAME SIZE UID GID MODE).
 
 See also: file:stat:gid file:stat:mode file:stat:size file:stat:uid
 Example: (print (file:stat "/etc/passwd"))
+%%
+file:write
+
+Write the given content to the specified path.
+
+Example: (file:write "/tmp/test.txt" "I like cake.")
 %%
 gensym
 

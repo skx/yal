@@ -1223,6 +1223,84 @@ func TestFileStat(t *testing.T) {
 	}
 }
 
+// TestFileWrite tests file:write
+func TestFileWrite(t *testing.T) {
+
+	// calling with no argument
+	out := fileWriteFn(ENV, []primitive.Primitive{})
+
+	// Will lead to an error
+	_, ok := out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+
+	}
+
+	// Call with the wrong type
+	out = fileWriteFn(ENV, []primitive.Primitive{
+		primitive.Number(3),
+		primitive.String("cake")})
+
+	_, ok = out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+
+	// Call with the wrong type
+	out = fileWriteFn(ENV, []primitive.Primitive{
+		primitive.String("/tmp/blah.txt"),
+		primitive.Number(3)})
+
+	_, ok = out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+
+	// Now we can try to write to something real
+	// Create a temporary file to write to
+	tmpfile, err := os.CreateTemp("", "exists")
+	if err != nil {
+		t.Fatalf("failed to create a temporary file")
+	}
+	defer os.Remove(tmpfile.Name())
+	// Try to write there
+	result := fileWriteFn(ENV, []primitive.Primitive{
+		primitive.String(tmpfile.Name()),
+		primitive.String("cake")})
+
+	// Should be no errors
+	_, ok = result.(primitive.Nil)
+	if !ok {
+		t.Fatalf("expected nil, got %v", out)
+	}
+
+	// Now create a temmporary directory, and use that
+	// as the destination - which will fail once it is
+	// removed
+	path, err2 := os.MkdirTemp("", "directory_")
+	if err2 != nil {
+		t.Fatalf("failed to create temporary directory")
+	}
+
+	// path beneath the temporary directory
+	target := filepath.Join(path, "foo.txt")
+
+	// remove the direcotry
+	os.RemoveAll(path)
+
+
+	failure := fileWriteFn(ENV, []primitive.Primitive{
+		primitive.String(target),
+		primitive.String("cake")})
+
+	// Should be no errors
+	_, ok = failure.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected failure writing beneath a directory which was removed, got %v", out)
+	}
+
+}
+
 // TestGenSym tests gensym
 func TestGenSym(t *testing.T) {
 
