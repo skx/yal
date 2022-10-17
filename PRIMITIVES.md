@@ -84,7 +84,7 @@ Things you'll find here include:
 * `chr`
   * Return the ASCII character of the given number.
 * `cons`
-  * Join two specified lists.
+  * Add the element to the start of the given (potentialy empty) list.
 * `contains?`
   * Does the specified hash contain the given key?
 * `date`
@@ -108,6 +108,8 @@ Things you'll find here include:
   * Return the contents of the given file, as a string.
 * `file:stat`
   * Return details of the given path.
+* `file:write`
+  * Write the specified content to the provided path.
 * `gensym`
   * Generate, and return, a unique symbol.  Useful for macro definitions.
 * `get`
@@ -188,8 +190,11 @@ Functions here include:
 * `and`
   * Logical operator, are all elements true?
 * `append`
+  * Append the given entry to the specified list.
 * `apply`
+  * Return the result of calling the specified function on every element in the supplied list, as a list.
 * `apply-hash`
+  * Apply the given function to everyu key in the specified hash, and return the result as list.
 * `boolean?`
   * Is the given thing a boolean?
 * `butlast`
@@ -223,6 +228,11 @@ Functions here include:
   * Return the size of the path, from the information provided by `(file:stat)`.
 * `file:stat:uid`
   * Return the UID of the path, from the information provided by `(file:stat)`.
+* `file:which`
+  * Locate the specified binary's location, upon the users' PATH.
+  * NOTE: This is almost certainly Unix/Linux/Darwin only, and will fail upon Windows systems.
+* `file:write`
+  * Write the specified content to the given path.
 * `filter`
   * Remove every element from the given list, unless the function returns true.
 * `first`
@@ -273,6 +283,7 @@ Functions here include:
 * `range`
   * Return a list of numbers between the given start/end, using the specified step-size.
 * `reduce`
+  * Our reduce function, with the list, function and accumulator.
 * `repeat`
   * Run the given body N times.
 * `repeated`

@@ -114,6 +114,7 @@ func PopulateEnvironment(env *env.Environment) {
 	env.Set("file:lines", &primitive.Procedure{F: fileLinesFn, Help: helpMap["file:lines"], Args: []primitive.Symbol{primitive.Symbol("path")}})
 	env.Set("file:read", &primitive.Procedure{F: fileReadFn, Help: helpMap["file:read"], Args: []primitive.Symbol{primitive.Symbol("path")}})
 	env.Set("file:stat", &primitive.Procedure{F: fileStatFn, Help: helpMap["file:stat"], Args: []primitive.Symbol{primitive.Symbol("path")}})
+	env.Set("file:write", &primitive.Procedure{F: fileWriteFn, Help: helpMap["file:write"], Args: []primitive.Symbol{primitive.Symbol("path"), primitive.Symbol("content")}})
 	env.Set("file?", &primitive.Procedure{F: fileFn, Help: helpMap["file?"], Args: []primitive.Symbol{primitive.Symbol("path")}})
 	env.Set("gensym", &primitive.Procedure{F: gensymFn, Help: helpMap["gensym"]})
 	env.Set("get", &primitive.Procedure{F: getFn, Help: helpMap["get"], Args: []primitive.Symbol{primitive.Symbol("hash"), primitive.Symbol("key")}})
@@ -616,6 +617,31 @@ func fileStatFn(env *env.Environment, args []primitive.Primitive) primitive.Prim
 	return res
 }
 
+// fileWriteFn implements file:write
+func fileWriteFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+	// We need two arguments
+	if len(args) != 2 {
+		return primitive.ArityError()
+	}
+
+	// Path is a string
+	path, ok := args[0].(primitive.String)
+	if !ok {
+		return primitive.Error("argument not a string")
+	}
+
+	// Content is a string
+	content, ok := args[1].(primitive.String)
+	if !ok {
+		return primitive.Error("argument not a string")
+	}
+
+	err := os.WriteFile(path.ToString(), []byte(content.ToString()), 0777)
+	if err != nil {
+		return primitive.Error(fmt.Sprintf("failed to write to %s:%s", path.ToString(), err))
+	}
+	return primitive.Nil{}
+}
 // gensymFn is the implementation of (gensym ..)
 func gensymFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 	// symbol characters
