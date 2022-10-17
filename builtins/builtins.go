@@ -96,7 +96,8 @@ func PopulateEnvironment(env *env.Environment) {
 	env.Set("*", &primitive.Procedure{F: multiplyFn, Help: helpMap["*"], Args: []primitive.Symbol{primitive.Symbol("N"), primitive.Symbol("arg1..argN")}})
 	env.Set("+", &primitive.Procedure{F: plusFn, Help: helpMap["+"], Args: []primitive.Symbol{primitive.Symbol("N"), primitive.Symbol("arg1..argN")}})
 	env.Set("-", &primitive.Procedure{F: minusFn, Help: helpMap["-"], Args: []primitive.Symbol{primitive.Symbol("N"), primitive.Symbol("arg1..argN")}})
-	env.Set("/", &primitive.Procedure{F: divideFn, Help: helpMap["-"], Args: []primitive.Symbol{primitive.Symbol("N"), primitive.Symbol("arg1..argN")}})
+	env.Set("/", &primitive.Procedure{F: divideFn, Help: helpMap["/"], Args: []primitive.Symbol{primitive.Symbol("N"), primitive.Symbol("arg1..argN")}})
+	env.Set("/=", &primitive.Procedure{F: inequalityFn, Help: helpMap["/="], Args: []primitive.Symbol{primitive.Symbol("N"), primitive.Symbol("arg1..argN")}})
 	env.Set("<", &primitive.Procedure{F: ltFn, Help: helpMap["<"], Args: []primitive.Symbol{primitive.Symbol("a"), primitive.Symbol("b")}})
 	env.Set("=", &primitive.Procedure{F: equalsFn, Help: helpMap["="], Args: []primitive.Symbol{primitive.Symbol("arg1"), primitive.Symbol("arg2 .. argN")}})
 	env.Set("arch", &primitive.Procedure{F: archFn, Help: helpMap["arch"]})
@@ -784,6 +785,53 @@ func helpFn(env *env.Environment, args []primitive.Primitive) primitive.Primitiv
 	}
 	str += proc.Help
 	return primitive.String(str)
+}
+
+// inequalityFn implements /=
+func inequalityFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+
+	// We need at least two arguments
+	if len(args) < 2 {
+		return primitive.ArityError()
+	}
+
+	// First argument must be a number.
+	nA, ok := args[0].(primitive.Number)
+	if !ok {
+		return primitive.Error("argument was not a number")
+	}
+
+	// Now we'll loop over all other numbers
+	//
+	// If we got something that was already seen we can
+	// terminate early but we don't because it is important
+	// to also report on failures to validate types - which
+	// we can't do if we bail.
+	//
+	ret := primitive.Bool(true)
+
+	// Keep track of things we've seen here
+	seen := make(map[float64]bool)
+	seen[float64(nA)] = true
+
+	for _, i := range args[1:] {
+
+		// check we have a number
+		nB, ok2 := i.(primitive.Number)
+
+		if !ok2 {
+			return primitive.Error("argument was not a number")
+		}
+
+		// Have we seen this?
+		_, found := seen[float64(nB)]
+		if found {
+			ret = primitive.Bool(false)
+		}
+		seen[float64(nB)] = true
+	}
+
+	return ret
 }
 
 // (join (1 2 3)

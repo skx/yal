@@ -72,6 +72,8 @@ Things you'll find here include:
 * `/`
   * Division function.
   * Note that if only a single value is specified the reciprocal is returned - i.e. "(/ 3)" is equal to "1/3".
+* `/=`
+  * Numerical inequality test, if any argument is the same as another return false, otherwise if all arguments are unique return true.
 * `<`
   * Less-than function.
 * `=`
