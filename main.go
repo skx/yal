@@ -24,6 +24,11 @@ import (
 	"github.com/skx/yal/stdlib"
 )
 
+var (
+	version = "unreleased"
+	sha1sum = "unknown"
+)
+
 func main() {
 
 	// (gensym) needs a decent random seed, as does (random).
@@ -32,7 +37,14 @@ func main() {
 	// Look to see if we're gonna execute a statement, or dump our help.
 	exp := flag.String("e", "", "A string to evaluate.")
 	hlp := flag.Bool("h", false, "Should we show help information, and exit?")
+	ver := flag.Bool("v", false, "Should we show our version, and exit?")
 	flag.Parse()
+
+	// Showing the version?
+	if *ver {
+		fmt.Printf("%s [%s]\n", version, sha1sum)
+		return
+	}
 
 	// Ensure we have an argument, if we don't have flags.
 	if len(flag.Args()) < 1 && (*exp == "") && !*hlp {
