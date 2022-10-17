@@ -19,7 +19,6 @@ import (
 	"sort"
 	"strconv"
 	"strings"
-	"syscall"
 	"time"
 
 	"github.com/skx/yal/env"
@@ -631,10 +630,16 @@ func fileStatFn(env *env.Environment, args []primitive.Primitive) primitive.Prim
 	UID := os.Getuid()
 	GID := os.Getgid()
 
-	// But if we can get the "real" values, then use them.
-	if stat, ok := info.Sys().(*syscall.Stat_t); ok {
-		UID = int(stat.Uid)
-		GID = int(stat.Gid)
+	// Get the UID in a non-portable way
+	u, e := getUID(info)
+	if e == nil {
+		UID = u
+	}
+
+	// Get the GID in a non-portable way
+	g, e := getGID(info)
+	if e == nil {
+		GID = g
 	}
 
 	var res primitive.List
