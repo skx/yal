@@ -57,14 +57,14 @@
 ;; >=
 ;;
 (set! >  (fn* (a b)
-              "Return true if the first value is greater than the second."
+              "Return true if a is greater than b."
               (< b a)))
 
 (set! >= (fn* (a b)
-              "Return true if the first value is greater than, or equal to the second."
+              "Return true if a is greater than, or equal to b."
               (! (< a b))))
 (set! <= (fn* (a b)
-              "Return true if the first value is less than, or equal to, the second."
+              "Return true if a is less than, or equal to, b."
               (! (> a b))))
 
 ;; We have a built in function "date" to return the current date
