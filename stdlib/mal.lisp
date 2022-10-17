@@ -9,13 +9,8 @@
 
 ;; Traditionally we use `car` and `cdr` for accessing the first and rest
 ;; elements of a list.  For readability it might be nice to vary that
-(set! first (fn* (x:list)
-                 "Return the first element of the specified list.  This is an alias for 'car'."
-                 (car x)))
-
-(set! rest (fn* (x:list)
-                 "Return all elements of the specified list, except the first.  This is an alias for 'cdr'."
-                 (cdr x)))
+(alias first car)
+(alias rest  cdr)
 
 ;; Some simple tests of numbers
 (set! zero? (fn* (n)
