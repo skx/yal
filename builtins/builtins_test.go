@@ -558,6 +558,16 @@ func TestDirectoryEntries(t *testing.T) {
 // TestDivide tests "*"
 func TestDivide(t *testing.T) {
 
+	// Test for "equality"
+	//
+	// Because floating points are hard
+	almostEqual := func(a, b float64) bool {
+		// Arbitrary equality threshold
+		float64EqualityThreshold := float64(1.0 / 1000000)
+
+		return math.Abs(a-b) <= float64EqualityThreshold
+	}
+
 	// No arguments
 	out := divideFn(ENV, []primitive.Primitive{})
 
@@ -630,6 +640,35 @@ func TestDivide(t *testing.T) {
 	if n != 4 {
 		t.Fatalf("got wrong result")
 	}
+
+	// Test only a single argument.
+	out = divideFn(ENV, []primitive.Primitive{
+		primitive.Number(12),
+	})
+
+	// Will work
+	n, ok2 = out.(primitive.Number)
+	if !ok2 {
+		t.Fatalf("expected number, got %v", out)
+	}
+	if !almostEqual(float64(n), 0.083333) {
+		t.Fatalf("got wrong result: %f", n)
+	}
+
+	// Another test
+	out = divideFn(ENV, []primitive.Primitive{
+		primitive.Number(-3),
+	})
+
+	// Will work
+	n, ok2 = out.(primitive.Number)
+	if !ok2 {
+		t.Fatalf("expected number, got %v", out)
+	}
+	if !almostEqual(float64(n), -(1 / 3.0)) {
+		t.Fatalf("got wrong result: %f", n)
+	}
+
 }
 
 // TestEnsureHelpPresent ensures that all our built-in functions have
@@ -1287,7 +1326,6 @@ func TestFileWrite(t *testing.T) {
 
 	// remove the direcotry
 	os.RemoveAll(path)
-
 
 	failure := fileWriteFn(ENV, []primitive.Primitive{
 		primitive.String(target),

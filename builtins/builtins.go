@@ -344,6 +344,14 @@ func divideFn(env *env.Environment, args []primitive.Primitive) primitive.Primit
 		return primitive.Error(fmt.Sprintf("argument '%s' was not a number", args[0].ToString()))
 	}
 
+	// If there is only one argument then we return the
+	// reciprocal.
+	//
+	// (i.e. "(/ 3)" == ".3333"
+	if len(args) == 1 {
+		return primitive.Number(1 / v)
+	}
+
 	// now process all the rest of the arguments
 	for _, i := range args[1:] {
 
@@ -642,6 +650,7 @@ func fileWriteFn(env *env.Environment, args []primitive.Primitive) primitive.Pri
 	}
 	return primitive.Nil{}
 }
+
 // gensymFn is the implementation of (gensym ..)
 func gensymFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 	// symbol characters
