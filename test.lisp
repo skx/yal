@@ -88,7 +88,7 @@ it took to execute.  Return that time, in ms."
 
 ;; For each item in the range 1-10, print it, and the associated square.
 ;; Awesome!  Much Wow!
-(apply (nat 11)
+(apply (nat 10)
       (lambda (x)
         (print "%s\tsquared is %s" x (sq x))))
 

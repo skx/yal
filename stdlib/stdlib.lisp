@@ -253,17 +253,17 @@ This is designed to pad the hours, minutes, and seconds in (hms)."
 
 ;; Create ranges of numbers in a list
 (set! range (fn* (start:number end:number step:number)
-                 "Create a list of numbers between the start and end bounds, incrementing by the given offset each time."
-                 (if (< start end)
+                 "Create a list of numbers between the start and end bounds, inclusive, incrementing by the given offset each time."
+                 (if (<= start end)
                      (cons start (range (+ start step) end step))
                    ())))
 
 ;; Create sequences from 0/1 to N
 (set! seq (fn* (n:number)
-               "Create, and return, list of number ranging from 0-N."
+               "Create, and return, list of number ranging from 0-N, inclusive."
                (range 0 n 1)))
 (set! nat (fn* (n:number)
-               "Create, and return, a list of numbers ranging from 1 to N."
+               "Create, and return, a list of numbers ranging from 1-N, inclusive."
                (range 1 n 1)))
 
 
