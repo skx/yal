@@ -502,19 +502,28 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 
 			// (alias ..)
 			case primitive.Symbol("alias"):
-				if len(listExp) != 3 {
+				// We need at least one pair.
+				if len(listExp) < 3 {
 					return primitive.ArityError()
 				}
 
-				// Name we'll use
-				name := listExp[1]
+				// The arguments are gonna be a list of pairs
+				args := listExp[1:]
 
-				// Existing function.
-				val := listExp[2]
+				if len(args)%2 != 0 {
+					return primitive.Error(fmt.Sprintf("(alias ..) must have an even length of arguments, got %v", args))
+				}
 
-				old, ok := e.Get(val.ToString())
-				if ok {
-					e.Set(name.ToString(), old)
+				for i := 0; i < len(args); i += 2 {
+
+					// The key/val pair we're working with
+					key := args[i]
+					val := args[i+1]
+
+					old, ok := e.Get(val.ToString())
+					if ok {
+						e.Set(key.ToString(), old)
+					}
 				}
 				return primitive.Nil{}
 

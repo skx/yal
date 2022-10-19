@@ -271,6 +271,8 @@ a
 		{"}}}}}}", "nil"},
 
 		{"(alias foo)", primitive.ArityError().ToString()},
+		{"(alias foo print)", "nil"},
+		{"(alias foo bar print)", "ERROR{(alias ..) must have an even length of arguments, got [foo bar print]}"},
 
 		// try / catch
 		{"(try 3)", primitive.ArityError().ToString()},
