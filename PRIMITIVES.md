@@ -281,6 +281,8 @@ Functions here include:
   * Is the given thing a macro?
 * `map`
   * Return the results of applying the specified function to every element of the given list.
+* `map-pairs`
+  * Return the results of applying the specified function to every pair of elements in the given list.
 * `max`
   * Return the maximum value in the specified list.
 * `min`

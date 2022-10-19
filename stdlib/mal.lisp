@@ -136,11 +136,25 @@ Note that offset starts from 0, rather than 1, for the first item."
                    (nth (cdr lst) (- i 1))))))
 
 
-(set! map (fn* (xs:list f:function)
-               "Return a list with the contents of evaluating the given function on every item of the supplied list."
-               (if (nil? xs)
+(set! map (fn* (lst:list fun:function)
+               "Return a list with the contents of evaluating the given function on every item of the supplied list.
+
+See-also: map-pairs"
+               (if (nil? lst)
                    ()
-                 (cons (f (car xs)) (map (cdr xs) f)))))
+                 (cons (fun (car lst)) (map (cdr lst) fun)))))
+
+(set! map-pairs (fn* (lst:list fun:function)
+               "Return a list with the contents of evaluating the given function on every pair of items in the supplied list.
+
+See-also: map"
+               (if (! (nil? lst))
+                   (if (= (% (length lst) 2) 0)
+                       (let* (a (car lst)
+                                b (car (cdr lst)))
+                         (cons (fun a b) (map-pairs (cdr (cdr lst)) fun)))
+                     (error "The list passed should have an even length"))
+                 ())))
 
 
 ;; This is required for our quote/quasiquote/unquote/splice-unquote handling
