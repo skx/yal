@@ -38,7 +38,12 @@ If you don't have the repository installed, but you have a working golang toolse
 $ go install github.com/skx/yal@latest
 ```
 
-If neither of those options suit, you may download the most recent binary from our [release page](https://github.com/skx/yal/releases).
+If neither of those options suit, you may download the most recent binary from our [release page](https://github.com/skx/yal/releases).  Remember that if you're running a Mac you'll need to remove the quarantine flag which _protects you_ from unsigned binaries, for example:
+
+```sh
+% xattr  -d com.apple.quarantine yal-darwin-amd64
+% chmod 755 com.apple.quarantine yal-darwin-amd64
+```
 
 
 
@@ -53,10 +58,16 @@ Once installed there are two ways to execute code:
 
 The yal interpreter allows (optional) documentation to be attached to functions, both those implemented in golang and those written in lisp, there is another command-line flag to dump that information from the standard library and built-in functions:
 
-* `yal -h`
-  * Shows all functions which contain help-text, in sorted order.
-  * Examples are included where available.
+* `yal -h [regexp]`
+  * By default this will show the help for all available functions, in sorted order.
+  * If you specify any regular expressions then any entry which matches the given patterns will be displayed.
 
+Finally if you've downloaded a binary release from [our release page](https://github.com/skx/yal/releases) the `-v`flag will show you what version you're running:
+
+```sh
+% yal-darwin-amd64 -v
+v0.11.0 f21d032e812ee6eadad5eac23f079a11f5e1041a
+```
 
 
 ## Examples
@@ -165,4 +176,3 @@ I've also played around with a couple of compilers which might be interesting to
    * [https://github.com/skx/bfcc/](https://github.com/skx/bfcc/)
 * A math-compiler:
   * [https://github.com/skx/math-compiler](https://github.com/skx/math-compiler)
-
