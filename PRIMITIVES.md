@@ -212,9 +212,11 @@ Functions here include:
 * `append`
   * Append the given entry to the specified list.
 * `apply`
-  * Return the result of calling the specified function on every element in the supplied list, as a list.
+  * Call the specified function on every element in the supplied list.
 * `apply-hash`
-  * Apply the given function to everyu key in the specified hash, and return the result as list.
+  * Call the specified function against every key present in the specified hash.
+* `apply-pairs`
+  * Call the specified function on every two elements of the given list, as pairs.
 * `boolean?`
   * Is the given thing a boolean?
 * `butlast`

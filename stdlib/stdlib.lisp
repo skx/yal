@@ -224,7 +224,9 @@ This is designed to pad the hours, minutes, and seconds in (hms)."
 
 ;; A helper to apply a function to each key/value pair of a hash
 (set! apply-hash (fn* (hs:hash fun:function)
-                      "Apply given function to every key in the specified hash"
+                      "Call the given function to every key in the specified hash.
+
+See-also: apply, apply-pairs"
                       (let* (lst (keys hs))
                         (apply lst (lambda (x) (fun x (get hs x)))))))
 

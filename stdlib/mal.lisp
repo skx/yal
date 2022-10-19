@@ -84,13 +84,33 @@ It is similar to an if-statement, however there is no provision for an 'else' cl
 
 ;; A useful helper to apply a given function to each element of a list.
 (set! apply (fn* (lst:list fun:function)
-                 "Return the result of calling the specified function on every element in the given list"
+                 "Call the specified function on every element in the given list.
+
+See-also: apply-pairs, apply-hash"
                  (if (nil? lst)
                      ()
                      (do
                       (fun (car lst))
                       (apply (cdr lst) fun)))))
 
+;; Apply, but walking the list in pairs.
+(set! apply-pairs (fn* (lst:list fun:function)
+                       "Calling the specified function with two items on the specified list.
+
+This is similar to apply, but apply apply invokes the callback with a single list-item, and here we apply in pairs.
+
+Note: The list-length must be even, and if not that will raise an error.
+
+See-also: apply apply-hash
+Example: (apply-pairs (list 1 2 3 4) (lambda (a b) (print \"Called with %s %s\" a b)))
+"
+                       (if (! (nil? lst))
+                           (if (= (% (length lst) 2) 0)
+                               (let* (a (car lst)
+                                      b (car (cdr lst)))
+                                 (fun a b)
+                                 (apply-pairs (cdr (cdr lst) ) fun))
+                               (error "The list passed to (apply-pairs..) should have an even length")))))
 
 ;; Return the length of the given list.
 (set! length (fn* (arg)
