@@ -1,4 +1,5 @@
 ;;; stdlib.lisp - Standard library as implemented in lisp.
+
 ;; This is essentially prepended to any program the user tries to run,
 ;; and implements behaviour which is useful for users.
 ;;
@@ -200,8 +201,13 @@ This is designed to pad the hours, minutes, and seconds in (hms)."
                 (# x 0.5)))
 
 ;; Return the last element of a list
+;;
+;; NOTE: This could be written more simply, for example:
+;;
+;;   (set! last (fn* (lst:list) "Return the last element of the given list" (car (reverse lst))))
+;;
 (set! last (fn* (lst:list)
-                "last returns the last item in the specified list, it is the opposite of cdr."
+                "last returns the last item in the specified list, it is the inverse of (butlast) and the logical opposite of (car)."
                 (let* (c (cdr lst))
                   (if (! (nil? c))
                       (last c)
@@ -226,7 +232,7 @@ This is designed to pad the hours, minutes, and seconds in (hms)."
 ;; Count the length of a string
 (set! strlen (fn* (str:string)
                   "Calculate and return the length of the supplied string."
-                  (length (split str "" ))))
+                  (length (split str ""))))
 
 
 ;; More mathematical functions relating to negative numbers.
