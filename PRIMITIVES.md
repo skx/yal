@@ -18,12 +18,18 @@ the help file, to see further details.  This is just intended as a summary.
 
 ## Symbols
 
-The only notable special symbols are the strings which represent boolean values:
+The only notable special symbols are the following strings which
+represent the nil value. and ourboolean values.
 
+* `nil`
+  * The nil value.
 * `#t`
-  * `true` is an alias.
+  * `true` is also available as an alias.
 * `#f`
-  * `false` is an alias.
+  * `false` is also available as an alias.
+
+In the future we _might_ support characters, via \#A, etc.
+
 
 
 ## Special Forms
@@ -31,6 +37,7 @@ The only notable special symbols are the strings which represent boolean values:
 Special forms are things that are built into the core interpreter, and include:
 
 * `alias`
+  * Define function aliases, this is used whenever we rename/change things in the standard-library to avoid breaking user scripts.
 * `catch`.
   * Demonstrated in [try.lisp](try.lisp).
 * `def!`
@@ -38,20 +45,29 @@ Special forms are things that are built into the core interpreter, and include:
 * `defmacro!`
   * Demonstrated in [mtest.lisp](mtest.lisp).
 * `do`
+  * Execute each statement in the list.
 * `env`
   * Env allows introspection of the current environment.
   * Demonstrated in [dynamic.lisp](dynamic.lisp)
 * `eval`
+  * Execute the given expression.
 * `fn*`
   * `lambda` is an alias.
 * `if`
+  * Our conditional operation.
 * `let*`
+  * Create a new scope, with locally bound variables.
 * `macroexpand`
+  * Expand the given macro.
 * `quote`
+  * Return the argument without evaluating it.
 * `read`
+  * Read a form from the specified string.
 * `set!`
+  * Set the value of a variable.
 * `try`
-  * Demonstrated in [try.lisp](try.lisp).
+  * Error-catching warpper, demonstrated in [try.lisp](try.lisp).
+
 
 ## Core Primitives
 
@@ -204,6 +220,7 @@ Functions here include:
 * `butlast`
   * Return all elements of the supplied list, except for the last.
 * `concat`
+  * Join the specified lists.
 * `date:day`
   * Return the current day of the month, via the output of `date`.
 * `date:month`
