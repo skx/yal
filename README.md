@@ -81,10 +81,10 @@ A reasonable amount of sample code can be found in the various included examples
 
 As noted there is a standard-library of functions which are loaded along with any user-supplied script.  These functions are implemented in lisp and also serve as a demonstration of syntax and features:
 
-* [stdlib/stdlib.lisp](stdlib/stdlib.lisp)
-* [stdlib/mal.lisp](stdlib/mal.lisp)
+* [stdlib/stdlib/](stdlib/stdlib/)
 
-Running these example will produce output, for example:
+Running any of our supplied examples will produce output, for example here's the result
+of running the `fibonacci.lisp` file:
 
 ```lisp
 $ yal fibonacci.lisp
