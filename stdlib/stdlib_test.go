@@ -2,6 +2,7 @@ package stdlib
 
 import (
 	"os"
+	"strings"
 	"testing"
 )
 
@@ -25,4 +26,40 @@ func TestStdlibExcludeAll(t *testing.T) {
 
 	// restore
 	os.Setenv("YAL_STDLIB_EXCLUDE_ALL", "")
+}
+
+// Test we can exclude time.lisp
+func TestStdlibExcludeTime(t *testing.T) {
+
+	// By default we get "stuff"
+	x := Contents()
+
+	if len(x) < 1 {
+		t.Fatalf("Failed to get contents of stdlib")
+	}
+
+	// ensure we have "hms" function defined
+	expected := "(hms)"
+
+	content := string(x)
+	if !strings.Contains(content, expected) {
+		t.Fatalf("failed to find expected function: %s", expected)
+	}
+
+	// Now exclude "time"
+	os.Setenv("YAL_STDLIB_EXCLUDE", "time")
+
+	// Re-read content
+	x = Contents()
+	if len(x) < 1 {
+		t.Fatalf("Failed to get contents of stdlib")
+	}
+
+	content = string(x)
+	if strings.Contains(content, expected) {
+		t.Fatalf("we shouldn't find the excluded function, but we did: %s", expected)
+	}
+
+	// restore
+	os.Setenv("YAL_STDLIB_EXCLUDE", "")
 }
