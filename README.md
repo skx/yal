@@ -4,6 +4,7 @@
 
 * [yet another lisp](#yet-another-lisp)
 * [Building / Installing](#building--installing)
+* [Standard Library](#standard-library)
 * [Usage](#usage)
 * [Examples](#examples)
 * [Fuzz Testing](#fuzz-testing)
@@ -70,6 +71,36 @@ v0.11.0 f21d032e812ee6eadad5eac23f079a11f5e1041a
 ```
 
 
+
+## Standard Library
+
+When user-code is executed, whether a simple statement supplied via the command-line, or read from a file, a standard-library is loaded from beneath the directory:
+
+* [stdlib/stdlib/](stdlib/stdlib/)
+
+
+Our standard-library consists of primitive functions such as `(map..)`, `(min..)` and similar, is written in 100% yal-lisp.
+
+The standard library may be entirely excluded via the use of the environmental varilable `YAL_STDLIB_EXCLUDE_ALL`:
+
+```
+$ yal  -e "(print (hms))"
+22:30:57
+
+$ YAL_STDLIB_EXCLUDE_ALL=true yal  -e "(print (hms))"
+Error running: error expanding argument [hms] for call to (print ..):
+  ERROR{argument 'hms' not a function}
+```
+
+If you prefer you may exclude specific _parts_ of the standard library, by specify the filenames you wish to exclude separated by commas:
+
+```
+$ YAL_STDLIB_ECLUDE=date,type-checks yal  -e "(print (hms))"
+22:30:57
+```
+
+
+
 ## Examples
 
 A reasonable amount of sample code can be found in the various included examples:
@@ -79,12 +110,11 @@ A reasonable amount of sample code can be found in the various included examples
 * [fizzbuzz.lisp](fizzbuzz.lisp) is a standalone sample of solving the fizzbuzz problem.
 * [mtest.lisp](mtest.lisp) shows some macro examples.
 
-As noted there is a standard-library of functions which are loaded along with any user-supplied script.  These functions are implemented in lisp and also serve as a demonstration of syntax and features:
+As noted there is a standard-library of functions which are loaded along with any user-supplied script - that library of functions may also provide a useful reference and example of yal-code:
 
 * [stdlib/stdlib/](stdlib/stdlib/)
 
-Running any of our supplied examples will produce output, for example here's the result
-of running the `fibonacci.lisp` file:
+Running any of our supplied examples should produce useful output for reference.  For example here's the result of running the `fibonacci.lisp` file:
 
 ```lisp
 $ yal fibonacci.lisp
