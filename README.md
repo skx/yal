@@ -95,7 +95,7 @@ Error running: error expanding argument [hms] for call to (print ..):
 If you prefer you may exclude specific _parts_ of the standard library, by specify the filenames you wish to exclude separated by commas:
 
 ```
-$ YAL_STDLIB_ECLUDE=date,type-checks yal  -e "(print (hms))"
+$ YAL_STDLIB_EXCLUDE=date,type-checks yal  -e "(print (hms))"
 22:30:57
 ```
 
