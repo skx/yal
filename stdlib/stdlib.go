@@ -40,12 +40,8 @@ func Contents() []byte {
 		exclude = strings.Split(os.Getenv("YAL_STDLIB_EXCLUDE"), ",")
 	}
 
-	// Read the list of entries
-	entries, err := stdlib.ReadDir("stdlib")
-	if err != nil {
-		fmt.Printf("Failed to read embedded resources; fatal error\n")
-		return result
-	}
+	// Read the list of entries - can't fail
+	entries, _ := stdlib.ReadDir("stdlib")
 
 	// For each entry
 	for _, entry := range entries {
@@ -67,12 +63,8 @@ func Contents() []byte {
 			continue
 		}
 
-		// Read the content
-		data, err := stdlib.ReadFile(fp)
-		if err != nil {
-			fmt.Printf("Failed to read embedded resource - %s - fatal error %s\n", fp, err)
-			return result
-		}
+		// Read the content - can't fail
+		data, _ := stdlib.ReadFile(fp)
 
 		// Append to our result
 		result = append(result, data...)
