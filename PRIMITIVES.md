@@ -188,10 +188,9 @@ Things you'll find here include:
 
 The standard library consists of routines, and helpers, which are written in 100% yal itself.
 
-The implementation of these primitives can be found in the following two files:
+The implementation of these primitives can be found in the following directory:
 
-* [stdlib/stdlib.lisp](stdlib/stdlib.lisp)
-* [stdlib/mal.lisp](stdlib/mal.lisp)
+* [stdlib/stdlib/](stdlib/stdlib/)
 
 The code in those files is essentially **prepended** to any script that is supplied upon the command-line.
 
@@ -282,7 +281,7 @@ Functions here include:
 * `map`
   * Return the results of applying the specified function to every element of the given list.
 * `map-pairs`
-  * Return the results of applying the specified function to every pair of elements in the given list.
+    * Return the results of applying the specified function to every pair of elements in the given list.
 * `max`
   * Return the maximum value in the specified list.
 * `min`

@@ -2,30 +2,64 @@ package stdlib
 
 import (
 	"os"
+	"strings"
 	"testing"
 )
 
-func TestStdlib(t *testing.T) {
+// Test we can exclude all
+func TestStdlibExcludeAll(t *testing.T) {
+
+	// By default we get "stuff"
 	x := Contents()
 
-	var core []byte
-	var mal []byte
-	var err error
-
-	core, err = os.ReadFile("stdlib.lisp")
-	if err != nil {
-		t.Fatalf("failed to read: %s", err)
+	if len(x) < 1 {
+		t.Fatalf("Failed to get contents of stdlib")
 	}
 
-	mal, err = os.ReadFile("mal.lisp")
-	if err != nil {
-		t.Fatalf("failed to read: %s", err)
+	// Excluding everything should return nothing
+	os.Setenv("YAL_STDLIB_EXCLUDE_ALL", "yes")
+
+	x = Contents()
+	if len(x) != 0 {
+		t.Fatalf("We expected no content, but got something, despite $YAL_STDLIB_EXCLUDE_ALL")
 	}
 
-	// Add one for the newline we add in the middle.
-	total := len(core) + 1 + len(mal) + 1
-	if total != len(x) {
-		t.Fatalf("stdlib size mismatch")
+	// restore
+	os.Setenv("YAL_STDLIB_EXCLUDE_ALL", "")
+}
+
+// Test we can exclude time.lisp
+func TestStdlibExcludeTime(t *testing.T) {
+
+	// By default we get "stuff"
+	x := Contents()
+
+	if len(x) < 1 {
+		t.Fatalf("Failed to get contents of stdlib")
 	}
 
+	// ensure we have "hms" function defined
+	expected := "(hms)"
+
+	content := string(x)
+	if !strings.Contains(content, expected) {
+		t.Fatalf("failed to find expected function: %s", expected)
+	}
+
+	// Now exclude "time"
+	os.Setenv("YAL_STDLIB_EXCLUDE", "time")
+
+	// Re-read content
+	x = Contents()
+	if len(x) < 1 {
+		t.Fatalf("Failed to get contents of stdlib")
+	}
+
+	content = string(x)
+	if strings.Contains(content, expected) {
+		t.Fatalf("we shouldn't find the excluded function, but we did: %s", expected)
+	}
+
+	// restore
+	os.Setenv("YAL_STDLIB_EXCLUDE", "")
 }

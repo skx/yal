@@ -1,42 +1,10 @@
 ;;; mal.lisp - Compatability with MAL, implemented in lisp.
 
-;; This is essentially prepended to any program the user tries to run,
-;; and implements functions that are expected by any MAL implementation.
-;;
-;; More general functions can be found in stdlib.lisp.
-;;
-
 
 ;; Traditionally we use `car` and `cdr` for accessing the first and rest
 ;; elements of a list.  For readability it might be nice to vary that
 (alias first car)
 (alias rest  cdr)
-
-;; Some simple tests of numbers
-(set! zero? (fn* (n)
-                 "Return true if the number supplied as the first argument to this function is equal to zero."
-                 (= n 0)))
-
-(set! one? (fn* (n)
-                "Return true if the number supplied as the argument to this function is equal to one."
-                (= n 1)))
-
-(set! even? (fn* (n)
-                 "Return true if the number supplied as the argument to this function is even."
-                 (zero? (% n 2))))
-
-(set! odd?  (fn* (n)
-                 "Return true if the number supplied as the argument to this function is odd."
-                 (! (even? n))))
-
-;; is the given argument "true", or "false"?
-(def! true?  (fn* (arg)
-                  "Return true if the argument supplied to this function is true."
-                  (if (eq #t arg) true false)))
-
-(def! false? (fn* (arg)
-                  "Return true if the argument supplied to this function is false."
-                  (if (eq #f arg) true false)))
 
 
 ;; Run an arbitrary series of statements, if the given condition is true.
@@ -171,12 +139,3 @@ See-also: map"
                   (if (nil? seq1)
                       seq2
                     (cons (car seq1) (concat (cdr seq1) seq2)))))
-
-
-
-;;
-;; Read a file
-;;
-(def! load-file (fn* (filename)
-                     "Load and execute the contents of the supplied filename."
-                     (eval (join (list "(do " (slurp filename) "\nnil)")))))
