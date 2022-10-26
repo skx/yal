@@ -111,6 +111,7 @@ func PopulateEnvironment(env *env.Environment) {
 	env.Set("eq", &primitive.Procedure{F: eqFn, Help: helpMap["eq"], Args: []primitive.Symbol{primitive.Symbol("a"), primitive.Symbol("b")}})
 	env.Set("error", &primitive.Procedure{F: errorFn, Help: helpMap["error"], Args: []primitive.Symbol{primitive.Symbol("message")}})
 	env.Set("exists?", &primitive.Procedure{F: existsFn, Help: helpMap["exists?"], Args: []primitive.Symbol{primitive.Symbol("path")}})
+	env.Set("explode", &primitive.Procedure{F: explodeFn, Help: helpMap["explode"], Args: []primitive.Symbol{primitive.Symbol("string")}})
 	env.Set("file:lines", &primitive.Procedure{F: fileLinesFn, Help: helpMap["file:lines"], Args: []primitive.Symbol{primitive.Symbol("path")}})
 	env.Set("file:read", &primitive.Procedure{F: fileReadFn, Help: helpMap["file:read"], Args: []primitive.Symbol{primitive.Symbol("path")}})
 	env.Set("file:stat", &primitive.Procedure{F: fileStatFn, Help: helpMap["file:stat"], Args: []primitive.Symbol{primitive.Symbol("path")}})
@@ -506,6 +507,33 @@ func expandStr(input string) string {
 	}
 
 	return out
+}
+
+// explodeFn splits a string into a list of characters
+func explodeFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+
+	// We only need a single argument
+	if len(args) != 1 {
+		return primitive.ArityError()
+	}
+
+	// Which is a string
+	str, ok := args[0].(primitive.String)
+	if !ok {
+		return primitive.Error("argument not a string")
+	}
+
+	// Split it
+	out := strings.Split(str.ToString(), "")
+
+	// return a list of characters
+	var c primitive.List
+
+	for _, x := range out {
+		c = append(c, primitive.Character(x))
+	}
+
+	return c
 }
 
 // expnFn implements "#"

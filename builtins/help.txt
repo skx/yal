@@ -104,6 +104,13 @@ exists? returns true if the specified path exists, regardless of the type of pat
 See also: directory? file?
 Example: (print (exists? "/etc"))
 %%
+explode
+
+explode converts the specified string into a list of characters.
+
+See also: join,split
+Example: (print (explode "foo bar"))
+%%
 file?
 
 file? returns true if the specified path exists, and is a file.
@@ -174,7 +181,9 @@ Example: (print (help print))
 %%
 join
 
-join returns a string formed by converting every element of the supplied list into a string and concatenating them.
+join returns a string formed by converting every element of the supplied list into a string and concatenating the results.
+
+See also: explode, split
 %%
 keys
 
@@ -274,7 +283,7 @@ split
 
 split accepts two string parameters, and splits the first string by the term specified as the second argument, returning a list of the results.
 
-See also: join
+See also: explode, join
 Example: (split "steve" "e") ; => ("st" "v")
 Example: (split "steve" "")  ; => ("s" "t" "e" "v" "e")
 %%

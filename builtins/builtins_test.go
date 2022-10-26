@@ -994,6 +994,55 @@ func TestExpandString(t *testing.T) {
 	}
 }
 
+// TestExplode tests explode?
+func TestExplode(t *testing.T) {
+
+	// No arguments
+	out := explodeFn(ENV, []primitive.Primitive{})
+
+	// Will lead to an error
+	e, ok := out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if e != primitive.ArityError() {
+		t.Fatalf("got error, but wrong one %v", out)
+	}
+
+	// An argument that isn't a string
+	out = explodeFn(ENV, []primitive.Primitive{
+		primitive.Number(3),
+	})
+
+	// Will lead to an error
+	e, ok = out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if !strings.Contains(string(e), "not a string") {
+		t.Fatalf("got error, but wrong one %v", out)
+	}
+
+	//
+	// Now a proper string
+	//
+	out = explodeFn(ENV, []primitive.Primitive{
+		primitive.String("fooπs"),
+	})
+
+	// Will lead to a list
+	l, ok2 := out.(primitive.List)
+	if !ok2 {
+		t.Fatalf("expected list, got %v", out)
+	}
+	if len(l) != 5 {
+		t.Fatalf("split list had the wrong length:%v", l)
+	}
+	if l.ToString() != "(f o o π s)" {
+		t.Fatalf("got wrong result %v", out)
+	}
+}
+
 // TestExpn tests "#"
 func TestExpn(t *testing.T) {
 
@@ -2728,7 +2777,7 @@ func TestSplit(t *testing.T) {
 	// Now a proper split
 	//
 	out = splitFn(ENV, []primitive.Primitive{
-		primitive.String("foo"),
+		primitive.String("fooπx"),
 		primitive.String(""),
 	})
 
@@ -2737,7 +2786,10 @@ func TestSplit(t *testing.T) {
 	if !ok2 {
 		t.Fatalf("expected list, got %v", out)
 	}
-	if l.ToString() != "(f o o)" {
+	if len(l) != 5 {
+		t.Fatalf("wrong length for result %v", l)
+	}
+	if l.ToString() != "(f o o π x)" {
 		t.Fatalf("got wrong result %v", out)
 	}
 
