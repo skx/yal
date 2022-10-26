@@ -122,6 +122,41 @@ func (ev *Eval) atom(token string) primitive.Primitive {
 	}
 
 	// Character
+	if strings.HasPrefix(token, "#\\") {
+		lit := token[2:]
+
+		if len(lit) == 1 {
+
+			// simple case "#\x", for example
+			c := primitive.Character(lit)
+			ev.symbols[token] = c
+			return c
+		}
+		if len(lit) == 2 && lit[0] == '\\' {
+
+			// First character is a backslash
+			// we'll expand a couple of characters
+			//
+			// TODO: Do this better.
+			var c primitive.Primitive
+
+			switch lit[1] {
+			case 'n':
+				c = primitive.Character("\n")
+			case 't':
+				c = primitive.Character("\t")
+			case 'r':
+				c = primitive.Character("\r")
+
+			}
+
+			if c.Type() == "character" {
+				ev.symbols[token] = c
+				return c
+			}
+		}
+		return primitive.Error(fmt.Sprintf("invalid character literal: %s", lit))
+	}
 
 	// Is it a number?
 	f, err := strconv.ParseFloat(token, 64)
@@ -480,6 +515,10 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 
 		// Booleans return themselves
 		case primitive.Bool:
+			return exp
+
+		// Characters return themselves
+		case primitive.Character:
 			return exp
 
 		// Strings return themselves
