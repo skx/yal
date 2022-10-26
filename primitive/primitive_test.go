@@ -21,6 +21,22 @@ func TestBool(t *testing.T) {
 	}
 }
 
+func TestCharacter(t *testing.T) {
+
+	nl := Character("\n")
+	ok := Character("o")
+
+	if nl.Type() != "character" {
+		t.Fatalf("wrong type")
+	}
+	if nl.ToString() != "\n" {
+		t.Fatalf("char->String had wrong result")
+	}
+	if ok.ToString() != "o" {
+		t.Fatalf("char->String had wrong result")
+	}
+}
+
 func TestError(t *testing.T) {
 
 	error := Error("no-cheese")
