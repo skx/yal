@@ -190,14 +190,13 @@ func TestChr(t *testing.T) {
 		primitive.Number(42),
 	})
 
-	r, ok2 := val.(primitive.String)
+	r, ok2 := val.(primitive.Character)
 	if !ok2 {
-		t.Fatalf("expected string, got %v", val)
+		t.Fatalf("expected character, got %v", val)
 	}
 	if r.ToString() != "*" {
 		t.Fatalf("got wrong result %v", r)
 	}
-
 }
 
 func TestCons(t *testing.T) {

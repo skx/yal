@@ -206,7 +206,7 @@ func chrFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive
 	i := args[0].(primitive.Number)
 	rune := rune(i)
 
-	return primitive.String(rune)
+	return primitive.Character(rune)
 }
 
 // consFn implements (cons).
