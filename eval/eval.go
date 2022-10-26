@@ -56,11 +56,18 @@ func New(src string) *Eval {
 	n := primitive.Nil{}
 
 	// Save them in our symbol-table
-	e.symbols["#t"] = t
-	e.symbols["true"] = t
 	e.symbols["#f"] = f
+	e.symbols["#t"] = t
 	e.symbols["false"] = f
 	e.symbols["nil"] = n
+	e.symbols["true"] = t
+
+	// character literals
+	e.symbols["#\\\\a"] = primitive.Character("\a")
+	e.symbols["#\\\\b"] = primitive.Character("\b")
+	e.symbols["#\\\\t"] = primitive.Character("\t")
+	e.symbols["#\\\\n"] = primitive.Character("\n")
+	e.symbols["#\\\\r"] = primitive.Character("\r")
 
 	// tokenize our input program into a series of terms
 	e.tokenize(src)
@@ -132,29 +139,8 @@ func (ev *Eval) atom(token string) primitive.Primitive {
 			ev.symbols[token] = c
 			return c
 		}
-		if len(lit) == 2 && lit[0] == '\\' {
 
-			// First character is a backslash
-			// we'll expand a couple of characters
-			//
-			// TODO: Do this better.
-			var c primitive.Primitive
-
-			switch lit[1] {
-			case 'n':
-				c = primitive.Character("\n")
-			case 't':
-				c = primitive.Character("\t")
-			case 'r':
-				c = primitive.Character("\r")
-
-			}
-
-			if c.Type() == "character" {
-				ev.symbols[token] = c
-				return c
-			}
-		}
+		// Ensure we have an error
 		return primitive.Error(fmt.Sprintf("invalid character literal: %s", lit))
 	}
 
@@ -509,10 +495,6 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 		//
 		switch obj := exp.(type) {
 
-		// Numbers return themselves
-		case primitive.Number:
-			return exp
-
 		// Booleans return themselves
 		case primitive.Bool:
 			return exp
@@ -521,8 +503,8 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 		case primitive.Character:
 			return exp
 
-		// Strings return themselves
-		case primitive.String:
+		// Errors return themselves
+		case primitive.Error:
 			return exp
 
 		// Hashes return themselves, but the values should be
@@ -538,8 +520,16 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 			}
 			return ret
 
+		// Numbers return themselves
+		case primitive.Number:
+			return exp
+
 		// Nil returns itself
 		case primitive.Nil:
+			return exp
+
+		// Strings return themselves
+		case primitive.String:
 			return exp
 
 		// Symbols return the value they contain
