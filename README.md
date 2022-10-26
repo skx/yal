@@ -39,7 +39,9 @@ If you don't have the repository installed, but you have a working golang toolse
 $ go install github.com/skx/yal@latest
 ```
 
-If neither of those options suit, you may download the most recent binary from our [release page](https://github.com/skx/yal/releases).  Remember that if you're running a Mac you'll need to remove the quarantine flag which _protects you_ from unsigned binaries, for example:
+If neither of those options suit, you may download the most recent binary from our [release page](https://github.com/skx/yal/releases).
+
+Remember that if you're running a Mac you'll need to remove the quarantine flag which _protects you_ from unsigned binaries, for example:
 
 ```sh
 % xattr  -d com.apple.quarantine yal-darwin-amd64
@@ -52,18 +54,19 @@ If neither of those options suit, you may download the most recent binary from o
 
 Once installed there are two ways to execute code:
 
-* By specifying an expressions on the command-line:
+* By specifying an expression to execute upon the command-line:
   * `yal -e '(print (os))'`
 * By passing the name of a file containing lisp code to read and execute:
   * `yal test.lisp`
 
-The yal interpreter allows (optional) documentation to be attached to functions, both those implemented in golang and those written in lisp, there is another command-line flag to dump that information from the standard library and built-in functions:
+The yal interpreter allows (optional) documentation to be attached to functions, both those implemented in the core, and those which are added in lisp:
 
-* `yal -h [regexp]`
+* `yal -h [regexp1] [regexp2] [regexpN]`
   * By default this will show the help for all available functions, in sorted order.
-  * If you specify any regular expressions then any entry which matches the given patterns will be displayed.
+  * If you specify any regular expressions then any entry which matches will be displayed.
+  * The match is attempted on the name of the function _and_ the documentation which is available.
 
-Finally if you've downloaded a binary release from [our release page](https://github.com/skx/yal/releases) the `-v`flag will show you what version you're running:
+Finally if you've downloaded a binary release from [our release page](https://github.com/skx/yal/releases) the `-v` flag will show you what version you're running:
 
 ```sh
 % yal-darwin-amd64 -v
@@ -92,12 +95,14 @@ Error running: error expanding argument [hms] for call to (print ..):
   ERROR{argument 'hms' not a function}
 ```
 
-If you prefer you may exclude specific _parts_ of the standard library, by specify the filenames you wish to exclude separated by commas:
+If you prefer you may exclude specific _parts_ of the standard library, by specifying a comma-separated list of regular expressions:
 
 ```
 $ YAL_STDLIB_EXCLUDE=date,type-checks yal  -e "(print (hms))"
 22:30:57
 ```
+
+Here the regular expressions will be matched against the name of the file(s) in the [standard library directory](stdlib/stdlib/).
 
 
 
