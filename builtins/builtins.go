@@ -1085,8 +1085,14 @@ func ordFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive
 		return primitive.ArityError()
 	}
 
-	if _, ok := args[0].(primitive.String); !ok {
-		return primitive.Error("argument not a string")
+	// We work on strings, or characters
+	switch args[0].Type() {
+	case "character":
+		// nop
+	case "string":
+		// nop
+	default:
+		return primitive.Error(fmt.Sprintf("argument not a character/string, got %v", args[0].Type()))
 	}
 
 	// We convert this to an array of runes because we

@@ -2345,7 +2345,7 @@ func TestOrd(t *testing.T) {
 	if !ok {
 		t.Fatalf("expected error, got %v", out)
 	}
-	if !strings.Contains(string(e), "not a string") {
+	if !strings.Contains(string(e), "not a character/string") {
 		t.Fatalf("got error, but wrong one %v", out)
 	}
 

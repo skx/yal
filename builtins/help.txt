@@ -218,6 +218,7 @@ ord returns the ASCII code for the character provided as the first input.
 
 See also: chr
 Example: (ord "a") ; => 97
+Example: (ord \#*) ; => 42
 %%
 os
 
