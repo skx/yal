@@ -36,6 +36,9 @@ type Eval struct {
 
 	// Recurse keeps track of how many times we've recursed
 	recurse int
+
+	// Symbols contains our (interned) symbol table
+	symbols map[string]primitive.Primitive
 }
 
 // New constructs a new evaluator.
@@ -44,7 +47,20 @@ func New(src string) *Eval {
 	// Create with a default context.
 	e := &Eval{
 		context: context.Background(),
+		symbols: make(map[string]primitive.Primitive),
 	}
+
+	// Setup the default symbols
+	t := primitive.Bool(true)
+	f := primitive.Bool(false)
+	n := primitive.Nil{}
+
+	// Save them in our symbol-table
+	e.symbols["#t"] = t
+	e.symbols["true"] = t
+	e.symbols["#f"] = f
+	e.symbols["false"] = f
+	e.symbols["nil"] = n
 
 	// tokenize our input program into a series of terms
 	e.tokenize(src)
@@ -90,23 +106,42 @@ func (ev *Eval) tokenize(str string) {
 
 // atom converts strings into symbols, booleans, etc, as appropriate.
 func (ev *Eval) atom(token string) primitive.Primitive {
-	switch token {
-	case "#t", "true":
-		return primitive.Bool(true)
-	case "#f", "false":
-		return primitive.Bool(false)
-	case "nil":
-		return primitive.Nil{}
+
+	// Lookup the contents of the symbol in our
+	// symbol-table.
+	//
+	// This gives us interning for free.
+	val, ok := ev.symbols[token]
+	if ok {
+		return val
 	}
+
+	// String
 	if token[0] == '"' {
 		return primitive.String(strings.ReplaceAll(strings.Trim(token, `"`), `\"`, `"`))
 	}
 
-	// if it isn't a number then it is a symbol
+	// Character
+
+	// Is it a number?
 	f, err := strconv.ParseFloat(token, 64)
 	if err == nil {
-		return primitive.Number(f)
+
+		// The value we'll return
+		n := primitive.Number(f)
+
+		// If this is an integer then save it in our
+		// interned table, for the future.
+		if f == float64(int(f)) {
+
+			ev.symbols[token] = n
+		}
+
+		return n
 	}
+
+	// OK, not something special, not a number, string, or
+	// character.  It is a symbol.
 	return primitive.Symbol(token)
 }
 
