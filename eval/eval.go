@@ -50,24 +50,29 @@ func New(src string) *Eval {
 		symbols: make(map[string]primitive.Primitive),
 	}
 
-	// Setup the default symbols
-	t := primitive.Bool(true)
-	f := primitive.Bool(false)
-	n := primitive.Nil{}
+	// Setup the default symbol-table entries
 
-	// Save them in our symbol-table
-	e.symbols["#f"] = f
+	// true
+	t := primitive.Bool(true)
 	e.symbols["#t"] = t
-	e.symbols["false"] = f
-	e.symbols["nil"] = n
 	e.symbols["true"] = t
 
-	// character literals
+	// false
+	f := primitive.Bool(false)
+	e.symbols["#f"] = f
+	e.symbols["false"] = f
+
+	// nil
+	n := primitive.Nil{}
+	e.symbols["nil"] = n
+
+	// character literals - escaped characters
 	e.symbols["#\\\\a"] = primitive.Character("\a")
 	e.symbols["#\\\\b"] = primitive.Character("\b")
-	e.symbols["#\\\\t"] = primitive.Character("\t")
+	e.symbols["#\\\\f"] = primitive.Character("\f")
 	e.symbols["#\\\\n"] = primitive.Character("\n")
 	e.symbols["#\\\\r"] = primitive.Character("\r")
+	e.symbols["#\\\\t"] = primitive.Character("\t")
 
 	// tokenize our input program into a series of terms
 	e.tokenize(src)
