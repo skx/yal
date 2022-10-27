@@ -1,7 +1,9 @@
-;;; comparisons.lisp - Numerical and integer comparisons
+;;; comparisons.lisp - boolean, character, and numerical comparison functions.
 
-;; We've defined "<" in natively, in golang.  We can
-;; define the other relational comparisons in terms of that.
+
+;; We've defined "<" in natively, in golang.
+;;
+;; We can define the other numerical relational comparisons in terms of that.
 (set! >  (fn* (a b)
               "Return true if a is greater than b."
               (< b a)))
@@ -12,6 +14,21 @@
 (set! <= (fn* (a b)
               "Return true if a is less than, or equal to, b."
               (! (> a b))))
+
+
+;; We've defined "char<" in natively, in golang.
+;;
+;; We can define the other relational comparisons in terms of that.
+(set! char>  (fn* (a b)
+              "Return true if a is greater than b."
+              (char< b a)))
+
+(set! char>= (fn* (a b)
+              "Return true if a is greater than, or equal to b."
+              (! (char< a b))))
+(set! char<= (fn* (a b)
+              "Return true if a is less than, or equal to, b."
+              (! (char> a b))))
 
 
 ;;

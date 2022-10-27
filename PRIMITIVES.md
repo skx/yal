@@ -111,6 +111,14 @@ Things you'll find here include:
   * Return all items of the list, except the first.
 * `char=`
   * Return true if the supplied values are characters, equal in value.
+* `char<`
+  * Return true if the first character is less than the second.
+* `char<=`
+  * Return true if the first character is less than, or equal to the second.
+* `char>`
+  * Return true if the first character is greater than the second.
+* `char>=`
+  * Return true if the first character is greater than, or equal to the second.
 * `chr`
   * Return the ASCII character of the given number.
 * `cons`

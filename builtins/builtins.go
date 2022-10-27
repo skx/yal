@@ -103,6 +103,7 @@ func PopulateEnvironment(env *env.Environment) {
 	env.Set("car", &primitive.Procedure{F: carFn, Help: helpMap["car"], Args: []primitive.Symbol{primitive.Symbol("list")}})
 	env.Set("cdr", &primitive.Procedure{F: cdrFn, Help: helpMap["cdr"], Args: []primitive.Symbol{primitive.Symbol("list")}})
 	env.Set("char=", &primitive.Procedure{F: charEqualsFn, Help: helpMap["char="], Args: []primitive.Symbol{primitive.Symbol("a"), primitive.Symbol("b")}})
+	env.Set("char<", &primitive.Procedure{F: charLtFn, Help: helpMap["char<"], Args: []primitive.Symbol{primitive.Symbol("a"), primitive.Symbol("b")}})
 	env.Set("chr", &primitive.Procedure{F: chrFn, Help: helpMap["chr"], Args: []primitive.Symbol{primitive.Symbol("num")}})
 	env.Set("cons", &primitive.Procedure{F: consFn, Help: helpMap["cons"], Args: []primitive.Symbol{primitive.Symbol("a"), primitive.Symbol("b")}})
 	env.Set("contains?", &primitive.Procedure{F: containsFn, Help: helpMap["contains?"], Args: []primitive.Symbol{primitive.Symbol("hash"), primitive.Symbol("key")}})
@@ -234,6 +235,25 @@ func charEqualsFn(env *env.Environment, args []primitive.Primitive) primitive.Pr
 	}
 
 	return ret
+}
+
+
+// charLtFn implements (char<)
+func charLtFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+	if len(args) != 2 {
+		return primitive.ArityError()
+	}
+
+	a, ok1 := args[0].(primitive.Character)
+	if !ok1 {
+		return primitive.Error("argument not a character")
+	}
+
+	b, ok2 := args[1].(primitive.Character);
+	if !ok2 {
+		return primitive.Error("argument not a character")
+	}
+	return primitive.Bool(a < b)
 }
 
 // chrFn is the implementation of (chr ..)
