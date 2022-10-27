@@ -5,7 +5,7 @@ type Symbol string
 
 // ToInterface converts this object to a golang value
 func (s Symbol) ToInterface() any {
-	return s
+	return s.ToString()
 }
 
 // ToString converts this object to a string.
