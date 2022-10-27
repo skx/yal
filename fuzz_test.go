@@ -123,6 +123,7 @@ func FuzzYAL(f *testing.F) {
 		"expected a function body",
 		"expected a list",
 		"expected a symbol",
+		"invalid character literal",
 		"is not a symbol",
 		"must have even length",
 		"not a function",
