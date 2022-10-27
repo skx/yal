@@ -19,7 +19,7 @@ the help file, to see further details.  This is just intended as a summary.
 ## Symbols
 
 The only notable special symbols are the following strings which
-represent the nil value. and ourboolean values.
+represent the nil value. and our boolean values.
 
 * `nil`
   * The nil value.
@@ -28,7 +28,15 @@ represent the nil value. and ourboolean values.
 * `#f`
   * `false` is also available as an alias.
 
-In the future we _might_ support characters, via \#A, etc.
+Characters are specified via the `#\X` syntax, for escaped characters you just need to add the escape:
+
+* `#\a` -> "a"
+* `#\b` -> "b"
+* ..
+* `#\X` -> "X"
+* `#\\n` -> newline
+* `#\\t` -> tab
+
 
 
 
