@@ -20,10 +20,10 @@
 (set! add-numeric-suffix (fn* (n)
                               "Add a trailing suffix to make a number readable."
                               (cond
-                                (match "(^|[^1]+)1$" n) (sprintf "%sst" n)
-                                (match "(^|[^1]+)2$" n) (sprintf "%snd" n)
-                                (match "(^|[^1]+)3$" n) (sprintf "%srd" n)
-                                true  (sprintf "%sth" n)
+                                (match "(^|[^1]+)1$" n) (sprintf "%dst" n)
+                                (match "(^|[^1]+)2$" n) (sprintf "%dnd" n)
+                                (match "(^|[^1]+)3$" n) (sprintf "%drd" n)
+                                true  (sprintf "%dth" n)
                                 )))
 
 ;; Fibonacci function
@@ -37,5 +37,5 @@
 ;; Now call our function in a loop, twenty times.
 (let* (n 1)
   (while (<= n 25)
-    (print "%s fibonacci number is %s" (add-numeric-suffix n) (fibonacci n))
+    (print "%s fibonacci number is %d" (add-numeric-suffix n) (fibonacci n))
     (set! n (+ n 1) true)))

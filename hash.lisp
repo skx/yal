@@ -22,7 +22,7 @@
 
 ;; This function is used as a callback by apply-hash.
 (set! hash-element (fn* (key val)
-   (print "KEY:%s VAL:%s" key val)))
+   (print "KEY:%s VAL:%s" key (str val))))
 
 ;; The `apply-hash` function will trigger a callback for each key and value
 ;; within a hash.

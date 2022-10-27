@@ -6,7 +6,7 @@
 ;;
 
 ;; Show the count.
-(print "I received %s command-line arguments." (length os.args))
+(print "I received %d command-line arguments." (length os.args))
 
 ;; Show the actual arguments
 (print "Args: %s" os.args)

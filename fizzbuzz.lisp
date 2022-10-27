@@ -14,7 +14,7 @@ and 'fizzbuzz' when divisible by both."
                             (= 0 (% n 15)) "fizzbuzz"
                             (= 0 (% n 3))  "fizz"
                             (= 0 (% n 5))  "buzz"
-                            true n) )))
+                            true (str n)) )))
 
 
 ;; As you can see the function above contains some help-text, or overview.
