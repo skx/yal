@@ -5,7 +5,7 @@ type Bool bool
 
 // ToInterface converts this object to a golang value
 func (b Bool) ToInterface() any {
-	return b
+	return bool(b)
 }
 
 // ToString converts this object to a string.
