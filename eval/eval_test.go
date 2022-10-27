@@ -36,6 +36,11 @@ func TestEvaluate(t *testing.T) {
 		{"#f", "#f"},
 		{"false", "#f"},
 
+		// character literals
+		{"#\\\\n", "\n"},
+		{"#\\a", "a"},
+		{"#\\AB", "ERROR{invalid character literal: AB}"},
+
 		// literals
 		{":foo", ":foo"},
 
