@@ -101,6 +101,8 @@ Things you'll find here include:
   * Return the first item of a list.
 * `cdr`
   * Return all items of the list, except the first.
+* `char=`
+  * Return true if the supplied values are characters, equal in value.
 * `chr`
   * Return the ASCII character of the given number.
 * `cons`
@@ -120,6 +122,8 @@ Things you'll find here include:
   * Return an error.
 * `exists?`
   * Does the given path exist?
+* `explode`
+  * Convert the supplied string to a list of characters.
 * `file?`
   * Does the given path exist, and is it not a directory?
 * `file:lines`
@@ -156,7 +160,7 @@ Things you'll find here include:
 * `now`
   * Return the number of seconds past the Unix Epoch.
 * `ord`
-  * Return the ASCII code of the specified character.
+  * Return the ASCII code of the specified character, or the first character of the supplied string.
 * `os`
   * Return a string describing the current operating-system.
 * `print`
