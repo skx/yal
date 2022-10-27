@@ -36,6 +36,9 @@ type Eval struct {
 
 	// Recurse keeps track of how many times we've recursed
 	recurse int
+
+	// Symbols contains our (interned) symbol table
+	symbols map[string]primitive.Primitive
 }
 
 // New constructs a new evaluator.
@@ -44,7 +47,32 @@ func New(src string) *Eval {
 	// Create with a default context.
 	e := &Eval{
 		context: context.Background(),
+		symbols: make(map[string]primitive.Primitive),
 	}
+
+	// Setup the default symbol-table entries
+
+	// true
+	t := primitive.Bool(true)
+	e.symbols["#t"] = t
+	e.symbols["true"] = t
+
+	// false
+	f := primitive.Bool(false)
+	e.symbols["#f"] = f
+	e.symbols["false"] = f
+
+	// nil
+	n := primitive.Nil{}
+	e.symbols["nil"] = n
+
+	// character literals - escaped characters
+	e.symbols["#\\\\a"] = primitive.Character("\a")
+	e.symbols["#\\\\b"] = primitive.Character("\b")
+	e.symbols["#\\\\f"] = primitive.Character("\f")
+	e.symbols["#\\\\n"] = primitive.Character("\n")
+	e.symbols["#\\\\r"] = primitive.Character("\r")
+	e.symbols["#\\\\t"] = primitive.Character("\t")
 
 	// tokenize our input program into a series of terms
 	e.tokenize(src)
@@ -90,23 +118,56 @@ func (ev *Eval) tokenize(str string) {
 
 // atom converts strings into symbols, booleans, etc, as appropriate.
 func (ev *Eval) atom(token string) primitive.Primitive {
-	switch token {
-	case "#t", "true":
-		return primitive.Bool(true)
-	case "#f", "false":
-		return primitive.Bool(false)
-	case "nil":
-		return primitive.Nil{}
+
+	// Lookup the contents of the symbol in our
+	// symbol-table.
+	//
+	// This gives us interning for free.
+	val, ok := ev.symbols[token]
+	if ok {
+		return val
 	}
+
+	// String
 	if token[0] == '"' {
 		return primitive.String(strings.ReplaceAll(strings.Trim(token, `"`), `\"`, `"`))
 	}
 
-	// if it isn't a number then it is a symbol
+	// Character
+	if strings.HasPrefix(token, "#\\") {
+		lit := token[2:]
+
+		if len(lit) == 1 {
+
+			// simple case "#\x", for example
+			c := primitive.Character(lit)
+			ev.symbols[token] = c
+			return c
+		}
+
+		// Ensure we have an error
+		return primitive.Error(fmt.Sprintf("invalid character literal: %s", lit))
+	}
+
+	// Is it a number?
 	f, err := strconv.ParseFloat(token, 64)
 	if err == nil {
-		return primitive.Number(f)
+
+		// The value we'll return
+		n := primitive.Number(f)
+
+		// If this is an integer then save it in our
+		// interned table, for the future.
+		if f == float64(int(f)) {
+
+			ev.symbols[token] = n
+		}
+
+		return n
 	}
+
+	// OK, not something special, not a number, string, or
+	// character.  It is a symbol.
 	return primitive.Symbol(token)
 }
 
@@ -439,16 +500,16 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 		//
 		switch obj := exp.(type) {
 
-		// Numbers return themselves
-		case primitive.Number:
-			return exp
-
 		// Booleans return themselves
 		case primitive.Bool:
 			return exp
 
-		// Strings return themselves
-		case primitive.String:
+		// Characters return themselves
+		case primitive.Character:
+			return exp
+
+		// Errors return themselves
+		case primitive.Error:
 			return exp
 
 		// Hashes return themselves, but the values should be
@@ -464,8 +525,16 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 			}
 			return ret
 
+		// Numbers return themselves
+		case primitive.Number:
+			return exp
+
 		// Nil returns itself
 		case primitive.Nil:
+			return exp
+
+		// Strings return themselves
+		case primitive.String:
 			return exp
 
 		// Symbols return the value they contain

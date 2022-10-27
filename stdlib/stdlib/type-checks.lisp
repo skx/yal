@@ -37,6 +37,10 @@
                      "Returns true if the argument specified is a string."
                      (eq (type x) "string")))
 
+(set! character?   (fn* (x)
+                     "Returns true if the argument specified is a character."
+                     (eq (type x) "character")))
+
 (set! symbol?   (fn* (x)
                      "Returns true if the argument specified is a symbol."
                      (eq (type x) "symbol")))

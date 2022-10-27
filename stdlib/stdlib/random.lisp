@@ -6,9 +6,9 @@
                        "Return a random character by default from the set a-z.
 
 If an optional string is provided it will be used as a list of characters to choose from."
-                       (let* (chars (split "abcdefghijklmnopqrstuvwxyz" ""))
+                       (let* (chars (explode "abcdefghijklmnopqrstuvwxyz"))
                          (if (list? x)
-                             (set! chars (split (car x) "")))
+                             (set! chars (explode (car x))))
                          (random:item chars))))
 
 ;; random list item

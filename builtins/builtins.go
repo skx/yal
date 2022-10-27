@@ -102,6 +102,8 @@ func PopulateEnvironment(env *env.Environment) {
 	env.Set("arch", &primitive.Procedure{F: archFn, Help: helpMap["arch"]})
 	env.Set("car", &primitive.Procedure{F: carFn, Help: helpMap["car"], Args: []primitive.Symbol{primitive.Symbol("list")}})
 	env.Set("cdr", &primitive.Procedure{F: cdrFn, Help: helpMap["cdr"], Args: []primitive.Symbol{primitive.Symbol("list")}})
+	env.Set("char=", &primitive.Procedure{F: charEqualsFn, Help: helpMap["char="], Args: []primitive.Symbol{primitive.Symbol("a"), primitive.Symbol("b")}})
+	env.Set("char<", &primitive.Procedure{F: charLtFn, Help: helpMap["char<"], Args: []primitive.Symbol{primitive.Symbol("a"), primitive.Symbol("b")}})
 	env.Set("chr", &primitive.Procedure{F: chrFn, Help: helpMap["chr"], Args: []primitive.Symbol{primitive.Symbol("num")}})
 	env.Set("cons", &primitive.Procedure{F: consFn, Help: helpMap["cons"], Args: []primitive.Symbol{primitive.Symbol("a"), primitive.Symbol("b")}})
 	env.Set("contains?", &primitive.Procedure{F: containsFn, Help: helpMap["contains?"], Args: []primitive.Symbol{primitive.Symbol("hash"), primitive.Symbol("key")}})
@@ -111,6 +113,7 @@ func PopulateEnvironment(env *env.Environment) {
 	env.Set("eq", &primitive.Procedure{F: eqFn, Help: helpMap["eq"], Args: []primitive.Symbol{primitive.Symbol("a"), primitive.Symbol("b")}})
 	env.Set("error", &primitive.Procedure{F: errorFn, Help: helpMap["error"], Args: []primitive.Symbol{primitive.Symbol("message")}})
 	env.Set("exists?", &primitive.Procedure{F: existsFn, Help: helpMap["exists?"], Args: []primitive.Symbol{primitive.Symbol("path")}})
+	env.Set("explode", &primitive.Procedure{F: explodeFn, Help: helpMap["explode"], Args: []primitive.Symbol{primitive.Symbol("string")}})
 	env.Set("file:lines", &primitive.Procedure{F: fileLinesFn, Help: helpMap["file:lines"], Args: []primitive.Symbol{primitive.Symbol("path")}})
 	env.Set("file:read", &primitive.Procedure{F: fileReadFn, Help: helpMap["file:read"], Args: []primitive.Symbol{primitive.Symbol("path")}})
 	env.Set("file:stat", &primitive.Procedure{F: fileStatFn, Help: helpMap["file:stat"], Args: []primitive.Symbol{primitive.Symbol("path")}})
@@ -191,6 +194,68 @@ func cdrFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive
 	return primitive.Nil{}
 }
 
+// charEqualsFn implements "char="
+func charEqualsFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+
+	// We need at least two arguments
+	if len(args) < 2 {
+		return primitive.ArityError()
+	}
+
+	// First argument must be a character
+	nA, ok := args[0].(primitive.Character)
+	if !ok {
+		return primitive.Error("argument was not a character")
+	}
+
+	// Now we'll loop over all other arguments
+	//
+	// If we got something that was NOT the same as our
+	// initial value we can terminate early but we don't
+	// because it is important to also report on failures to
+	// validate types - which we can't do if we bail.
+	//
+	ret := primitive.Bool(true)
+
+	for _, i := range args[1:] {
+
+		// check we have a character
+		nB, ok2 := i.(primitive.Character)
+
+		if !ok2 {
+			return primitive.Error("argument was not a character")
+		}
+
+		// Record our failure, but keep testing in case
+		// we have a type violation to report in a later
+		// argument.
+		if nB != nA {
+			ret = primitive.Bool(false)
+		}
+	}
+
+	return ret
+}
+
+
+// charLtFn implements (char<)
+func charLtFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+	if len(args) != 2 {
+		return primitive.ArityError()
+	}
+
+	a, ok1 := args[0].(primitive.Character)
+	if !ok1 {
+		return primitive.Error("argument not a character")
+	}
+
+	b, ok2 := args[1].(primitive.Character);
+	if !ok2 {
+		return primitive.Error("argument not a character")
+	}
+	return primitive.Bool(a < b)
+}
+
 // chrFn is the implementation of (chr ..)
 func chrFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 
@@ -205,7 +270,7 @@ func chrFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive
 	i := args[0].(primitive.Number)
 	rune := rune(i)
 
-	return primitive.String(rune)
+	return primitive.Character(rune)
 }
 
 // consFn implements (cons).
@@ -506,6 +571,33 @@ func expandStr(input string) string {
 	}
 
 	return out
+}
+
+// explodeFn splits a string into a list of characters
+func explodeFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+
+	// We only need a single argument
+	if len(args) != 1 {
+		return primitive.ArityError()
+	}
+
+	// Which is a string
+	str, ok := args[0].(primitive.String)
+	if !ok {
+		return primitive.Error("argument not a string")
+	}
+
+	// Split it
+	out := strings.Split(str.ToString(), "")
+
+	// return a list of characters
+	var c primitive.List
+
+	for _, x := range out {
+		c = append(c, primitive.Character(x))
+	}
+
+	return c
 }
 
 // expnFn implements "#"
@@ -1085,8 +1177,14 @@ func ordFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive
 		return primitive.ArityError()
 	}
 
-	if _, ok := args[0].(primitive.String); !ok {
-		return primitive.Error("argument not a string")
+	// We work on strings, or characters
+	switch args[0].Type() {
+	case "character":
+		// nop
+	case "string":
+		// nop
+	default:
+		return primitive.Error(fmt.Sprintf("argument not a character/string, got %v", args[0].Type()))
 	}
 
 	// We convert this to an array of runes because we
