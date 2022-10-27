@@ -1251,10 +1251,7 @@ func printFn(env *env.Environment, args []primitive.Primitive) primitive.Primiti
 	frmt := expandStr(args[0].ToString())
 	parm := []any{}
 
-	for i, a := range args {
-		if i == 0 {
-			continue
-		}
+	for _, a := range args[1:] {
 
 		// If we can use ToNative then do that,
 		// otherwise fall back to outputting a string.
@@ -1432,11 +1429,16 @@ func sprintfFn(env *env.Environment, args []primitive.Primitive) primitive.Primi
 	frmt := expandStr(args[0].ToString())
 	parm := []any{}
 
-	for i, a := range args {
-		if i == 0 {
-			continue
+	for _, a := range args[1:] {
+
+		// If we can use ToNative then do that,
+		// otherwise fall back to outputting a string.
+		native, ok := a.(primitive.ToNative)
+		if ok {
+			parm = append(parm, native.ToInterface())
+		} else {
+			parm = append(parm, a.ToString())
 		}
-		parm = append(parm, a.ToString())
 	}
 
 	out := fmt.Sprintf(frmt, parm...)
