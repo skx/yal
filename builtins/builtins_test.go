@@ -157,6 +157,129 @@ func TestCdr(t *testing.T) {
 	}
 }
 
+// TestCharEquals tests "chare=" (character equality)
+func TestCharEquals(t *testing.T) {
+
+	// No arguments
+	out := charEqualsFn(ENV, []primitive.Primitive{})
+
+	// Will lead to an error
+	e, ok := out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if e != primitive.ArityError() {
+		t.Fatalf("got error, but wrong one %v", out)
+	}
+
+	// One bogus argument
+	out = charEqualsFn(ENV, []primitive.Primitive{
+		primitive.Number(33),
+		primitive.Character("a"),
+	})
+
+	// Will lead to an error
+	e, ok = out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if !strings.Contains(string(e), "was not a character") {
+		t.Fatalf("got error, but wrong one %v", out)
+	}
+
+	//
+	// Now a real one: equal
+	//
+	out = charEqualsFn(ENV, []primitive.Primitive{
+		primitive.Character("a"),
+		primitive.Character("a"),
+	})
+
+	// Will work
+	n, ok2 := out.(primitive.Bool)
+	if !ok2 {
+		t.Fatalf("expected bool, got %v", out)
+	}
+	if n != true {
+		t.Fatalf("got wrong result")
+	}
+
+	//
+	// Now a real one: equal - but multiple values
+	//
+	out = charEqualsFn(ENV, []primitive.Primitive{
+		primitive.Character("b"),
+		primitive.Character("b"),
+		primitive.Character("b"),
+		primitive.Character("b"),
+		primitive.Character("b"),
+		primitive.Character("b"),
+	})
+
+	// Will work
+	n, ok2 = out.(primitive.Bool)
+	if !ok2 {
+		t.Fatalf("expected bool, got %v", out)
+	}
+	if n != true {
+		t.Fatalf("got wrong result")
+	}
+
+	//
+	// Now a real one: unequal values
+	//
+	out = charEqualsFn(ENV, []primitive.Primitive{
+		primitive.Character("a"),
+		primitive.Character("b"),
+		primitive.Character("c"),
+		primitive.Character("d"),
+	})
+
+	// Will work
+	n, ok2 = out.(primitive.Bool)
+	if !ok2 {
+		t.Fatalf("expected bool, got %v", out)
+	}
+	if n != false {
+		t.Fatalf("got wrong result")
+	}
+
+	//
+	// Now with wrong types - last one is wrong
+	//
+	out = charEqualsFn(ENV, []primitive.Primitive{
+		primitive.Character("a"),
+		primitive.Character("b"),
+		primitive.Character("c"),
+		primitive.Character("d"),
+		primitive.String("e"),
+	})
+
+	e, ok = out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if !strings.Contains(string(e), "was not a character") {
+		t.Fatalf("got error, but wrong one '%v'", e)
+	}
+
+	//
+	// Now with wrong types
+	//
+	out = charEqualsFn(ENV, []primitive.Primitive{
+		primitive.Character("b"),
+		primitive.Number(9),
+	})
+
+	// Will report an error
+	e, ok = out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if !strings.Contains(string(e), "was not a character") {
+		t.Fatalf("got error, but wrong one %v", out)
+	}
+}
 func TestChr(t *testing.T) {
 
 	// no arguments

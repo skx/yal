@@ -102,6 +102,7 @@ func PopulateEnvironment(env *env.Environment) {
 	env.Set("arch", &primitive.Procedure{F: archFn, Help: helpMap["arch"]})
 	env.Set("car", &primitive.Procedure{F: carFn, Help: helpMap["car"], Args: []primitive.Symbol{primitive.Symbol("list")}})
 	env.Set("cdr", &primitive.Procedure{F: cdrFn, Help: helpMap["cdr"], Args: []primitive.Symbol{primitive.Symbol("list")}})
+	env.Set("char=", &primitive.Procedure{F: charEqualsFn, Help: helpMap["char="], Args: []primitive.Symbol{primitive.Symbol("a"), primitive.Symbol("b")}})
 	env.Set("chr", &primitive.Procedure{F: chrFn, Help: helpMap["chr"], Args: []primitive.Symbol{primitive.Symbol("num")}})
 	env.Set("cons", &primitive.Procedure{F: consFn, Help: helpMap["cons"], Args: []primitive.Symbol{primitive.Symbol("a"), primitive.Symbol("b")}})
 	env.Set("contains?", &primitive.Procedure{F: containsFn, Help: helpMap["contains?"], Args: []primitive.Symbol{primitive.Symbol("hash"), primitive.Symbol("key")}})
@@ -190,6 +191,49 @@ func cdrFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive
 		return lst[1:]
 	}
 	return primitive.Nil{}
+}
+
+// charEqualsFn implements "char="
+func charEqualsFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+
+	// We need at least two arguments
+	if len(args) < 2 {
+		return primitive.ArityError()
+	}
+
+	// First argument must be a character
+	nA, ok := args[0].(primitive.Character)
+	if !ok {
+		return primitive.Error("argument was not a character")
+	}
+
+	// Now we'll loop over all other arguments
+	//
+	// If we got something that was NOT the same as our
+	// initial value we can terminate early but we don't
+	// because it is important to also report on failures to
+	// validate types - which we can't do if we bail.
+	//
+	ret := primitive.Bool(true)
+
+	for _, i := range args[1:] {
+
+		// check we have a character
+		nB, ok2 := i.(primitive.Character)
+
+		if !ok2 {
+			return primitive.Error("argument was not a character")
+		}
+
+		// Record our failure, but keep testing in case
+		// we have a type violation to report in a later
+		// argument.
+		if nB != nA {
+			ret = primitive.Bool(false)
+		}
+	}
+
+	return ret
 }
 
 // chrFn is the implementation of (chr ..)

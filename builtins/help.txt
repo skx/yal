@@ -30,7 +30,7 @@ returns true if the numerical values supplied are all equal to each other.
 Note that multiple values may be specified, so it is possible to compare
 three, or more, values as per the second example below.
 
-See also: eq
+See also: char=, eq
 Example : (print (= 3 a))
 Example : (print (= 3 a b))
 %%
@@ -48,6 +48,12 @@ car returns the first item from the specified list.
 %%
 cdr
 cdr returns all items from the specified list, except the first.
+%%
+char=
+
+char= returns true if the supplied parameters were characters, and were equal.
+
+See also: =
 %%
 chr
 chr returns a string containing the single character who's ASCII code was provided.
