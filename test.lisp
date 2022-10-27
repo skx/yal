@@ -18,7 +18,7 @@
 ;; Use our "repeat" function, from the standard library, to run a block
 ;; N/10 times.  The number of the attempt is given as a parameter.
 ;;
-(repeat 10 (lambda (n) (print "I'm in a loop %s" n)))
+(repeat 10 (lambda (n) (print "I'm in a loop %d" n)))
 
 ;;
 ;; Use our "while" function, from the standard library, to run a block
@@ -27,7 +27,7 @@
 (let* (a 5)
   (while (> a 0)
     (do
-     (print "(while) loop - iteration %s" a)
+     (print "(while) loop - iteration %d" a)
      (set! a (- a 1) true))))
 
 
@@ -55,7 +55,7 @@ it took to execute.  Return that time, in ms."
 ;; `now` function which times how long it took.
 (apply (list 1 10 100 1000 10000 50000 100000)
        (lambda (x)
-         (print "Calculating %s factorial took %sms"
+         (print "Calculating %d factorial took %dms"
            x
            (benchmark (lambda () (fact x))))))
 
@@ -69,9 +69,9 @@ it took to execute.  Return that time, in ms."
 ;; Define a variable "foo => 0"
 ;; but then change it, and show that result
 (let* (foo 0)
-  (print "foo is set to %s" foo)
+  (print "foo is set to %d" foo)
   (set! foo 3)
-  (print "foo is now set to %s" foo))
+  (print "foo is now set to %d" foo))
 
 ;;Now we're outside the scope of the `let` so `foo` is nil
 (if foo
@@ -81,7 +81,7 @@ it took to execute.  Return that time, in ms."
 
 ;; Define another function, and invoke it
 (set! sum2 (fn* (n acc) (if (= n 0) acc (sum2 (- n 1) (+ n acc)))))
-(print "Sum of 1-100: %s" (sum2 100 0))
+(print "Sum of 1-100: %d" (sum2 100 0))
 
 ;; Now create a utility function to square a number
 (set! sq (fn* (x) (* x x)))
@@ -90,21 +90,21 @@ it took to execute.  Return that time, in ms."
 ;; Awesome!  Much Wow!
 (apply (nat 10)
       (lambda (x)
-        (print "%s\tsquared is %s" x (sq x))))
+        (print "%d\tsquared is %d" x (sq x))))
 
 ;; Test our some of our earlier functions against a range of numbers
 (apply (list -2 -1 0 1 2 3 4 5)
   (lambda (x)
     (do
-      (if (neg? x)  (print "%s is negative" x))
-      (if (zero? x) (print "%s is ZERO"     x))
-      (if (even? x) (print "%s is EVEN"     x))
-      (if (odd? x)  (print "%s is ODD"      x)))))
+      (if (neg? x)  (print "%d is negative" x))
+      (if (zero? x) (print "%d is ZERO"     x))
+      (if (even? x) (print "%d is EVEN"     x))
+      (if (odd? x)  (print "%d is ODD"      x)))))
 
 ;; Test that we can get the correct type of each of our primitives
 (apply (list 1 "steve" (list 1 2 3) true #t false #f nil boolean? print)
   (lambda (x)
-    (print "'%s' has type '%s'" x (type x))))
+    (print "'%s' has type '%s'" (str x) (type x))))
 
 
 ;;
@@ -123,11 +123,11 @@ it took to execute.  Return that time, in ms."
 ;;
 (let* (vals '(32 92 109 903 31 3 -93 -31 -17 -3))
   (print "Working with the list: %s " vals)
-  (print "\tBiggest item is %s"       (max vals))
-  (print "\tSmallest item is %s"      (min vals))
+  (print "\tBiggest item is %d"       (max vals))
+  (print "\tSmallest item is %d"      (min vals))
   (print "\tReversed list is %s "     (reverse vals))
   (print "\tSorted list is %s "       (sort vals))
-  (print "\tFirst item is %s "        (first vals))
+  (print "\tFirst item is %d "        (first vals))
   (print "\tRemaining items %s "      (rest vals)))
 
 
@@ -175,21 +175,21 @@ it took to execute.  Return that time, in ms."
 
 ;; We have a built-in eval function, which operates upon symbols, or strings.
 (set! e "(+ 3 4)")
-(print "Eval of '%s' resulted in %s" e (eval e))
-(print "Eval of '%s' resulted in %s" "(+ 40 2)" (eval "(+ 40 2)"))
+(print "Eval of '%s' resulted in %d" e (eval e))
+(print "Eval of '%s' resulted in %d" "(+ 40 2)" (eval "(+ 40 2)"))
 
 ;; Simple test of `cond`
 (set! a 6)
 (cond
     (> a 20) (print "A > 20")
     (> a 15) (print "A > 15")
-    true     (print "A is %s" a)
+    true     (print "A is %d" a)
 )
 
 ;;
 ;; Trivial Read/Eval pair
 ;;
-(print "The answer to life, the universe, and everything is %s!\n"
+(print "The answer to life, the universe, and everything is %d!\n"
   (eval (read "(* 6 7)")))
 
 ;; Upper-case and lower-casing of strings

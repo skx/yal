@@ -1,7 +1,14 @@
 package primitive
 
+import "fmt"
+
 // Error holds an error message.
 type Error string
+
+// ToInterface converts this object to a golang value
+func (e Error) ToInterface() any {
+	return fmt.Errorf(string(e))
+}
 
 // ToString converts this object to a string.
 func (e Error) ToString() string {

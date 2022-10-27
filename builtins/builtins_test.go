@@ -2718,17 +2718,35 @@ func TestPrint(t *testing.T) {
 
 	// Two argument
 	out = printFn(ENV, []primitive.Primitive{
-		primitive.String("Hello %s!"),
-		primitive.String("Steve"),
+		primitive.String("Hello %d!"),
+		primitive.Number(3),
 	})
 
 	e2, ok2 = out.(primitive.String)
 	if !ok2 {
 		t.Fatalf("expected string, got %v", out)
 	}
-	if e2 != "Hello Steve!" {
-		t.Fatalf("got error, but wrong one %v", e2)
+	if e2 != "Hello 3!" {
+		t.Fatalf("got string, but wrong one %v", e2)
 	}
+
+	// Two argument with a type that can't be native-converated
+	out = printFn(ENV, []primitive.Primitive{
+		primitive.String("Hello %s!"),
+		primitive.List{
+			primitive.Number(3),
+			primitive.Number(4),
+		},
+	})
+
+	e2, ok2 = out.(primitive.String)
+	if !ok2 {
+		t.Fatalf("expected string, got %v", out)
+	}
+	if e2 != "Hello (3 4)!" {
+		t.Fatalf("got string, but wrong one %v", e2)
+	}
+
 }
 
 // TestRandom tests (random)
@@ -3007,6 +3025,20 @@ func TestSprintf(t *testing.T) {
 	}
 	if e2 != "Hello\t\"world\"\n\r!" {
 		t.Fatalf("got wrong result %v", e2)
+	}
+
+	// Two arguments with a native mapping
+	out = sprintfFn(ENV, []primitive.Primitive{
+		primitive.String("Hello %d!"),
+		primitive.Number(3),
+	})
+
+	e2, ok2 = out.(primitive.String)
+	if !ok2 {
+		t.Fatalf("expected string, got %v", out)
+	}
+	if e2 != "Hello 3!" {
+		t.Fatalf("got string, but wrong one %v", e2)
 	}
 }
 
