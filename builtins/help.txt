@@ -53,7 +53,13 @@ char=
 
 char= returns true if the supplied parameters were characters, and were equal.
 
-See also: =
+See also: = char<
+%%
+char<
+
+char< returns true if the first character is "less than" the second character.
+
+See also: < char=
 %%
 chr
 chr returns a string containing the single character who's ASCII code was provided.
