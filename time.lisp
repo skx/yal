@@ -10,9 +10,9 @@
 ;; made available by helper-functions defined in our standard-library.
 ;;
 
-(print "The year is %s" (date:year))
-(print "The date is %s/%s/%s" (date:day) (date:month) (date:year))
-(print "The time is %s (%s seconds past the epoch)" (time:hms) (now))
+(print "The year is %d" (date:year))
+(print "The date is %d/%d/%d" (date:day) (date:month) (date:year))
+(print "The time is %s (%d seconds past the epoch)" (time:hms) (now))
 (print "Today is a %s" (date:weekday))
 
 (print "Date as a list %s" (date))
