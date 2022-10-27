@@ -252,6 +252,14 @@ print
 
 print is used to output text to the console.  It can be called with either an object/string to print, or a format-string and list of parameters.
 
+When a format string is used it can contain the following strings:
+
+%c -> output a character value.
+%d -> output an integer.
+%f -> output a floating-point number.
+%s -> output a string.
+%t -> output a boolean value.
+
 See also: sprintf
 Example: (print "Hello, world")
 Example: (print "Hello user %s you are %d" (getenv "USER") 32)
@@ -302,6 +310,14 @@ Example: (split "steve" "")  ; => ("s" "t" "e" "v" "e")
 sprintf
 
 sprintf allows formating values with a simple format-string.
+
+When a format string is used it can contain the following strings:
+
+%c -> output a character value.
+%d -> output an integer.
+%f -> output a floating-point number.
+%s -> output a string.
+%t -> output a boolean value.
 
 See also: print
 Example: (sprintf "Today is %s" (weekday))
