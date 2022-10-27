@@ -7,6 +7,18 @@ import (
 // Number type holds numbers.
 type Number float64
 
+// ToInterface converts this object to a golang value
+func (n Number) ToInterface() any {
+
+	// int?
+	if float64(n) == float64(int(n)) {
+		return int(n)
+	}
+
+	// float
+	return float64(n)
+}
+
 // ToString converts this object to a string.
 func (n Number) ToString() string {
 

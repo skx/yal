@@ -3,6 +3,11 @@ package primitive
 // Symbol is the type for our symbols.
 type Symbol string
 
+// ToInterface converts this object to a golang value
+func (s Symbol) ToInterface() any {
+	return s
+}
+
 // ToString converts this object to a string.
 func (s Symbol) ToString() string {
 	return string(s)

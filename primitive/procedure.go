@@ -34,6 +34,11 @@ type Procedure struct {
 	Macro bool
 }
 
+// ToInterface converts this object to a golang value
+func (p *Procedure) ToInterface() any {
+	return p.ToString()
+}
+
 // ToString converts this object to a string.
 func (p *Procedure) ToString() string {
 	if p.F != nil {
