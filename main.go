@@ -108,6 +108,9 @@ func main() {
 		// We can only get help for functions which are present.
 		interpreter.Evaluate(environment)
 
+		// Show aliased functions, separately
+		aliased := interpreter.Aliased()
+
 		// Build up a list of all things known in the environment
 		keys := []string{}
 
@@ -142,6 +145,13 @@ func main() {
 
 			// Get the text
 			txt := prc.Help
+
+			// Is this an aliased function?
+			target, ok := aliased[key]
+			if ok {
+
+				txt = fmt.Sprintf("%s is an alias for %s.", key, target)
+			}
 
 			// Build up the arguments
 			args := ""
