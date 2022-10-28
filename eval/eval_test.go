@@ -13,6 +13,54 @@ import (
 	"github.com/skx/yal/stdlib"
 )
 
+// TestAliased ensures we have some aliases
+func TestAliased(t *testing.T) {
+
+	// Load our standard library
+	st := stdlib.Contents()
+	std := string(st)
+
+	// Create a new interpreter to evaluate 3
+	l := New(std + "\n3")
+
+	// With a new environment
+	env := env.New()
+
+	// Populate the default primitives
+	builtins.PopulateEnvironment(env)
+
+	// Run it
+	out := l.Evaluate(env)
+	if out.ToString() != "3" {
+		t.Fatalf("got wrong result")
+	}
+
+	// Get the aliases
+	a := l.Aliased()
+
+	// Count of functions with a similar name
+	//
+	// i.e "hms" is like "time:hms"
+	//
+	similar := 0
+
+	//
+	// Look for similarities
+	//
+	for k, v := range a {
+
+		if strings.Contains(v, k) {
+			t.Logf("%s contains %s\n", v, k)
+			similar++
+		}
+	}
+
+	if similar == 0 {
+		t.Fatalf("found no similar aliases")
+	}
+
+}
+
 // This function contains a bunch of table-driven tests which are
 // designed to be simple.
 func TestEvaluate(t *testing.T) {
