@@ -37,8 +37,11 @@ type Eval struct {
 	// Recurse keeps track of how many times we've recursed
 	recurse int
 
-	// Symbols contains our (interned) symbol table
+	// Symbols contains our (interned) symbol atom
 	symbols map[string]primitive.Primitive
+
+	// aliases contains any record of aliased functionality
+	aliases map[string]string
 }
 
 // New constructs a new evaluator.
@@ -74,6 +77,9 @@ func New(src string) *Eval {
 	e.symbols["#\\\\r"] = primitive.Character("\r")
 	e.symbols["#\\\\t"] = primitive.Character("\t")
 
+	// Record aliases here
+	e.aliases = make(map[string]string)
+
 	// tokenize our input program into a series of terms
 	e.tokenize(src)
 
@@ -86,6 +92,11 @@ func New(src string) *Eval {
 // execution of user-supplied scripts.
 func (ev *Eval) SetContext(ctx context.Context) {
 	ev.context = ctx
+}
+
+// Aliased returns records of anything that has been aliased with "(alias ..)"
+func (ev *Eval) Aliased() map[string]string {
+	return ev.aliases
 }
 
 // tokenize splits the input string into tokens, via a horrific regular
@@ -586,12 +597,14 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 				for i := 0; i < len(args); i += 2 {
 
 					// The key/val pair we're working with
-					key := args[i]
-					val := args[i+1]
+					new := args[i]
+					orig := args[i+1]
 
-					old, ok := e.Get(val.ToString())
+					old, ok := e.Get(orig.ToString())
 					if ok {
-						e.Set(key.ToString(), old)
+						e.Set(new.ToString(), old)
+
+						ev.aliases[new.ToString()] = orig.ToString()
 					}
 				}
 				return primitive.Nil{}
