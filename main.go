@@ -27,17 +27,167 @@ import (
 var (
 	version = "unreleased"
 	sha1sum = "unknown"
+
+	// ENV is the environment the interpreter uses.
+	ENV *env.Environment
+
+	// LISP is the actual interpreter.
+	LISP *eval.Eval
 )
+
+// create handles the setup of our global interpreter and environment.
+//
+// The standard-library will be loaded, and os.args will be populated.
+func create() {
+
+	// Create a new environment
+	ENV = env.New()
+
+	// Populate the default primitives
+	builtins.PopulateEnvironment(ENV)
+
+	// Build up a list of the command-line arguments
+	args := primitive.List{}
+
+	// Adding them to the list
+	for _, arg := range flag.Args() {
+		args = append(args, primitive.String(arg))
+	}
+
+	// Before setting them in the environment
+	ENV.Set("os.args", args)
+
+	// Read the standard library
+	txt := stdlib.Contents()
+
+	// Create a new interpreter with that source
+	LISP = eval.New(string(txt))
+
+	// Now evaluate the input using the specified environment
+	out := LISP.Evaluate(ENV)
+
+	// Did we get an error?  Then show it.
+	if _, ok := out.(primitive.Error); ok {
+		fmt.Printf("Error executing standard-library: %v\n", out)
+		os.Exit(1)
+	}
+}
+
+// help - show help information.
+//
+// Either all functions, or only those that match the regular expressions
+// supplied.
+func help(show []string) {
+
+	// Patterns is a cache of regexps, to ensure we only compile
+	// them once.
+	var patterns []*regexp.Regexp
+
+	// Compile each supplied pattern, and save it away.
+	for _, pat := range show {
+
+		r, er := regexp.Compile(pat)
+		if er != nil {
+			fmt.Printf("Error compiling regexp %s:%s", show, er)
+			return
+		}
+
+		patterns = append(patterns, r)
+	}
+
+	// We want to show aliased functions separately, so we have to
+	// find them - via the interpreter which executed the stdlib
+	// at create() time.
+	aliased := LISP.Aliased()
+
+	// Build up a list of all things known in the environment
+	keys := []string{}
+
+	// Save the known "things", because we want show them in sorted-order.
+	items := ENV.Items()
+	for k := range items {
+		keys = append(keys, k)
+	}
+
+	// sort the known-things (i.e. environment keys)
+	sort.Strings(keys)
+
+	// Now we have a list of sorted things.
+	for _, key := range keys {
+
+		// get the item from the environment.
+		val, _ := ENV.Get(key)
+
+		// Is it a procedure?
+		prc, ok := val.(*primitive.Procedure)
+
+		// If it isn't a procedure skip it.
+		if !ok {
+			continue
+		}
+
+		// If there is no help then skip it.
+		if len(prc.Help) == 0 {
+			continue
+		}
+
+		// Get the text
+		txt := prc.Help
+
+		// Is this an aliased function?
+		target, ok := aliased[key]
+		if ok {
+			// If so change the text.
+			txt = fmt.Sprintf("%s is an alias for %s.", key, target)
+		}
+
+		// Build up the arguments to the procedure.
+		args := ""
+
+		if len(prc.Args) > 0 {
+
+			for _, arg := range prc.Args {
+				args += " " + arg.ToString()
+			}
+			args = strings.TrimSpace(args)
+			args = " (" + args + ")"
+		}
+
+		// Build up a complete list of the entry we'll output.
+		entry := key + args + "\n"
+		entry += strings.Repeat("=", len(key+args)) + "\n"
+		entry += txt + "\n\n\n"
+
+		// Are we going to show this?
+		//
+		// No filtering?  Then yes
+		if len(show) == 0 {
+			fmt.Printf("%s", entry)
+			continue
+		}
+
+		// Otherwise test each supplied pattern against the text,
+		// and if one matches show it and continue.
+		for _, test := range patterns {
+
+			res := test.FindStringSubmatch(entry)
+			if len(res) > 0 {
+				fmt.Printf("%s", entry)
+				continue
+			}
+		}
+	}
+}
 
 func main() {
 
 	// (gensym) needs a decent random seed, as does (random).
 	rand.Seed(time.Now().UnixNano())
 
-	// Look to see if we're gonna execute a statement, or dump our help.
+	// Parse our command-line flags
 	exp := flag.String("e", "", "A string to evaluate.")
-	hlp := flag.Bool("h", false, "Should we show help information, and exit?")
-	ver := flag.Bool("v", false, "Should we show our version, and exit?")
+	hlp := flag.Bool("h", false, "Show help information and exit.")
+	ver := flag.Bool("v", false, "Show our version and exit.")
 	flag.Parse()
 
 	// Showing the version?
@@ -46,168 +196,62 @@ func main() {
 		return
 	}
 
-	// Ensure we have an argument, if we don't have flags.
-	if len(flag.Args()) < 1 && (*exp == "") && !*hlp {
-		fmt.Printf("Usage: yal [-e expr] [-h] [-v] file.lisp\n")
+	// create the interpreter.
+	//
+	// This populates the environment, by executing the standard-library.
+	//
+	// This saves time because:
+	//
+	//     -h will require the stdlib to be loaded, to dump help info.
+	//
+	// OR
+	//
+	//     executing the users' code, via "-e" or a file, will need
+	//     that present too.
+	//
+	create()
+
+	// showing the help?
+	if *hlp {
+		help(flag.Args())
 		return
 	}
 
-	// Source we'll execute, either from the CLI, or a file
-	src := ""
-
+	// Executing an expression?
 	if *exp != "" {
-		src = *exp
+
+		// Now evaluate the input using the specified environment
+		out := LISP.Execute(ENV, string(*exp))
+
+		// Did we get an error?  Then show it.
+		if _, ok := out.(primitive.Error); ok {
+			fmt.Printf("Error executing the supplied expression: %v\n", out)
+			os.Exit(1)
+		}
+		os.Exit(0)
 	}
 
-	// If we have a file, then read the content
-	if len(flag.Args()) > 0 && !*hlp {
+	// If we have a file, then read the content.
+	if len(flag.Args()) > 0 {
 		content, err := os.ReadFile(flag.Args()[0])
 		if err != nil {
 			fmt.Printf("Error reading %s:%s\n", os.Args[1], err)
 			return
 		}
 
-		src = string(content)
-	}
+		// Now evaluate the input using the specified environment
+		out := LISP.Execute(ENV, string(content))
 
-	// Create a new environment
-	environment := env.New()
-
-	// If we got any command-line arguments then save them
-	if len(flag.Args()) > 0 {
-
-		x := primitive.List{}
-		for _, arg := range flag.Args() {
-			x = append(x, primitive.String(arg))
+		// Did we get an error?  Then show it.
+		if _, ok := out.(primitive.Error); ok {
+			fmt.Printf("Error executing %s: %v\n", os.Args[1], out)
+			os.Exit(1)
 		}
-
-		environment.Set("os.args", x)
-	} else {
-		// Otherwise we'll set an empty list.
-		environment.Set("os.args", primitive.List{})
+		os.Exit(0)
 	}
 
-	// Populate the default primitives
-	builtins.PopulateEnvironment(environment)
-
-	// Show the help?
-	if *hlp {
-
-		// Are we just showing a specific thing?
-		show := flag.Args()
-
-		// Read the standard library
-		pre := stdlib.Contents()
-
-		// Create a new interpreter with that source
-		interpreter := eval.New(string(pre))
-
-		// Now evaluate the library, so that all our core
-		// functions are defined.
-		//
-		// We can only get help for functions which are present.
-		interpreter.Evaluate(environment)
-
-		// Show aliased functions, separately
-		aliased := interpreter.Aliased()
-
-		// Build up a list of all things known in the environment
-		keys := []string{}
-
-		// Save the known "things", because we want show them
-		// in sorted-order.
-		items := environment.Items()
-		for k := range items {
-			keys = append(keys, k)
-		}
-
-		// sort the items
-		sort.Strings(keys)
-
-		// Now we have a list of sorted things.
-		for _, key := range keys {
-
-			// get the item.
-			val, _ := environment.Get(key)
-
-			// Is it a procedure?
-			prc, ok := val.(*primitive.Procedure)
-
-			// If it isn't a procedure skip it
-			if !ok {
-				continue
-			}
-
-			// No help? skip it
-			if len(prc.Help) == 0 {
-				continue
-			}
-
-			// Get the text
-			txt := prc.Help
-
-			// Is this an aliased function?
-			target, ok := aliased[key]
-			if ok {
-
-				txt = fmt.Sprintf("%s is an alias for %s.", key, target)
-			}
-
-			// Build up the arguments
-			args := ""
-
-			if len(prc.Args) > 0 {
-
-				for _, arg := range prc.Args {
-					args += " " + arg.ToString()
-				}
-				args = strings.TrimSpace(args)
-				args = " (" + args + ")"
-			}
-
-			entry := key + args + "\n"
-			entry += strings.Repeat("=", len(key+args)) + "\n"
-			entry += txt + "\n\n\n"
-
-			// Are we going to show this?
-			match := false
-			for _, x := range show {
-
-				r, er := regexp.Compile(x)
-				if er != nil {
-					fmt.Printf("Error compiling regexp %s:%s", show, er)
-					return
-				}
-
-				res := r.FindStringSubmatch(entry)
-				if len(res) > 0 {
-					match = true
-				}
-			}
-
-			if (len(show) == 0) || match {
-				fmt.Printf("%s", entry)
-			}
-
-		}
-
-		return
-	}
-
-	// Read the standard library
-	pre := stdlib.Contents()
-
-	// Prepend that to the users' script
-	src = string(pre) + "\n" + src
-
-	// Create a new interpreter with that source
-	interpreter := eval.New(src)
-
-	// Now evaluate the input using the specified environment
-	out := interpreter.Evaluate(environment)
-
-	// Did we get an error?  Then show it.
-	if _, ok := out.(primitive.Error); ok {
-		fmt.Printf("Error running: %v\n", out)
-	}
+	// No arguments
+	//
+	// TODO REPL
+	//
 }

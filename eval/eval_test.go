@@ -37,6 +37,7 @@ func TestAliased(t *testing.T) {
 
 	// Get the aliases
 	a := l.Aliased()
+	size := len(a)
 
 	// Count of functions with a similar name
 	//
@@ -57,6 +58,28 @@ func TestAliased(t *testing.T) {
 
 	if similar == 0 {
 		t.Fatalf("found no similar aliases")
+	}
+
+	// Now execute another piece of code, in the same
+	// interpreter.
+	//
+	// We'll add a new alias and see if that gets found
+	out = l.Execute(env, "(do (alias testing +) (testing 30 12))")
+
+	if out.ToString() != "42" {
+		t.Fatalf("execution had unexpected result")
+	}
+
+	if l.aliases["testing"] != "+" {
+		t.Fatalf("testing alias wasn't set")
+	}
+
+	// Get the updated alias.
+	b := l.Aliased()
+
+	// Bigger, by one entry
+	if (size + 1) != len(b) {
+		t.Fatalf("failed to find newly added alias - old %v new %v", a, b)
 	}
 
 }
