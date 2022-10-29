@@ -267,6 +267,11 @@ func main() {
 		src += line
 		src = strings.TrimSpace(src)
 
+		// Allow the user to exit
+		if src == "exit" || src == "quit" {
+			os.Exit(0)
+		}
+
 		open := strings.Count(src, "(")
 		close := strings.Count(src, ")")
 
