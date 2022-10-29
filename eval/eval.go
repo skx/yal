@@ -86,6 +86,20 @@ func New(src string) *Eval {
 	return e
 }
 
+// Execute will load the new code in the given src, and execute it
+// using the specified environment.
+//
+// This allows a single interpreter to be reused to execute multiple
+// expressions, with persistent state.
+func (ev *Eval) Execute(e *env.Environment, src string) primitive.Primitive {
+
+	// Reset our source
+	ev.tokenize(src)
+
+	// Now execute that source
+	return (ev.Evaluate(e))
+}
+
 // SetContext allows a context to be passed to the evaluator.
 //
 // The context allows you to setup a timeout/deadline for the
@@ -102,6 +116,11 @@ func (ev *Eval) Aliased() map[string]string {
 // tokenize splits the input string into tokens, via a horrific regular
 // expression which I don't understand!
 func (ev *Eval) tokenize(str string) {
+
+	// Reset our position
+	ev.offset = 0
+	ev.toks = []string{}
+
 	re := regexp.MustCompile(`[\s,]*(~@|[\[\]{}()'` + "`" +
 		`~^@]|"(?:\\.|[^\\"])*"|;.*|[^\s\[\]{}('"` + "`" +
 		`,;)]*)`)
