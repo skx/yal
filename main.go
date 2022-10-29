@@ -13,6 +13,7 @@ import (
 	"fmt"
 	"math/rand"
 	"os"
+	"path"
 	"regexp"
 	"sort"
 	"strings"
@@ -257,10 +258,34 @@ func main() {
 	fmt.Printf("YAL version %s\n", version)
 	reader := bufio.NewReader(os.Stdin)
 
+	//
+	// Get the home directory, and load ~/.yalrc if present
+	//
+	home := os.Getenv("HOME")
+	if home != "" {
+
+		// Build the path
+		file := path.Join(home, ".yalrc")
+
+		// Read the content
+		content, err := os.ReadFile(file)
+		if err == nil {
+
+			// Execute the contents
+			out := LISP.Execute(ENV, string(content))
+			if _, ok := out.(primitive.Error); ok {
+				fmt.Printf("Error executing ~/.yalrc %v\n", out)
+			}
+		}
+	}
+
 	src := ""
 	for {
 		if src == "" {
 			fmt.Printf("\n> ")
+		} else {
+			fmt.Printf("    ")
+
 		}
 
 		line, _ := reader.ReadString('\n')
