@@ -52,12 +52,13 @@ Remember that if you're running a Mac you'll need to remove the quarantine flag 
 
 ## Usage
 
-Once installed there are two ways to execute code:
+Once installed there are three ways to execute code:
 
 * By specifying an expression to execute upon the command-line:
   * `yal -e '(print (os))'`
 * By passing the name of a file containing lisp code to read and execute:
   * `yal test.lisp`
+* By launching the interpreter with zero arguments, which will launch the interactive REPL mode.
 
 The yal interpreter allows (optional) documentation to be attached to functions, both those implemented in the core, and those which are added in lisp:
 

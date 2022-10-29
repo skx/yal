@@ -8,6 +8,7 @@
 package main
 
 import (
+	"bufio"
 	"flag"
 	"fmt"
 	"math/rand"
@@ -250,8 +251,44 @@ func main() {
 		os.Exit(0)
 	}
 
-	// No arguments
 	//
-	// TODO REPL
+	// No arguments mean this is our REPL
 	//
+	fmt.Printf("YAL version %s\n", version)
+	reader := bufio.NewReader(os.Stdin)
+
+	src := ""
+	for {
+		if src == "" {
+			fmt.Printf("\n> ")
+		}
+
+		line, _ := reader.ReadString('\n')
+		src += line
+		src = strings.TrimSpace(src)
+
+		// Allow the user to exit
+		if src == "exit" || src == "quit" {
+			os.Exit(0)
+		}
+
+		open := strings.Count(src, "(")
+		close := strings.Count(src, ")")
+
+		if open < close {
+			fmt.Printf("Malformed expression: %v", src)
+			src = ""
+			continue
+		}
+		if open == close {
+
+			out := LISP.Execute(ENV, src)
+
+			// If the result wasn't nil then show it
+			if _, ok := out.(primitive.Nil); !ok {
+				fmt.Printf("%v\n", out)
+			}
+			src = ""
+		}
+	}
 }
