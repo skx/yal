@@ -111,10 +111,11 @@ Here the regular expressions will be matched against the name of the file(s) in 
 
 A reasonable amount of sample code can be found in the various included examples:
 
-* [test.lisp](test.lisp) shows many things.
 * [fibonacci.list](fibonacci.lisp) calculate the first 25 numbers of the Fibonacci sequence.
 * [fizzbuzz.lisp](fizzbuzz.lisp) is a standalone sample of solving the fizzbuzz problem.
 * [mtest.lisp](mtest.lisp) shows some macro examples.
+* [sorting.lisp](sorting.lisp) demonstrates writing & benchmarking sorting-routines.
+* [test.lisp](test.lisp) shows many things.
 
 As noted there is a standard-library of functions which are loaded along with any user-supplied script - that library of functions may also provide a useful reference and example of yal-code:
 
