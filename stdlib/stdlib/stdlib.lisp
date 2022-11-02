@@ -81,19 +81,18 @@ See-also: apply, apply-pairs"
                       acc
                       (reduce (cdr xs) f (f acc (car xs))))))
 
-; O(n^2) behavior with linked lists
-(set! append (fn* (xs:list el)
-                  "Append the given element to the specified list."
-                  (if (nil? xs)
-                      (list el)
-                      (cons (car xs) (append (cdr xs) el)))))
+(set! append (fn* (lst item)
+                   "Append the given value to the specified list.  If the list is empty just return the specified item."
+                   (if (nil? lst)
+                       item
+                       (cons (car lst) (append (cdr lst) item)))))
 
 
-(set! reverse (fn* (x:list)
-                   "Return a list containing all values in the supplied list, in reverse order."
-                   (if (nil? x)
-                       ()
-                     (append (reverse (cdr x)) (car x)))))
+(set! reverse (fn* (l)
+                   "Reverse the contents of the specified list."
+                   (if (nil? l)
+                       nil
+                     (append (reverse (cdr l)) (list (car l))))))
 
 
 ;; Get the first N items from a list.
