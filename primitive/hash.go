@@ -5,14 +5,6 @@ type Hash struct {
 	Entries map[string]Primitive
 }
 
-// NewHash creates a new hash, and ensures that the storage-space
-// is initialized.
-func NewHash() Hash {
-	h := Hash{}
-	h.Entries = make(map[string]Primitive)
-	return h
-}
-
 // Get returns the value of a given index
 func (h Hash) Get(key string) Primitive {
 	x, ok := h.Entries[key]
@@ -20,6 +12,14 @@ func (h Hash) Get(key string) Primitive {
 		return x
 	}
 	return Nil{}
+}
+
+// NewHash creates a new hash, and ensures that the storage-space
+// is initialized.
+func NewHash() Hash {
+	h := Hash{}
+	h.Entries = make(map[string]Primitive)
+	return h
 }
 
 // Set stores a value in the hash

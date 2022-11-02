@@ -19,22 +19,6 @@ type Environment struct {
 	values map[string]any
 }
 
-// New creates a new environment, with no parent.
-func New() *Environment {
-	return &Environment{
-		values: map[string]any{},
-	}
-}
-
-// NewEnvironment creates a new environment, which will use the specified
-// parent environment for values in a higher level.
-func NewEnvironment(parent *Environment) *Environment {
-	return &Environment{
-		parent: parent,
-		values: map[string]any{},
-	}
-}
-
 // Get retrieves a value from the environment.
 //
 // If the value isn't found in the current scope, and a parent is present,
@@ -70,6 +54,22 @@ func (env *Environment) Items() map[string]any {
 
 	// all done
 	return x
+}
+
+// New creates a new environment, with no parent.
+func New() *Environment {
+	return &Environment{
+		values: map[string]any{},
+	}
+}
+
+// NewEnvironment creates a new environment, which will use the specified
+// parent environment for values in a higher level.
+func NewEnvironment(parent *Environment) *Environment {
+	return &Environment{
+		parent: parent,
+		values: map[string]any{},
+	}
 }
 
 // Set updates the contents of the current environment.

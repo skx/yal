@@ -47,14 +47,6 @@ func init() {
 	interpreter = eval.New(src)
 }
 
-// fact is a benchmark implementation in pure-go for comparison purposes.
-func fact(n int64) int64 {
-	if n == 0 {
-		return 1
-	}
-	return n * fact(n-1)
-}
-
 // BenchmarkGoFactorial allows running the golang benchmark.
 func BenchmarkGoFactorial(b *testing.B) {
 	for i := 0; i < b.N; i++ {
@@ -77,4 +69,12 @@ func BenchmarkYALFactorial(b *testing.B) {
 		fmt.Printf("Error running: %v\n", out)
 	}
 
+}
+
+// fact is a benchmark implementation in pure-go for comparison purposes.
+func fact(n int64) int64 {
+	if n == 0 {
+		return 1
+	}
+	return n * fact(n-1)
 }
