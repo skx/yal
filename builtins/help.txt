@@ -233,6 +233,14 @@ now returns the number of seconds since the Unix Epoch.
 
 See also: ms
 %%
+nth
+
+nth returns an item from the specified list, at the given offset.
+
+NOTE: The offset starts from 0, to access the first item.
+
+Example: (print (nth '( 1 2 3 ) 0 ) )
+%%
 ord
 
 ord returns the ASCII code for the character provided as the first input.
