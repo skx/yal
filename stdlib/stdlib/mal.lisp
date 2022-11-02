@@ -92,17 +92,6 @@ Example: (apply-pairs (list 1 2 3 4) (lambda (a b) (print \"Called with %s %s\" 
 
 (alias count length)
 
-;; Find the Nth item of a list
-(set! nth (fn* (lst:list i:number)
-               "Return the Nth item of the specified list.
-
-Note that offset starts from 0, rather than 1, for the first item."
-               (if (> i (length lst))
-                   (error "Out of bounds on list-length")
-                 (if (= 0 i)
-                     (car lst)
-                   (nth (cdr lst) (- i 1))))))
-
 
 (set! map (fn* (lst:list fun:function)
                "Return a list with the contents of evaluating the given function on every item of the supplied list.

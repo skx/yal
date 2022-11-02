@@ -2556,6 +2556,120 @@ func TestNow(t *testing.T) {
 
 }
 
+func TestNth(t *testing.T) {
+
+	// No arguments
+	out := nthFn(ENV, []primitive.Primitive{})
+
+
+	// Will lead to an error
+	e, ok := out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if e != primitive.ArityError() {
+		t.Fatalf("got error, but wrong one:%s", out)
+	}
+
+	// we need to have "list" + "number"
+
+	// Not a list
+	out = nthFn(ENV, []primitive.Primitive{
+		primitive.Number(3),
+		primitive.Number(3),
+	})
+
+	e, ok = out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if !strings.Contains(string(e), "not a list") {
+		t.Fatalf("got error, but wrong one %v", out)
+	}
+
+
+	// Not a number
+	out = nthFn(ENV, []primitive.Primitive{
+		primitive.List{},
+		primitive.List{},
+	})
+
+	e, ok = out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if !strings.Contains(string(e), "not a number") {
+		t.Fatalf("got error, but wrong one %v", out)
+	}
+
+
+	// bound checking
+	var l primitive.List
+	l = append(l, primitive.String("one"))
+	l = append(l, primitive.String("two"))
+
+
+	// negative offset
+	out = nthFn(ENV, []primitive.Primitive{
+		l,
+		primitive.Number(-1),
+	})
+
+	e, ok = out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if !strings.Contains(string(e), "out of bounds") {
+		t.Fatalf("got error, but wrong one %v", out)
+	}
+
+	// out of bounds.
+	// list has two entries: offset 0, then offset 1
+	// offset 2 is buffer overflow
+	out = nthFn(ENV, []primitive.Primitive{
+		l,
+		primitive.Number(2),
+	})
+
+	e, ok = out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if !strings.Contains(string(e), "out of bounds") {
+		t.Fatalf("got error, but wrong one %v", out)
+	}
+
+
+	// valid access
+	str := nthFn(ENV, []primitive.Primitive{
+		l,
+		primitive.Number(0),
+	})
+
+	val, ok2 := str.(primitive.String)
+	if !ok2 {
+		t.Fatalf("expected string, got %v", str)
+	}
+	if val.ToString() != "one" {
+		t.Fatalf("got string, but wrong one %v", out)
+	}
+
+	// valid access
+	str = nthFn(ENV, []primitive.Primitive{
+		l,
+		primitive.Number(1),
+	})
+
+	val, ok2 = str.(primitive.String)
+	if !ok2 {
+		t.Fatalf("expected string, got %v", str)
+	}
+	if val.ToString() != "two" {
+		t.Fatalf("got string, but wrong one %v", out)
+	}
+
+}
+
 func TestOrd(t *testing.T) {
 
 	// no arguments

@@ -131,6 +131,7 @@ func PopulateEnvironment(env *env.Environment) {
 	env.Set("ms", &primitive.Procedure{F: msFn, Help: helpMap["ms"]})
 	env.Set("nil?", &primitive.Procedure{F: nilFn, Help: helpMap["nil?"], Args: []primitive.Symbol{primitive.Symbol("object")}})
 	env.Set("now", &primitive.Procedure{F: nowFn, Help: helpMap["now"]})
+	env.Set("nth", &primitive.Procedure{F: nthFn, Help: helpMap["nth"],Args: []primitive.Symbol{primitive.Symbol("list"), primitive.Symbol("offset")}})
 	env.Set("ord", &primitive.Procedure{F: ordFn, Help: helpMap["ord"], Args: []primitive.Symbol{primitive.Symbol("char")}})
 	env.Set("os", &primitive.Procedure{F: osFn, Help: helpMap["os"]})
 	env.Set("print", &primitive.Procedure{F: printFn, Help: helpMap["print"], Args: []primitive.Symbol{primitive.Symbol("arg1..argN")}})
@@ -1167,6 +1168,37 @@ func nilFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive
 // nowFn is the implementation of `(now)`
 func nowFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 	return primitive.Number(time.Now().Unix())
+}
+
+// nthFn is the implementation of `(nth..)`
+func nthFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+
+
+	// We need two arguments.
+	if len(args) != 2 {
+		return primitive.ArityError()
+	}
+
+	// The argument must be a list
+	lst, ok := args[0].(primitive.List)
+	if !ok {
+		return primitive.Error("argument not a list")
+	}
+
+	// The second argument must be a number
+	num, ok2 := args[1].(primitive.Number)
+	if !ok2 {
+		return primitive.Error("argument not a number")
+	}
+
+	n := int(num)
+
+	// Is it in bound?
+	if n >= 0 && n < len(lst) {
+		return lst[n]
+	}
+
+	return primitive.Error("out of bounds")
 }
 
 // ordFn is the implementation of (ord ..)
