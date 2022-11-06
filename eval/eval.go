@@ -44,7 +44,7 @@ type Eval struct {
 	aliases map[string]string
 }
 
-// New constructs a new evaluator.
+// New constructs a new lisp interpreter.
 func New(src string) *Eval {
 
 	// Create with a default context.
@@ -86,6 +86,53 @@ func New(src string) *Eval {
 	return e
 }
 
+// Aliased returns records of anything that has been aliased with "(alias ..)"
+func (ev *Eval) Aliased() map[string]string {
+	return ev.aliases
+}
+
+// Evaluate executes the source that was passed in the constructor,
+// using the given environment for storing/retrieving state.
+//
+// The return value of this function is that of the last expression which
+// was executed.
+func (ev *Eval) Evaluate(e *env.Environment) primitive.Primitive {
+
+	// Reset our position so we can evaluate the same program
+	// multiple times
+	ev.offset = 0
+
+	// Our output/return value
+	var out primitive.Primitive
+
+	// Default to "nil" not "<nil>"
+	out = primitive.Nil{}
+
+	// loop over all input
+	for {
+		// Get the next expression
+		expr, err := ev.readExpression()
+
+		if err != nil {
+			// End of list?
+			if err == ErrEOF {
+				return out
+			}
+			break
+		}
+
+		// Evaluate, and save the result
+		out = ev.eval(expr, e, true)
+
+		// If this is an error then return that immediately
+		switch out.(type) {
+		case *primitive.Error, primitive.Error:
+			return out
+		}
+	}
+	return out
+}
+
 // Execute will load the new code in the given src, and execute it
 // using the specified environment.
 //
@@ -106,44 +153,6 @@ func (ev *Eval) Execute(e *env.Environment, src string) primitive.Primitive {
 // execution of user-supplied scripts.
 func (ev *Eval) SetContext(ctx context.Context) {
 	ev.context = ctx
-}
-
-// Aliased returns records of anything that has been aliased with "(alias ..)"
-func (ev *Eval) Aliased() map[string]string {
-	return ev.aliases
-}
-
-// tokenize splits the input string into tokens, via a horrific regular
-// expression which I don't understand!
-func (ev *Eval) tokenize(str string) {
-
-	// Reset our position
-	ev.offset = 0
-	ev.toks = []string{}
-
-	re := regexp.MustCompile(`[\s,]*(~@|[\[\]{}()'` + "`" +
-		`~^@]|"(?:\\.|[^\\"])*"|;.*|[^\s\[\]{}('"` + "`" +
-		`,;)]*)`)
-
-	for _, match := range re.FindAllStringSubmatch(str, -1) {
-
-		// skip empty terms
-		if match[1] == "" {
-			continue
-		}
-
-		// skip comments
-		if len(match[1]) > 1 && match[1][0] == ';' {
-			continue
-		}
-
-		// skip shebang
-		if len(match[1]) > 2 && match[1][0] == '#' && match[1][1] == '!' {
-			continue
-		}
-
-		ev.toks = append(ev.toks, match[1])
-	}
 }
 
 // atom converts strings into symbols, booleans, etc, as appropriate.
@@ -199,282 +208,6 @@ func (ev *Eval) atom(token string) primitive.Primitive {
 	// OK, not something special, not a number, string, or
 	// character.  It is a symbol.
 	return primitive.Symbol(token)
-}
-
-// readExpression uses recursion to read a complete expression from
-// our internal array of tokens - as produced by `tokenize`.
-func (ev *Eval) readExpression() (primitive.Primitive, error) {
-
-	// Have we walked off the end of the program?
-	if ev.offset >= len(ev.toks) {
-		return nil, ErrEOF
-	}
-
-	// Get the next token, and increase our read-position
-	token := ev.toks[ev.offset]
-	ev.offset++
-
-	// We'll have different behaviour depending on what we're
-	// looking at right now.
-	switch token {
-	case "'":
-		// '... => (quote ...)
-		quoted, err := ev.readExpression()
-		if err != nil {
-			return nil, err
-		}
-		return primitive.List{ev.atom("quote"), quoted}, nil
-
-	case "`":
-		// `... => (quasiquote ...)
-		quoted, err := ev.readExpression()
-		if err != nil {
-			return nil, err
-		}
-		return primitive.List{ev.atom("quasiquote"), quoted}, nil
-
-	case "~", ",":
-		// ~... => (unquote ...)
-		quoted, err := ev.readExpression()
-		if err != nil {
-			return nil, err
-		}
-		return primitive.List{ev.atom("unquote"), quoted}, nil
-
-	case "~@", "`,", ",@":
-		// ~@... => (splice-unquote ...)
-		quoted, err := ev.readExpression()
-		if err != nil {
-			return nil, err
-		}
-		return primitive.List{ev.atom("splice-unquote"), quoted}, nil
-
-	case "(":
-		// ( .. => (list ...)
-
-		// Are we at the end of our program?
-		if ev.offset >= len(ev.toks) {
-			return nil, ErrEOF
-		}
-
-		// Create a list, which we'll populate with items
-		// until we reach the matching ")" statement
-		list := primitive.List{}
-
-		// Loop until we hit the closing bracket
-		for ev.toks[ev.offset] != ")" {
-
-			// Read the sub-expressions, recursively.
-			expr, err := ev.readExpression()
-			if err != nil {
-				return nil, err
-			}
-			list = append(list, expr)
-
-			// Check again we've not hit the end of the program
-			if ev.offset >= len(ev.toks) {
-				return nil, ErrEOF
-			}
-		}
-
-		// We bump the current read-position one more here,
-		// which means we skip over the closing ")" character.
-		ev.offset++
-
-		return list, nil
-
-	case "{":
-		// { .. => (hash ...)
-
-		// Are we at the end of our program?
-		if ev.offset >= len(ev.toks) {
-			return nil, ErrEOF
-		}
-
-		// Create a hash, which we'll populate with items
-		// until we reach the matching ")" statement
-		hash := primitive.NewHash()
-
-		// Loop until we hit the closing bracket
-		for ev.toks[ev.offset] != "}" {
-
-			// Read the sub-expressions, recursively.
-			key, err := ev.readExpression()
-			if err != nil {
-				return nil, err
-			}
-
-			// Check again we've not hit the end of the program
-			if ev.offset >= len(ev.toks) {
-				return nil, ErrEOF
-			}
-
-			// Read the sub-expressions, recursively.
-			val, err2 := ev.readExpression()
-			if err2 != nil {
-				return nil, err2
-			}
-
-			// Check again we've not hit the end of the program
-			if ev.offset >= len(ev.toks) {
-				return nil, ErrEOF
-			}
-
-			hash.Set(key.ToString(), val)
-		}
-
-		// We bump the current read-position one more here,
-		// which means we skip over the closing "}" character.
-		ev.offset++
-
-		return hash, nil
-
-	case ")", "}":
-		// We shouldn't ever hit these, because we skip over
-		// the closing characters ")" and "}" when we handle
-		// the corresponding opening character.
-		return nil, errors.New("unexpected '" + token + "'")
-
-	default:
-
-		// Return a single atom/primitive.
-		return ev.atom(token), nil
-	}
-}
-
-// Evaluate executes the source that was passed in the constructor,
-// using the given environment for storing/retrieving state.
-//
-// The return value of this function is that of the last expression which
-// was executed.
-func (ev *Eval) Evaluate(e *env.Environment) primitive.Primitive {
-
-	// Reset our position so we can evaluate the same program
-	// multiple times
-	ev.offset = 0
-
-	// Our output/return value
-	var out primitive.Primitive
-
-	// Default to "nil" not "<nil>"
-	out = primitive.Nil{}
-
-	// loop over all input
-	for {
-		// Get the next expression
-		expr, err := ev.readExpression()
-
-		if err != nil {
-			// End of list?
-			if err == ErrEOF {
-				return out
-			}
-			break
-		}
-
-		// Evaluate, and save the result
-		out = ev.eval(expr, e, true)
-
-		// If this is an error then return that immediately
-		switch out.(type) {
-		case *primitive.Error, primitive.Error:
-			return out
-		}
-	}
-	return out
-}
-
-// Does the given list start with a call to the given function?
-func (ev *Eval) startsWith(l primitive.List, val string) bool {
-	// list must have one entry
-	if len(l) < 1 {
-		return false
-	}
-
-	// entry should match
-	return l[0].ToString() == val
-}
-
-// quote/quote loop
-func (ev *Eval) qqLoop(xs primitive.List) primitive.List {
-	var acc primitive.List
-
-	for i := len(xs) - 1; 0 <= i; i-- {
-		elt := xs[i]
-		switch e := elt.(type) {
-		case primitive.List:
-			if ev.startsWith(e, "splice-unquote") {
-				tmp := primitive.List{}
-				tmp = append(tmp, primitive.Symbol("concat"))
-				tmp = append(tmp, e[1])
-				tmp = append(tmp, acc)
-				acc = tmp
-				continue
-			}
-		default:
-		}
-
-		tmp := primitive.List{}
-		tmp = append(tmp, primitive.Symbol("cons"))
-		tmp = append(tmp, ev.quasiquote(elt))
-		tmp = append(tmp, acc)
-		acc = tmp
-	}
-	return acc
-}
-
-// quasiquote handler.
-func (ev *Eval) quasiquote(exp primitive.Primitive) primitive.Primitive {
-	switch a := exp.(type) {
-	case primitive.Symbol:
-
-		var c primitive.List
-		c = append(c, primitive.Symbol("quote"))
-		c = append(c, exp)
-		return c
-	case primitive.List:
-		if ev.startsWith(a, "unquote") {
-			return a[1]
-		}
-		return ev.qqLoop(a)
-
-	default:
-		return exp
-	}
-}
-
-// isMacro tests if a given thing is a macro
-func (ev *Eval) isMacro(exp primitive.Primitive, e *env.Environment) bool {
-
-	// If we're not being called with a list then there's nothing to do
-	l, ok := exp.(primitive.List)
-	if !ok {
-		return false
-	}
-
-	// If the list doesn't have a size it is not a macro.
-	if len(l) < 1 {
-		return false
-	}
-
-	// Find the thing we're gonna call.
-	procExp := ev.eval(l[0], e, false)
-
-	// Is it really a procedure we can call?
-	proc, ok2 := procExp.(*primitive.Procedure)
-	if !ok2 {
-		return false
-	}
-	return proc.Macro
-}
-
-func (ev *Eval) macroExpand(exp primitive.Primitive, e *env.Environment) primitive.Primitive {
-
-	// is this a macro?
-	for ev.isMacro(exp, e) {
-		exp = ev.eval(exp, e, false)
-	}
-	return exp
 }
 
 // eval evaluates a single expression appropriately.
@@ -1231,5 +964,273 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 			}
 		}
 	repeat_eval:
+	}
+}
+
+// isMacro tests if a given thing is a macro
+func (ev *Eval) isMacro(exp primitive.Primitive, e *env.Environment) bool {
+
+	// If we're not being called with a list then there's nothing to do
+	l, ok := exp.(primitive.List)
+	if !ok {
+		return false
+	}
+
+	// If the list doesn't have a size it is not a macro.
+	if len(l) < 1 {
+		return false
+	}
+
+	// Find the thing we're gonna call.
+	procExp := ev.eval(l[0], e, false)
+
+	// Is it really a procedure we can call?
+	proc, ok2 := procExp.(*primitive.Procedure)
+	if !ok2 {
+		return false
+	}
+	return proc.Macro
+}
+
+// macroExpand expands the given macro, recursively.
+func (ev *Eval) macroExpand(exp primitive.Primitive, e *env.Environment) primitive.Primitive {
+
+	// is this a macro?
+	for ev.isMacro(exp, e) {
+		exp = ev.eval(exp, e, false)
+	}
+	return exp
+}
+
+// quote/quote loop
+func (ev *Eval) qqLoop(xs primitive.List) primitive.List {
+	var acc primitive.List
+
+	for i := len(xs) - 1; 0 <= i; i-- {
+		elt := xs[i]
+		switch e := elt.(type) {
+		case primitive.List:
+			if ev.startsWith(e, "splice-unquote") {
+				tmp := primitive.List{}
+				tmp = append(tmp, primitive.Symbol("concat"))
+				tmp = append(tmp, e[1])
+				tmp = append(tmp, acc)
+				acc = tmp
+				continue
+			}
+		default:
+		}
+
+		tmp := primitive.List{}
+		tmp = append(tmp, primitive.Symbol("cons"))
+		tmp = append(tmp, ev.quasiquote(elt))
+		tmp = append(tmp, acc)
+		acc = tmp
+	}
+	return acc
+}
+
+// quasiquote handler.
+func (ev *Eval) quasiquote(exp primitive.Primitive) primitive.Primitive {
+	switch a := exp.(type) {
+	case primitive.Symbol:
+
+		var c primitive.List
+		c = append(c, primitive.Symbol("quote"))
+		c = append(c, exp)
+		return c
+	case primitive.List:
+		if ev.startsWith(a, "unquote") {
+			return a[1]
+		}
+		return ev.qqLoop(a)
+
+	default:
+		return exp
+	}
+}
+
+// readExpression uses recursion to read a complete expression from
+// our internal array of tokens - as produced by `tokenize`.
+func (ev *Eval) readExpression() (primitive.Primitive, error) {
+
+	// Have we walked off the end of the program?
+	if ev.offset >= len(ev.toks) {
+		return nil, ErrEOF
+	}
+
+	// Get the next token, and increase our read-position
+	token := ev.toks[ev.offset]
+	ev.offset++
+
+	// We'll have different behaviour depending on what we're
+	// looking at right now.
+	switch token {
+	case "'":
+		// '... => (quote ...)
+		quoted, err := ev.readExpression()
+		if err != nil {
+			return nil, err
+		}
+		return primitive.List{ev.atom("quote"), quoted}, nil
+
+	case "`":
+		// `... => (quasiquote ...)
+		quoted, err := ev.readExpression()
+		if err != nil {
+			return nil, err
+		}
+		return primitive.List{ev.atom("quasiquote"), quoted}, nil
+
+	case "~", ",":
+		// ~... => (unquote ...)
+		quoted, err := ev.readExpression()
+		if err != nil {
+			return nil, err
+		}
+		return primitive.List{ev.atom("unquote"), quoted}, nil
+
+	case "~@", "`,", ",@":
+		// ~@... => (splice-unquote ...)
+		quoted, err := ev.readExpression()
+		if err != nil {
+			return nil, err
+		}
+		return primitive.List{ev.atom("splice-unquote"), quoted}, nil
+
+	case "(":
+		// ( .. => (list ...)
+
+		// Are we at the end of our program?
+		if ev.offset >= len(ev.toks) {
+			return nil, ErrEOF
+		}
+
+		// Create a list, which we'll populate with items
+		// until we reach the matching ")" statement
+		list := primitive.List{}
+
+		// Loop until we hit the closing bracket
+		for ev.toks[ev.offset] != ")" {
+
+			// Read the sub-expressions, recursively.
+			expr, err := ev.readExpression()
+			if err != nil {
+				return nil, err
+			}
+			list = append(list, expr)
+
+			// Check again we've not hit the end of the program
+			if ev.offset >= len(ev.toks) {
+				return nil, ErrEOF
+			}
+		}
+
+		// We bump the current read-position one more here,
+		// which means we skip over the closing ")" character.
+		ev.offset++
+
+		return list, nil
+
+	case "{":
+		// { .. => (hash ...)
+
+		// Are we at the end of our program?
+		if ev.offset >= len(ev.toks) {
+			return nil, ErrEOF
+		}
+
+		// Create a hash, which we'll populate with items
+		// until we reach the matching ")" statement
+		hash := primitive.NewHash()
+
+		// Loop until we hit the closing bracket
+		for ev.toks[ev.offset] != "}" {
+
+			// Read the sub-expressions, recursively.
+			key, err := ev.readExpression()
+			if err != nil {
+				return nil, err
+			}
+
+			// Check again we've not hit the end of the program
+			if ev.offset >= len(ev.toks) {
+				return nil, ErrEOF
+			}
+
+			// Read the sub-expressions, recursively.
+			val, err2 := ev.readExpression()
+			if err2 != nil {
+				return nil, err2
+			}
+
+			// Check again we've not hit the end of the program
+			if ev.offset >= len(ev.toks) {
+				return nil, ErrEOF
+			}
+
+			hash.Set(key.ToString(), val)
+		}
+
+		// We bump the current read-position one more here,
+		// which means we skip over the closing "}" character.
+		ev.offset++
+
+		return hash, nil
+
+	case ")", "}":
+		// We shouldn't ever hit these, because we skip over
+		// the closing characters ")" and "}" when we handle
+		// the corresponding opening character.
+		return nil, errors.New("unexpected '" + token + "'")
+
+	default:
+
+		// Return a single atom/primitive.
+		return ev.atom(token), nil
+	}
+}
+
+// Does the given list start with a call to the given function?
+func (ev *Eval) startsWith(l primitive.List, val string) bool {
+	// list must have one entry
+	if len(l) < 1 {
+		return false
+	}
+
+	// entry should match
+	return l[0].ToString() == val
+}
+
+// tokenize splits the input string into tokens, via a horrific regular
+// expression which I don't understand!
+func (ev *Eval) tokenize(str string) {
+
+	// Reset our position
+	ev.offset = 0
+	ev.toks = []string{}
+
+	re := regexp.MustCompile(`[\s,]*(~@|[\[\]{}()'` + "`" +
+		`~^@]|"(?:\\.|[^\\"])*"|;.*|[^\s\[\]{}('"` + "`" +
+		`,;)]*)`)
+
+	for _, match := range re.FindAllStringSubmatch(str, -1) {
+
+		// skip empty terms
+		if match[1] == "" {
+			continue
+		}
+
+		// skip comments
+		if len(match[1]) > 1 && match[1][0] == ';' {
+			continue
+		}
+
+		// skip shebang
+		if len(match[1]) > 2 && match[1][0] == '#' && match[1][1] == '!' {
+			continue
+		}
+
+		ev.toks = append(ev.toks, match[1])
 	}
 }
