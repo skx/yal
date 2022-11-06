@@ -101,6 +101,20 @@ func TestEvaluate(t *testing.T) {
 		{"#!/usr/bin/yal\n", "nil"},
 		{"#!/usr/bin/yal\n#t", "#t"},
 
+		// integers: in hex
+		{"0xff", "255"},
+		{"0xFF", "255"},
+		{"0xFf", "255"},
+		{"0xfF", "255"},
+
+		// integers: in binary
+		{"0b00000000", "0"},
+		{"0b00000001", "1"},
+		{"0b00000010", "2"},
+		{"0b00000100", "4"},
+		{"0b00001000", "8"},
+		{"0b10000000", "128"},
+
 		// bools
 		{"#t", "#t"},
 		{"true", "#t"},

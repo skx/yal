@@ -188,6 +188,22 @@ func (ev *Eval) atom(token string) primitive.Primitive {
 		return primitive.Error(fmt.Sprintf("invalid character literal: %s", lit))
 	}
 
+	// See if this is a number with a hex/binary prefix
+	based := strings.ToLower(token)
+	if strings.HasPrefix(based, "0x") || strings.HasPrefix(based, "0b") {
+
+		// If so then parse as an integer
+		n, err := strconv.ParseInt(based, 0, 32)
+		if err == nil {
+
+			// Assuming it worked save it in our interned
+			// table and return it.
+			num := primitive.Number(n)
+			ev.symbols[token] = num
+			return num
+		}
+	}
+
 	// Is it a number?
 	f, err := strconv.ParseFloat(token, 64)
 	if err == nil {
