@@ -286,6 +286,8 @@ Functions here include:
   * Is the given thing a hash?
 * `inc`
   * Increment the given variable.
+* `intersection`
+  * Return those elements in common in the specified pair of lists.
 * `last`
   * Return the last element of the specified list.
 * `length`
@@ -304,6 +306,8 @@ Functions here include:
     * Return the results of applying the specified function to every pair of elements in the given list.
 * `max`
   * Return the maximum value in the specified list.
+* `member`
+  * Return true if the specified item is contained within the given list.
 * `min`
   * Return the maximum value in the specified list.
 * `nat`
@@ -362,6 +366,8 @@ Functions here include:
 * `translate`
   * Translate a string of characters, via a lookup table.
   * Used by `lower`, and `upper`.
+* `union`
+  * Return a list of all items in the specified two lists - without duplicates.
 * `upper`
   * Return an upper-case version of the specified string.
 * `upper-table`
