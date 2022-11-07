@@ -1,0 +1,46 @@
+
+;; Get our hostname.
+;;
+;;  1. If /etc/hostname exists, then read that.
+;;
+;;  2. If "hostname" is a binary on the PATH execute it, and return the output
+;;
+;;  3. Otherwise give up.
+;;
+(set! hostname (fn* ()
+                    (cond
+                      (file? "/etc/hostname") (slurp "/etc/hostname")
+                      (file:which "hostname") (car (shell (list (file:which "hostname"))))
+                      true                    "unknown.host.name")))
+
+;;
+;; Trim leading/trailing whichspace from a given string
+;;
+(set! trim (fn* (str)
+                "Trim all leading/trailing whitespace from the given string."
+                (let* (res (match "^[ \t\r\n]*([^ \t\r\n]+)[ \t\r\n]*" str))
+                  (if (list? res)
+                      (car (cdr res))
+                      str))))
+
+
+;; (print) returns the value it prints, which is annoying in the REPL
+;; environment, as you'd see repeated output:
+;;
+;;      > (print 3)
+;;      3
+;;      3
+;;      >
+;;
+;; To avoid this we create a trivial wrapper function that returns nil
+;;
+(set! puts (fn* (x)
+                (do
+                 (print x)
+                 nil)))
+
+
+;;
+;; OK now we're done, show a banner and launch the REPL
+;;
+(print "This is ~/.yalrc on %s - %s %s" (trim (hostname)) (os) (arch) )
