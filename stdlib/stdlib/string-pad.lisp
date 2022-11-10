@@ -11,8 +11,8 @@
 
 See also: pad:right"
                     (if (>= (strlen str) len)
-                        val
-                      (pad:left (join (list str val)) add len))))
+                        str
+                      (pad:left (join (list add str)) add len))))
 
 
 (set! pad:right (fn* (str add len)
@@ -20,5 +20,5 @@ See also: pad:right"
 
 See also: pad:left"
                      (if (>= (strlen str) len)
-                         val
+                         str
                        (pad:right (join (list str add)) add len))))
