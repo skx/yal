@@ -5,6 +5,7 @@
   * [Core Primitives](#core-primitives)
   * [Standard Library](#standard-library)
 * [Type Checking](#type-checking)
+* [Testing](#testing)
 * [See Also](#see-also)
 
 
@@ -73,6 +74,8 @@ Special forms are things that are built into the core interpreter, and include:
   * Read a form from the specified string.
 * `set!`
   * Set the value of a variable.
+* `symbol`
+  * Create a new symbol from the given string.
 * `try`
   * Error-catching warpper, demonstrated in [try.lisp](try.lisp).
 
@@ -105,6 +108,8 @@ Things you'll find here include:
   * Note that multiple arguments are supported, not just two.
 * `arch`
   * Return the operating system architecture.
+* `base`
+  * Convert the specified integer to a string, in the given base.
 * `car`
   * Return the first item of a list.
 * `cdr`
@@ -128,6 +133,10 @@ Things you'll find here include:
 * `date`
   * Return details of today's date, as a list.
   * Demonstrated in [time.lisp](time.lisp).
+* `dec2bin`
+  * Convert the specified integer to a binary string.
+* `dec2hex`
+  * Convert the specified integer to a hexadecimal string.
 * `directory?`
   * Does the given path represent something that exists, and is a directory?
 * `directory:entries`
@@ -173,12 +182,21 @@ Things you'll find here include:
   * Return the time, in milliseconds.
 * `nil?`
   * Is the given value nil, or an empty list?
+* `nth`
+  * Return the nth element of the supplied list.
 * `now`
   * Return the number of seconds past the Unix Epoch.
+* `number`
+  * Convert the specified string to a number.  We accept base 2, 10, and 16.
+  * Use the appropriate prefix in your input, for example "0b10101", or "0xFF".
 * `ord`
   * Return the ASCII code of the specified character, or the first character of the supplied string.
 * `os`
   * Return a string describing the current operating-system.
+* `pad:left`
+  * Pad the specified string to the given length, by prepending to it.
+* `pad:right`
+  * Pad the specified string to the given length, by appending to it.
 * `print`
   * Output the specified string, or format string + values.
 * `set`
@@ -351,6 +369,8 @@ Functions here include:
   * Is the given thing a string?
 * `strlen`
   * Return the length of the specified string.
+* `substr`
+  * Return part of the specified string, identified by offset and length.
 * `symbol?`
   * Is the given thing a symbol?
 * `take`
@@ -405,6 +425,17 @@ If multiple types are permitted then just keep appending things, for example:
 
 * `(set! blah (fn* (a:list:number)  (print "I was given a list OR a number: %s" a)))`
   * Allows either a list, or a number.
+
+
+
+# Testing
+
+There is a simple set of tests written in Lisp, using a macro to define them easily, which can be viewed:
+
+* [lisp-tests.lisp](lisp-tests.lisp)
+
+Adding new tests is easy enough that this file should be updated over time with new test-cases.
+
 
 
 # See Also

@@ -3,12 +3,16 @@
 
 ;; Convert a number to a binary string.
 (set! dec2bin (fn* (n:number)
-                  "Convert the given number to a binary string representation of that number."
+                  "Convert the given number to a binary string representation of that number.
+
+See also: dec2hex"
                   (base n 2)))
 
 ;; Convert a number to a hexadecimal string.
 (set! dec2hex (fn* (n:number)
-                  "Convert the given number to a hexadecimal string representation."
+                  "Convert the given number to a hexadecimal string representation.
+
+See also: dec2bin"
                   (base n 16)))
 
 ;; Useful for creating a list of numbers

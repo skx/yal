@@ -10,7 +10,7 @@
 
 
 ;; Instead of just (+ 1 2) we allow multiple args
-(print "Our mathematical functions allow 2+ arguments, e.g: %s = %s"
+(print "Our mathematical functions allow 2+ arguments, e.g: %s = %d"
   (quote (+ 1 2 3 4 5 6)) (+ 1 2 3 4 5 6))
 
 
