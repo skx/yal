@@ -6,6 +6,8 @@
 * [Building / Installing](#building--installing)
 * [Standard Library](#standard-library)
 * [Usage](#usage)
+  * [Integrated Help](#integrated-help)
+  * [REPL Helper](#repl-helper)
 * [Examples](#examples)
 * [Fuzz Testing](#fuzz-testing)
 * [Benchmark](#benchmark)
@@ -58,16 +60,9 @@ Once installed there are three ways to execute code:
   * `yal -e '(print (os))'`
 * By passing the name of a file containing lisp code to read and execute:
   * `yal test.lisp`
-* By launching the interpreter with zero arguments, which will launch the interactive REPL mode.
+* By launching the interpreter with zero arguments, which will start the interactive REPL mode.
   * If present the file `~/.yalrc` is loaded before the REPL starts.
   * Here is a sample [.yalrc](.yalrc) file which shows the kind of thing you might wish to do.
-
-The yal interpreter allows (optional) documentation to be attached to functions, both those implemented in the core, and those which are added in lisp:
-
-* `yal -h [regexp1] [regexp2] [regexpN]`
-  * By default this will show the help for all available functions, in sorted order.
-  * If you specify any regular expressions then any entry which matches will be displayed.
-  * The match is attempted on the name of the function _and_ the documentation which is available.
 
 Finally if you've downloaded a binary release from [our release page](https://github.com/skx/yal/releases) the `-v` flag will show you what version you're running:
 
@@ -75,6 +70,67 @@ Finally if you've downloaded a binary release from [our release page](https://gi
 % yal-darwin-amd64 -v
 v0.11.0 f21d032e812ee6eadad5eac23f079a11f5e1041a
 ```
+
+
+### Integrated Help
+
+The yal interpreter allows (optional) documentation to be attached to functions, both those implemented in the core, and those which are added in lisp.
+
+You can view the help output by launching with the `-h` flag:
+
+    $ yal -h
+
+By default all the help-text contained within the standard-library, and our built-in primitives, will be shown.  You may limit the display to specific function(s) by supplying an arbitrary number of regular expression, for example:
+
+    $ yal -h count execute
+    count (arg)
+    ===========
+    count is an alias for length.
+
+    load-file (filename)
+    ====================
+    Load and execute the contents of the supplied filename.
+
+When you specify a regular expression, or more than one, the matches will be applied to the complete documentation for each function.  So the term "foo" will match the term "foo" inside the explanation of the function, the argument list, and the function name itself.
+
+A good example of the broad matching would include the term "length":
+
+    $ yal -h length | grep -B1 ==
+    apply-pairs (lst:list fun:function)
+    ===================================
+    --
+    count (arg)
+    ===========
+    --
+    length (arg)
+    ============
+    --
+    pad:left (str add len)
+    ======================
+    --
+    pad:right (str add len)
+    =======================
+    --
+    repeated (n:number x)
+    =====================
+    --
+    strlen (str:string)
+    ===================
+
+
+
+### REPL Helper
+
+If you wish to get command-line completion, history, etc, within the REPL-environment you might consider using the `rlwrap` tool.
+
+First of all output a list of the names of each of the built-in function:
+
+     $ yal -e "(apply (env) (lambda (x) (print (get x :name))))" > functions.txt
+
+Now launch the REPL with completion on those names:
+
+     $ rlwrap --file functions.txt ./yal
+
 
 
 
