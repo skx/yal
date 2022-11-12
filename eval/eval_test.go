@@ -322,6 +322,15 @@ a
 		{"(let* (a 3 b))", "ERROR{list for (len*) must have even length, got [a 3 b]}"},
 		{"(let* (a 3 3 b))", "ERROR{binding name is not a symbol, got 3}"},
 
+		{"(struct foo bar)  (type (foo 3))", "struct-foo"},
+		{"(struct foo bar)  (foo 3 3)", primitive.ArityError().ToString()},
+		{"(struct foo bar)  (foo? nil)", "#f"},
+		{"(struct foo bar)  (foo? (foo 3))", "#t"},
+		{"(struct a name) (struct b name)  (a? (b 3))", "#f"},
+		{"(struct a name) (struct b name)  (b? (b 3))", "#t"},
+
+		{"(struct)", primitive.ArityError().ToString()},
+		{"(do (struct foo bar ) (foo?))", primitive.ArityError().ToString()},
 		{"(error )", primitive.ArityError().ToString()},
 		{"(quote )", primitive.ArityError().ToString()},
 		{"(quasiquote )", primitive.ArityError().ToString()},
