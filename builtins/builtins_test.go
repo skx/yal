@@ -39,6 +39,67 @@ func TestArch(t *testing.T) {
 	}
 }
 
+// Test (base
+func TestBase(t *testing.T) {
+
+	// No arguments
+	out := baseFn(ENV, []primitive.Primitive{})
+
+	// Will lead to an error
+	e, ok := out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if e != primitive.ArityError() {
+		t.Fatalf("got error, but wrong one %v", out)
+	}
+
+	// Arguments must be numbers
+	out = baseFn(ENV, []primitive.Primitive{
+		primitive.Number(3),
+		primitive.String("foo"),
+	})
+
+	// Will lead to an error
+	e, ok = out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if !strings.Contains(string(e), "not a number") {
+		t.Fatalf("got error, but wrong one %v", out)
+	}
+
+	// Arguments must be numbers
+	out = baseFn(ENV, []primitive.Primitive{
+		primitive.String("foo"),
+		primitive.Number(3),
+	})
+
+	// Will lead to an error
+	e, ok = out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if !strings.Contains(string(e), "not a number") {
+		t.Fatalf("got error, but wrong one %v", out)
+	}
+
+	// Valid result
+	result := baseFn(ENV, []primitive.Primitive{
+		primitive.Number(255),
+		primitive.Number(2),
+	})
+
+	// Will lead to an error
+	r, ok2 := result.(primitive.String)
+	if !ok2 {
+		t.Fatalf("expected string, got %v", result)
+	}
+	if !strings.Contains(string(r), "11111111") {
+		t.Fatalf("got string, but wrong one %v", r)
+	}
+}
+
 // Test (car
 func TestCar(t *testing.T) {
 
@@ -2561,7 +2622,6 @@ func TestNth(t *testing.T) {
 	// No arguments
 	out := nthFn(ENV, []primitive.Primitive{})
 
-
 	// Will lead to an error
 	e, ok := out.(primitive.Error)
 	if !ok {
@@ -2587,7 +2647,6 @@ func TestNth(t *testing.T) {
 		t.Fatalf("got error, but wrong one %v", out)
 	}
 
-
 	// Not a number
 	out = nthFn(ENV, []primitive.Primitive{
 		primitive.List{},
@@ -2602,12 +2661,10 @@ func TestNth(t *testing.T) {
 		t.Fatalf("got error, but wrong one %v", out)
 	}
 
-
 	// bound checking
 	var l primitive.List
 	l = append(l, primitive.String("one"))
 	l = append(l, primitive.String("two"))
-
 
 	// negative offset
 	out = nthFn(ENV, []primitive.Primitive{
@@ -2639,7 +2696,6 @@ func TestNth(t *testing.T) {
 		t.Fatalf("got error, but wrong one %v", out)
 	}
 
-
 	// valid access
 	str := nthFn(ENV, []primitive.Primitive{
 		l,
@@ -2668,6 +2724,78 @@ func TestNth(t *testing.T) {
 		t.Fatalf("got string, but wrong one %v", out)
 	}
 
+}
+
+func TestNumber(t *testing.T) {
+
+	// No arguments
+	out := numberFn(ENV, []primitive.Primitive{})
+
+	// Will lead to an error
+	e, ok := out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if e != primitive.ArityError() {
+		t.Fatalf("got error, but wrong one:%s", out)
+	}
+
+	// Must be a string.
+	out = numberFn(ENV, []primitive.Primitive{
+		primitive.Number(3),
+	})
+
+	// Will lead to an error
+	e, ok = out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if !strings.Contains(string(e), "not a string") {
+		t.Fatalf("got error, but wrong one %v", out)
+	}
+
+	// Type for table-driven tests
+	type Input struct {
+		Inp string
+		Out int
+	}
+
+	// Trivial test-cases with base10, base2, and base16
+	tests := []Input{
+		Input{"3", 3},
+		Input{"0b1111", 15},
+		Input{"0xff", 255},
+	}
+
+	for _, tst := range tests {
+
+		res := numberFn(ENV, []primitive.Primitive{
+			primitive.String(tst.Inp),
+		})
+
+		// Will lead to a number
+		r, ok2 := res.(primitive.Number)
+		if !ok2 {
+			t.Fatalf("expected number, got %v", res)
+		}
+		if int(r) != tst.Out {
+			t.Fatalf("got %d, not %d", int(r), tst.Out)
+		}
+	}
+
+	// Failure to convert a bogus number
+	out = numberFn(ENV, []primitive.Primitive{
+		primitive.String("3.3.3.3"),
+	})
+
+	// Will lead to an error
+	e, ok = out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if !strings.Contains(string(e), "failed to convert") {
+		t.Fatalf("got error, but wrong one %v", out)
+	}
 }
 
 func TestOrd(t *testing.T) {

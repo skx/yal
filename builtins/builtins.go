@@ -100,6 +100,7 @@ func PopulateEnvironment(env *env.Environment) {
 	env.Set("<", &primitive.Procedure{F: ltFn, Help: helpMap["<"], Args: []primitive.Symbol{primitive.Symbol("a"), primitive.Symbol("b")}})
 	env.Set("=", &primitive.Procedure{F: equalsFn, Help: helpMap["="], Args: []primitive.Symbol{primitive.Symbol("arg1"), primitive.Symbol("arg2 .. argN")}})
 	env.Set("arch", &primitive.Procedure{F: archFn, Help: helpMap["arch"]})
+	env.Set("base", &primitive.Procedure{F: baseFn, Help: helpMap["base"], Args: []primitive.Symbol{primitive.Symbol("number"), primitive.Symbol("base")}})
 	env.Set("car", &primitive.Procedure{F: carFn, Help: helpMap["car"], Args: []primitive.Symbol{primitive.Symbol("list")}})
 	env.Set("cdr", &primitive.Procedure{F: cdrFn, Help: helpMap["cdr"], Args: []primitive.Symbol{primitive.Symbol("list")}})
 	env.Set("char=", &primitive.Procedure{F: charEqualsFn, Help: helpMap["char="], Args: []primitive.Symbol{primitive.Symbol("a"), primitive.Symbol("b")}})
@@ -131,7 +132,8 @@ func PopulateEnvironment(env *env.Environment) {
 	env.Set("ms", &primitive.Procedure{F: msFn, Help: helpMap["ms"]})
 	env.Set("nil?", &primitive.Procedure{F: nilFn, Help: helpMap["nil?"], Args: []primitive.Symbol{primitive.Symbol("object")}})
 	env.Set("now", &primitive.Procedure{F: nowFn, Help: helpMap["now"]})
-	env.Set("nth", &primitive.Procedure{F: nthFn, Help: helpMap["nth"],Args: []primitive.Symbol{primitive.Symbol("list"), primitive.Symbol("offset")}})
+	env.Set("nth", &primitive.Procedure{F: nthFn, Help: helpMap["nth"], Args: []primitive.Symbol{primitive.Symbol("list"), primitive.Symbol("offset")}})
+	env.Set("number", &primitive.Procedure{F: numberFn, Help: helpMap["number"], Args: []primitive.Symbol{primitive.Symbol("str")}})
 	env.Set("ord", &primitive.Procedure{F: ordFn, Help: helpMap["ord"], Args: []primitive.Symbol{primitive.Symbol("char")}})
 	env.Set("os", &primitive.Procedure{F: osFn, Help: helpMap["os"]})
 	env.Set("print", &primitive.Procedure{F: printFn, Help: helpMap["print"], Args: []primitive.Symbol{primitive.Symbol("arg1..argN")}})
@@ -152,6 +154,27 @@ func PopulateEnvironment(env *env.Environment) {
 // archFn implements (os)
 func archFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 	return primitive.String(runtime.GOARCH)
+}
+
+// baseFn implements (base)
+func baseFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+	if len(args) != 2 {
+		return primitive.ArityError()
+	}
+
+	// Get the value
+	n, ok := args[0].(primitive.Number)
+	if !ok {
+		return primitive.Error("argument not a number")
+	}
+
+	// Get the base
+	base, ok2 := args[1].(primitive.Number)
+	if !ok2 {
+		return primitive.Error("argument not a number")
+	}
+
+	return primitive.String(strconv.FormatInt(int64(n), int(base)))
 }
 
 // carFn implements "car"
@@ -1173,7 +1196,6 @@ func nowFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive
 // nthFn is the implementation of `(nth..)`
 func nthFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 
-
 	// We need two arguments.
 	if len(args) != 2 {
 		return primitive.ArityError()
@@ -1199,6 +1221,40 @@ func nthFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive
 	}
 
 	return primitive.Error("out of bounds")
+}
+
+// numberFn is the implementation of (number ..)
+func numberFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+	// we only accept a single parameter
+	if len(args) != 1 {
+		return primitive.ArityError()
+	}
+
+	// The argument must be a string
+	str, ok := args[0].(primitive.String)
+	if !ok {
+		return primitive.Error("argument not a string")
+	}
+
+	// Lower-case so our prefix-matching works
+	s := strings.ToLower(str.ToString())
+	if strings.HasPrefix(s, "0x") || strings.HasPrefix(s, "0b") {
+
+		// If so then parse as an integer
+		n, err := strconv.ParseInt(s, 0, 32)
+		if err == nil {
+			return primitive.Number(n)
+		}
+	}
+
+	// Is it a number?
+	f, err := strconv.ParseFloat(s, 64)
+	if err == nil {
+
+		return primitive.Number(f)
+	}
+
+	return primitive.Error(fmt.Sprintf("failed to convert %s to number", args[0].ToString()))
 }
 
 // ordFn is the implementation of (ord ..)
