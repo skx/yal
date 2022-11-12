@@ -39,7 +39,7 @@ func TestStdlibExcludeTime(t *testing.T) {
 	}
 
 	// ensure we have "hms" function defined
-	expected := "(hms)"
+	expected := "(set! time:hms"
 
 	content := string(x)
 	if !strings.Contains(content, expected) {
