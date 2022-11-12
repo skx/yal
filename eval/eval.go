@@ -634,6 +634,13 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 				}
 				return ret
 
+			// (symbol
+			case primitive.Symbol("symbol"):
+				if len(listExp) != 2 {
+					return primitive.ArityError()
+				}
+				return ev.atom(listExp[1].ToString())
+
 			// (env
 			case primitive.Symbol("env"):
 
