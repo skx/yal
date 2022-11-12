@@ -647,7 +647,7 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 				}
 				return ev.atom(listExp[1].ToString())
 
-			// (structure
+			// (struct
 			case primitive.Symbol("struct"):
 				if len(listExp) <= 2 {
 					return primitive.ArityError()
@@ -822,6 +822,8 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 			// a structure, or a user-function.
 			default:
 
+				// first item of the list - i.e. the thing
+				// we're gonna call.
 				thing := listExp[0]
 
 				// Is this a structure creation?
@@ -831,6 +833,8 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 					// args supplied to this call
 					args := listExp[1:]
 
+					// ensure that we have some fields that
+					// match those we expect.
 					if len(fields) != len(args) {
 						return primitive.ArityError()
 					}
@@ -839,13 +843,11 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 					hash := primitive.NewHash()
 
 					// However mark this as a "struct",
-					// not a hash.
+					// rather than a hash.
 					hash.SetStruct(thing.ToString())
 
-					// Set the fields
+					// Set the fields, ensuring we evaluate them
 					for i, name := range fields {
-
-						// Note: We evaluate
 						hash.Set(name, ev.eval(args[i], e, expandMacro))
 					}
 					return hash
@@ -854,9 +856,13 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 				// Is this a type-check on a struct?
 				if strings.HasSuffix(thing.ToString(), "?") {
 
+					// We're looking for a function-call
+					// that has a trailing "?", and one
+					// argument
 					if len(listExp) != 2 {
 						return primitive.ArityError()
 					}
+
 					// Get the thing that is being tested.
 					typeName := strings.TrimSuffix(thing.ToString(), "?")
 
@@ -881,16 +887,20 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 							return primitive.Bool(true)
 						}
 						return primitive.Bool(false)
-
 					}
+
+					// just a method call with a trailing "?".
+					//
+					// could be "string?", etc, so we fall-through
 				}
+
 				// Find the thing we're gonna call.
-				procExp := ev.eval(listExp[0], e, expandMacro)
+				procExp := ev.eval(thing, e, expandMacro)
 
 				// Is it really a procedure we can call?
 				proc, ok := procExp.(*primitive.Procedure)
 				if !ok {
-					return primitive.Error(fmt.Sprintf("argument '%s' not a function", listExp[0].ToString()))
+					return primitive.Error(fmt.Sprintf("argument '%s' not a function", thing.ToString()))
 				}
 
 				// build up the arguments
