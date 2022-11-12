@@ -42,6 +42,9 @@ type Eval struct {
 
 	// aliases contains any record of aliased functionality
 	aliases map[string]string
+
+	// structs contains a list of known structures
+	structs map[string][]string
 }
 
 // New constructs a new lisp interpreter.
@@ -51,6 +54,7 @@ func New(src string) *Eval {
 	e := &Eval{
 		context: context.Background(),
 		symbols: make(map[string]primitive.Primitive),
+		structs: make(map[string][]string),
 	}
 
 	// Setup the default symbol-table entries
@@ -641,6 +645,27 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 				}
 				return ev.atom(listExp[1].ToString())
 
+			// (structure
+			case primitive.Symbol("struct"):
+				if len(listExp) <= 2 {
+					return primitive.ArityError()
+				}
+
+				// name of structure
+				name := listExp[1].ToString()
+
+				// the fields it contains
+				fields := []string{}
+
+				// convert the fields to strings
+				for _, field := range listExp[2:] {
+					fields = append(fields, field.ToString())
+				}
+
+				// save the structure as a known-thing
+				ev.structs[name] = fields
+				return primitive.Nil{}
+
 			// (env
 			case primitive.Symbol("env"):
 
@@ -792,8 +817,29 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 				}
 
 			// Anything else is either a built-in function,
-			// or a user-function.
+			// a structure, or a user-function.
 			default:
+
+				// Is this a structure creation?
+				fields, ok := ev.structs[listExp[0].ToString()]
+				if ok {
+
+					// args supplied to this call
+					args := listExp[1:]
+
+					if len(fields) != len(args) {
+						return primitive.ArityError()
+					}
+
+					// TODO: Distinct type
+					hash := primitive.NewHash()
+
+					// Set the fields
+					for i, name := range fields {
+						hash.Set(name, args[i])
+					}
+					return hash
+				}
 
 				// Find the thing we're gonna call.
 				procExp := ev.eval(listExp[0], e, expandMacro)
