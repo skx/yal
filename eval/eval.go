@@ -867,8 +867,8 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 					typeName := strings.TrimSuffix(thing.ToString(), "?")
 
 					// Does that represent a known-type?
-					_, ok := ev.structs[typeName]
-					if ok {
+					_, ok2 := ev.structs[typeName]
+					if ok2 {
 
 						// OK a type-check on a known struct
 						//
