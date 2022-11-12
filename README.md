@@ -167,46 +167,28 @@ Here the regular expressions will be matched against the name of the file(s) in 
 
 ## Examples
 
-A reasonable amount of sample code can be found in the various included examples:
+A reasonable amount of sample code can be found in the various included files:
 
-* [fibonacci.list](fibonacci.lisp) calculate the first 25 numbers of the Fibonacci sequence.
-* [fizzbuzz.lisp](fizzbuzz.lisp) is a standalone sample of solving the fizzbuzz problem.
-* [mtest.lisp](mtest.lisp) shows some macro examples.
-* [sorting.lisp](sorting.lisp) demonstrates writing & benchmarking sorting-routines.
-* [test.lisp](test.lisp) shows many things.
+* [fibonacci.list](fibonacci.lisp)
+  * Calculate the first 25 numbers of the Fibonacci sequence.
+* [fizzbuzz.lisp](fizzbuzz.lisp)
+  * A standalone sample of solving the fizzbuzz problem.
+* [mtest.lisp](mtest.lisp)
+  * Shows simple some macro examples, but see [lisp-tests.lisp](lisp-tests.lisp) for a more useful example.
+* [sorting.lisp](sorting.lisp)
+  * Demonstrates writing & benchmarking sorting-routines.
+* [test.lisp](test.lisp)
+  * A misc. collection of sample code, functions, and notes.
 
 As noted there is a standard-library of functions which are loaded along with any user-supplied script - that library of functions may also provide a useful reference and example of yal-code:
 
 * [stdlib/stdlib/](stdlib/stdlib/)
 
-Running any of our supplied examples should produce useful output for reference.  For example here's the result of running the `fibonacci.lisp` file:
+The standard-library contains its own series of test-cases written in Lisp:
 
-```lisp
-$ yal fibonacci.lisp
-1st fibonacci number is 1
-2nd fibonacci number is 1
-3rd fibonacci number is 2
-4th fibonacci number is 3
-5th fibonacci number is 5
-6th fibonacci number is 8
-7th fibonacci number is 13
-8th fibonacci number is 21
-9th fibonacci number is 34
-10th fibonacci number is 55
-11th fibonacci number is 89
-12th fibonacci number is 144
-13th fibonacci number is 233
-14th fibonacci number is 377
-15th fibonacci number is 610
-16th fibonacci number is 987
-17th fibonacci number is 1597
-18th fibonacci number is 2584
-19th fibonacci number is 4181
-20th fibonacci number is 6765
-21st fibonacci number is 10946
-22nd fibonacci number is 17711
+* [lisp-tests.lisp](lisp-tests.lisp)
 
-```
+The lisp-tests.lisp file contains a simple macro for defining test-cases, and uses that to good effect to test a range of our lisp-implemented primitives.
 
 
 
