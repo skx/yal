@@ -1,13 +1,21 @@
 ;;; stdlib.lisp - Standard library as implemented in lisp.
 
 
+;; Convert a number to a binary string.
+(set! dec2bin (fn* (n:number)
+                  "Convert the given number to a binary string representation of that number."
+                  (base n 2)))
 
+;; Convert a number to a hexadecimal string.
+(set! dec2hex (fn* (n:number)
+                  "Convert the given number to a hexadecimal string representation."
+                  (base n 16)))
 
 ;; Useful for creating a list of numbers
 (set! repeated (fn* (n:number x)
                     "Return a list of length n whose elements are all x."
-                  (when (pos? n)
-                    (cons x (repeated (dec n) x)))))
+                    (when (pos? n)
+                      (cons x (repeated (dec n) x)))))
 
 ;; Return the last element of a list
 ;;
@@ -16,7 +24,7 @@
 ;;   (set! last (fn* (lst:list) "Return the last element of the given list" (car (reverse lst))))
 ;;
 (set! last (fn* (lst:list)
-                "last returns the last item in the specified list, it is the inverse of (butlast) and the logical opposite of (car)."
+                "Return the last item in the specified list, it is the inverse of (butlast) and the logical opposite of (car)."
                 (let* (c (cdr lst))
                   (if (! (nil? c))
                       (last c)
