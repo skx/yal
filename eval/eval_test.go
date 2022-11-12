@@ -140,6 +140,9 @@ func TestEvaluate(t *testing.T) {
 		{`(if false "false" "true")`, "true"},
 		{"(if false false)", "nil"},
 
+		// symbol
+		{`(set! foo (symbol bar)) (symbol? foo)`, `#t`},
+
 		// macroexpand - args are not evaluated
 		{`(defmacro! foo (fn* (x) x)) (macroexpand (foo (+ 1 2)))`, "(+ 1 2)"},
 		// quote
@@ -303,6 +306,8 @@ a
 		{"(< (length (env)) 200)", "#t"},
 
 		// errors
+		{"(symbol)", primitive.ArityError().ToString()},
+		{"(symbol 1 2)", primitive.ArityError().ToString()},
 		{"(invalid)", "ERROR{argument 'invalid' not a function}"},
 		{"(set! 3 4)", "ERROR{tried to set a non-symbol 3}"},
 		{"(eval 'foo 'bar)", primitive.ArityError().ToString()},
