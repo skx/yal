@@ -306,6 +306,8 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 
 				ret.Set(x, val)
 			}
+
+			ret.SetStruct(obj.GetStruct())
 			return ret
 
 		// Numbers return themselves
@@ -820,8 +822,10 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 			// a structure, or a user-function.
 			default:
 
+				thing := listExp[0]
+
 				// Is this a structure creation?
-				fields, ok := ev.structs[listExp[0].ToString()]
+				fields, ok := ev.structs[thing.ToString()]
 				if ok {
 
 					// args supplied to this call
@@ -831,16 +835,55 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 						return primitive.ArityError()
 					}
 
-					// TODO: Distinct type
+					// Create a hash to store the state
 					hash := primitive.NewHash()
+
+					// However mark this as a "struct",
+					// not a hash.
+					hash.SetStruct(thing.ToString())
 
 					// Set the fields
 					for i, name := range fields {
-						hash.Set(name, args[i])
+
+						// Note: We evaluate
+						hash.Set(name, ev.eval(args[i], e, expandMacro))
 					}
 					return hash
 				}
 
+				// Is this a type-check on a struct?
+				if strings.HasSuffix(thing.ToString(), "?") {
+
+					if len(listExp) != 2 {
+						return primitive.ArityError()
+					}
+					// Get the thing that is being tested.
+					typeName := strings.TrimSuffix(thing.ToString(), "?")
+
+					// Does that represent a known-type?
+					_, ok := ev.structs[typeName]
+					if ok {
+
+						// OK a type-check on a known struct
+						//
+						// Note we evaluate the object
+						obj := ev.eval(listExp[1], e, expandMacro)
+
+						// is it a hash?
+						hsh, ok2 := obj.(primitive.Hash)
+						if !ok2 {
+							// nope - then not a struct
+							return primitive.Bool(false)
+						}
+
+						// is the struct-type the same as the type name?
+						if hsh.GetStruct() == typeName {
+							return primitive.Bool(true)
+						}
+						return primitive.Bool(false)
+
+					}
+				}
 				// Find the thing we're gonna call.
 				procExp := ev.eval(listExp[0], e, expandMacro)
 
