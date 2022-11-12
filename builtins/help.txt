@@ -43,6 +43,15 @@ arch returns a simple string describing the architecture the current host is run
 See also: (os)
 Example : (print (arch))
 %%
+base
+
+Convert the given number into a string representation in the specified base.
+
+See also: number, sprintf, str
+
+Example: (print (base 255 2))  ; base two is binary
+Example: (print (base 255 16)) ; base 16 is hexadecimal
+%%
 car
 car returns the first item from the specified list.
 %%
@@ -241,6 +250,16 @@ NOTE: The offset starts from 0, to access the first item.
 
 Example: (print (nth '( 1 2 3 ) 0 ) )
 %%
+number
+
+Number will convert the given string to a number object, and supports
+hexadecimal, binary, and base-ten values.
+
+Example: (print (number "0xffed"))
+Example: (print (number "0b1011"))
+
+See also: base, str
+%%
 ord
 
 ord returns the ASCII code for the character provided as the first input.
@@ -329,10 +348,14 @@ When a format string is used it can contain the following strings:
 
 See also: print
 Example: (sprintf "Today is %s" (weekday))
+Example: (sprintf "31 in binary is %08b" 31)
 %%
 str
 
 str converts the parameter supplied to a string, and returns it.
+
+Example: (print (str 3))
+See also: base, number
 %%
 time
 
