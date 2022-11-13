@@ -61,13 +61,26 @@ func New(src string) *Eval {
 
 	// Create with a default context.
 	e := &Eval{
-		context:   context.Background(),
-		symbols:   make(map[string]primitive.Primitive),
-		structs:   make(map[string][]string),
+
+		// aliases holds function aliases
+		aliases: make(map[string]string),
+
+		// context used for timeout-testing
+		context: context.Background(),
+
+		// symbols is an interning cache
+		symbols: make(map[string]primitive.Primitive),
+
+		// structs contains the names and expected field-names
+		// of user-defined structures.
+		structs: make(map[string][]string),
+
+		// accessors contains the names of generated get/set
+		// functions for field access within structs
 		accessors: make(map[string]string),
 	}
 
-	// Setup the default symbol-table entries
+	// Setup the default symbol-table (interned) entries.
 
 	// true
 	t := primitive.Bool(true)
@@ -90,9 +103,6 @@ func New(src string) *Eval {
 	e.symbols["#\\\\n"] = primitive.Character("\n")
 	e.symbols["#\\\\r"] = primitive.Character("\r")
 	e.symbols["#\\\\t"] = primitive.Character("\t")
-
-	// Record aliases here
-	e.aliases = make(map[string]string)
 
 	// tokenize our input program into a series of terms
 	e.tokenize(src)
@@ -207,7 +217,7 @@ func (ev *Eval) atom(token string) primitive.Primitive {
 	if strings.HasPrefix(based, "0x") || strings.HasPrefix(based, "0b") {
 
 		// If so then parse as an integer
-		n, err := strconv.ParseInt(based, 0, 32)
+		n, err := strconv.ParseInt(based, 0, 64)
 		if err == nil {
 
 			// Assuming it worked save it in our interned
@@ -357,6 +367,7 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 					return res
 				}
 			}
+
 		default:
 			return primitive.Error(fmt.Sprintf("unexpected type: %s", exp))
 		}
