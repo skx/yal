@@ -43,8 +43,17 @@ type Eval struct {
 	// aliases contains any record of aliased functionality
 	aliases map[string]string
 
-	// structs contains a list of known structures
+	// structs contains a list of known structures.
+	//
+	// The key is the name of the structure, and the value is an
+	// array of the fields that structure possesses.
 	structs map[string][]string
+
+	// accessors contains struct field lookups
+	//
+	// The key is the name of the fake method, the value the name of
+	// the field to get/set
+	accessors map[string]string
 }
 
 // New constructs a new lisp interpreter.
@@ -52,9 +61,10 @@ func New(src string) *Eval {
 
 	// Create with a default context.
 	e := &Eval{
-		context: context.Background(),
-		symbols: make(map[string]primitive.Primitive),
-		structs: make(map[string][]string),
+		context:   context.Background(),
+		symbols:   make(map[string]primitive.Primitive),
+		structs:   make(map[string][]string),
+		accessors: make(map[string]string),
 	}
 
 	// Setup the default symbol-table entries
@@ -661,7 +671,11 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 
 				// convert the fields to strings
 				for _, field := range listExp[2:] {
-					fields = append(fields, field.ToString())
+
+					f := field.ToString()
+
+					ev.accessors[name+"."+f] = f
+					fields = append(fields, f)
 				}
 
 				// save the structure as a known-thing
@@ -826,16 +840,37 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 				// we're gonna call.
 				thing := listExp[0]
 
+				// args supplied to this call
+				listArgs := listExp[1:]
+
+				// Is this a structure field access
+				access, okA := ev.accessors[thing.ToString()]
+				if okA {
+
+					if len(listArgs) == 1 || len(listArgs) == 2 {
+
+						obj := ev.eval(listArgs[0], e, expandMacro)
+						hsh, okH := obj.(primitive.Hash)
+						if okH {
+
+							if len(listArgs) == 1 {
+								return hsh.Get(access)
+							}
+
+							val := ev.eval(listArgs[1], e, expandMacro)
+							hsh.Set(access, val)
+							return primitive.Nil{}
+						}
+					}
+
+				}
 				// Is this a structure creation?
 				fields, ok := ev.structs[thing.ToString()]
 				if ok {
 
-					// args supplied to this call
-					args := listExp[1:]
-
 					// ensure that we have some fields that
 					// match those we expect.
-					if len(fields) != len(args) {
+					if len(fields) != len(listArgs) {
 						return primitive.ArityError()
 					}
 
@@ -848,7 +883,7 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 
 					// Set the fields, ensuring we evaluate them
 					for i, name := range fields {
-						hash.Set(name, ev.eval(args[i], e, expandMacro))
+						hash.Set(name, ev.eval(listArgs[i], e, expandMacro))
 					}
 					return hash
 				}
