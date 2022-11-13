@@ -263,6 +263,10 @@ a
 		{"(cond false 7 (= 2 2) 8 \"else\" 9)", "8"},
 		{"(cond false 7 false 8 false 9)", "nil"},
 
+		// struct
+		{"(struct foo bar) (set! me (foo 3)) (foo.bar me)", "3"},
+		{"(struct foo bar) (set! me (foo 3)) (foo.bar me 32) (foo.bar me)", "32"},
+
 		// maths
 		{"(+ 3 1)", "4"},
 		{"(- 3 1)", "2"},
