@@ -7,6 +7,12 @@ import (
 // Number type holds numbers.
 type Number float64
 
+// IsSimpleType is used to denote whether this object
+// is self-evaluating.
+func (n Number) IsSimpleType() bool {
+	return true
+}
+
 // ToInterface converts this object to a golang value
 func (n Number) ToInterface() any {
 

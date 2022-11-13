@@ -288,38 +288,23 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 		}
 
 		//
+		// Simple types return themselves literally.
+		//
+		// For example a string returns itself, as
+		// does a number, a boolean, or a hash.
+		//
+		// Lists are the things that are complex in
+		// lisp, as they represent function calls.
+		//
+		if exp.IsSimpleType() {
+			return exp
+		}
+
+		//
 		// Behaviour depends on the type of the primitive/expression
 		// we've been given to execute.
 		//
 		switch exp.(type) {
-
-		// Booleans return themselves
-		case primitive.Bool:
-			return exp
-
-		// Characters return themselves
-		case primitive.Character:
-			return exp
-
-		// Errors return themselves
-		case primitive.Error:
-			return exp
-
-		// Hashes return themselves
-		case primitive.Hash:
-			return exp
-
-		// Numbers return themselves
-		case primitive.Number:
-			return exp
-
-		// Nil returns itself
-		case primitive.Nil:
-			return exp
-
-		// Strings return themselves
-		case primitive.String:
-			return exp
 
 		// Symbols return the value they contain
 		case primitive.Symbol:

@@ -11,6 +11,12 @@ func ArityError() Error {
 	return Error("ArityError - Unexpected argument count")
 }
 
+// IsSimpleType is used to denote whether this object
+// is self-evaluating.
+func (e Error) IsSimpleType() bool {
+	return true
+}
+
 // ToInterface converts this object to a golang value
 func (e Error) ToInterface() any {
 	return fmt.Errorf(string(e))

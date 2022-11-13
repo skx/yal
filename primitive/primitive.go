@@ -5,6 +5,15 @@ package primitive
 // Primitive is the interface of all our types
 type Primitive interface {
 
+	// IsSimpleType is used to denote whether this object
+	// is self-evaluating.
+	//
+	// Simple types include strings, numbers, booleans, etc.
+	//
+	// However note that a list is NOT a simple type, as it
+	// is used to denote a function-call.
+	IsSimpleType() bool
+
 	// ToString converts this primitive to a string representation.
 	ToString() string
 

@@ -13,6 +13,12 @@ type Hash struct {
 	StructType string
 }
 
+// IsSimpleType is used to denote whether this object
+// is self-evaluating.
+func (h Hash) IsSimpleType() bool {
+	return true
+}
+
 // SetStruct marks this as a "struct" type instead of a "hash type",
 // when queried by lisp
 func (h *Hash) SetStruct(name string) {
