@@ -42,6 +42,18 @@ type Eval struct {
 
 	// aliases contains any record of aliased functionality
 	aliases map[string]string
+
+	// structs contains a list of known structures.
+	//
+	// The key is the name of the structure, and the value is an
+	// array of the fields that structure possesses.
+	structs map[string][]string
+
+	// accessors contains struct field lookups
+	//
+	// The key is the name of the fake method, the value the name of
+	// the field to get/set
+	accessors map[string]string
 }
 
 // New constructs a new lisp interpreter.
@@ -49,8 +61,10 @@ func New(src string) *Eval {
 
 	// Create with a default context.
 	e := &Eval{
-		context: context.Background(),
-		symbols: make(map[string]primitive.Primitive),
+		context:   context.Background(),
+		symbols:   make(map[string]primitive.Primitive),
+		structs:   make(map[string][]string),
+		accessors: make(map[string]string),
 	}
 
 	// Setup the default symbol-table entries
@@ -302,6 +316,8 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 
 				ret.Set(x, val)
 			}
+
+			ret.SetStruct(obj.GetStruct())
 			return ret
 
 		// Numbers return themselves
@@ -641,6 +657,31 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 				}
 				return ev.atom(listExp[1].ToString())
 
+			// (struct
+			case primitive.Symbol("struct"):
+				if len(listExp) <= 2 {
+					return primitive.ArityError()
+				}
+
+				// name of structure
+				name := listExp[1].ToString()
+
+				// the fields it contains
+				fields := []string{}
+
+				// convert the fields to strings
+				for _, field := range listExp[2:] {
+
+					f := field.ToString()
+
+					ev.accessors[name+"."+f] = f
+					fields = append(fields, f)
+				}
+
+				// save the structure as a known-thing
+				ev.structs[name] = fields
+				return primitive.Nil{}
+
 			// (env
 			case primitive.Symbol("env"):
 
@@ -792,16 +833,113 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 				}
 
 			// Anything else is either a built-in function,
-			// or a user-function.
+			// a structure, or a user-function.
 			default:
 
+				// first item of the list - i.e. the thing
+				// we're gonna call.
+				thing := listExp[0]
+
+				// args supplied to this call
+				listArgs := listExp[1:]
+
+				// Is this a structure field access
+				access, okA := ev.accessors[thing.ToString()]
+				if okA {
+
+					if len(listArgs) == 1 || len(listArgs) == 2 {
+
+						obj := ev.eval(listArgs[0], e, expandMacro)
+						hsh, okH := obj.(primitive.Hash)
+						if okH {
+
+							if len(listArgs) == 1 {
+								return hsh.Get(access)
+							}
+
+							val := ev.eval(listArgs[1], e, expandMacro)
+							hsh.Set(access, val)
+							return primitive.Nil{}
+						}
+					}
+
+				}
+				// Is this a structure creation?
+				fields, ok := ev.structs[thing.ToString()]
+				if ok {
+
+					// ensure that we have some fields that
+					// match those we expect.
+					if len(listArgs) > len(fields) {
+						return primitive.ArityError()
+					}
+
+					// Create a hash to store the state
+					hash := primitive.NewHash()
+
+					// However mark this as a "struct",
+					// rather than a hash.
+					hash.SetStruct(thing.ToString())
+
+					// Set the fields, ensuring we evaluate them
+					for i, name := range fields {
+						if i < len(listArgs) {
+							hash.Set(name, ev.eval(listArgs[i], e, expandMacro))
+						} else {
+							hash.Set(name, primitive.Nil{})
+						}
+					}
+					return hash
+				}
+
+				// Is this a type-check on a struct?
+				if strings.HasSuffix(thing.ToString(), "?") {
+
+					// We're looking for a function-call
+					// that has a trailing "?", and one
+					// argument
+					if len(listExp) != 2 {
+						return primitive.ArityError()
+					}
+
+					// Get the thing that is being tested.
+					typeName := strings.TrimSuffix(thing.ToString(), "?")
+
+					// Does that represent a known-type?
+					_, ok2 := ev.structs[typeName]
+					if ok2 {
+
+						// OK a type-check on a known struct
+						//
+						// Note we evaluate the object
+						obj := ev.eval(listExp[1], e, expandMacro)
+
+						// is it a hash?
+						hsh, ok2 := obj.(primitive.Hash)
+						if !ok2 {
+							// nope - then not a struct
+							return primitive.Bool(false)
+						}
+
+						// is the struct-type the same as the type name?
+						if hsh.GetStruct() == typeName {
+							return primitive.Bool(true)
+						}
+						return primitive.Bool(false)
+					}
+
+					// just a method call with a trailing "?".
+					//
+					// could be "string?", etc, so we fall-through
+				}
+
 				// Find the thing we're gonna call.
-				procExp := ev.eval(listExp[0], e, expandMacro)
+				procExp := ev.eval(thing, e, expandMacro)
 
 				// Is it really a procedure we can call?
 				proc, ok := procExp.(*primitive.Procedure)
 				if !ok {
-					return primitive.Error(fmt.Sprintf("argument '%s' not a function", listExp[0].ToString()))
+					return primitive.Error(fmt.Sprintf("argument '%s' not a function", thing.ToString()))
 				}
 
 				// build up the arguments

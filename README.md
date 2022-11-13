@@ -19,6 +19,9 @@
 
 * [A brief introduction to using this lisp](INTRODUCTION.md).
   * Getting started setting variables, defining functions, etc.
+  * This includes documentation on enhanced features such as
+    * Hashes.
+    * Structures.
 * [A list of primitives we have implemented](PRIMITIVES.md).
   * This describes the functions we support, whether implemented in lisp or golang.
   * For example `(car)`, `(cdr)`, `(file:lines)`, `(shell)`, etc.

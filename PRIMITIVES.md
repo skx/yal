@@ -3,6 +3,7 @@
   * [Symbols](#symbols)
   * [Special Forms](#special-forms)
   * [Core Primitives](#core-primitives)
+  * [Structure Methods](#structure-methods)
   * [Standard Library](#standard-library)
 * [Type Checking](#type-checking)
 * [Testing](#testing)
@@ -14,7 +15,8 @@
 Here is a list of all the primitives which are available to yal users.
 
 Note that you might need to consult the source of the standard-library, or
-the help file, to see further details.  This is just intended as a summary.
+the help file, to see further details.  This document is primarily intended
+as a quick summary, and might lapse behind reality at times.
 
 
 ## Symbols
@@ -74,6 +76,8 @@ Special forms are things that are built into the core interpreter, and include:
   * Read a form from the specified string.
 * `set!`
   * Set the value of a variable.
+* `struct`
+  * Define a structure.
 * `symbol`
   * Create a new symbol from the given string.
 * `try`
@@ -219,6 +223,34 @@ Things you'll find here include:
 * `vals`
   * Return the values contained within the given hash.
   * Note that this returns things in the order of the sorted-keys.
+
+
+
+## Structure Methods
+
+A structure is a minimal wrapper over a hash, but when a structure is
+defined several methods are created.  Assuming a person-structure has
+been defined like so:
+
+```lisp
+(struct person name age address)
+```
+
+There is now a new structure, named `person` with three fields `name`, `age`, and `address` which can be instantiated.
+
+To help operate upon this structure several methods have also been created:
+
+* `(person "name" "age" "address")`
+  * Constructor method, which returns a new struct instance.
+  * If the number of arguments is less than the number of object-fields they will be left unset (i.e. nil).
+* `(person? obj)`
+  * Returns true if the given object is an instance of the person struct.
+* `(person.name obj [new-value])`
+  * Accessor/Mutator for the name-field in the given struct instance.
+* `(person.age obj [new-value])`
+  * Accessor/Mutator for the age-field in the given struct instance.
+* `(person.address obj [new-value])`
+  * Accessor/Mutator for the address-field in the given struct instance.
 
 
 

@@ -1,8 +1,27 @@
 package primitive
 
+import "fmt"
+
 // Hash holds a collection of other types, indexed by string
 type Hash struct {
+
+	// Entries contains the key/value pairs this object holds.
 	Entries map[string]Primitive
+
+	// StructType contains the name of this struct, if it is being
+	// being used to implement a Struct, rather than a Hash
+	StructType string
+}
+
+// SetStruct marks this as a "struct" type instead of a "hash type",
+// when queried by lisp
+func (h *Hash) SetStruct(name string) {
+	h.StructType = name
+}
+
+// GetStruct returns the name of the structure this object contains, if any
+func (h *Hash) GetStruct() string {
+	return h.StructType
 }
 
 // Get returns the value of a given index
@@ -40,5 +59,8 @@ func (h Hash) ToString() string {
 
 // Type returns the type of this primitive object.
 func (h Hash) Type() string {
-	return "hash"
+	if h.StructType == "" {
+		return "hash"
+	}
+	return fmt.Sprintf("struct-%s", h.StructType)
 }
