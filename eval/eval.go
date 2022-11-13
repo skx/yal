@@ -125,7 +125,7 @@ func (ev *Eval) Evaluate(e *env.Environment) primitive.Primitive {
 	// loop over all input
 	for {
 		// Get the next expression
-		expr, err := ev.readExpression()
+		expr, err := ev.readExpression(e)
 
 		if err != nil {
 			// End of list?
@@ -291,7 +291,7 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 		// Behaviour depends on the type of the primitive/expression
 		// we've been given to execute.
 		//
-		switch obj := exp.(type) {
+		switch exp.(type) {
 
 		// Booleans return themselves
 		case primitive.Bool:
@@ -305,20 +305,9 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 		case primitive.Error:
 			return exp
 
-		// Hashes return themselves, but the values should be
-		// evaluated - see #8.
+		// Hashes return themselves
 		case primitive.Hash:
-			ret := primitive.NewHash()
-
-			for x, y := range obj.Entries {
-
-				val := ev.eval(y, e, expandMacro)
-
-				ret.Set(x, val)
-			}
-
-			ret.SetStruct(obj.GetStruct())
-			return ret
+			return exp
 
 		// Numbers return themselves
 		case primitive.Number:
@@ -419,7 +408,7 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 				//
 				// So we don't need an environment, etc.
 				//
-				out, err := tmp.readExpression()
+				out, err := tmp.readExpression(e)
 				if err != nil {
 					return primitive.Error(fmt.Sprintf("failed to read %s:%s", arg, err.Error()))
 				}
@@ -895,13 +884,6 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 				// Is this a type-check on a struct?
 				if strings.HasSuffix(thing.ToString(), "?") {
 
-					// We're looking for a function-call
-					// that has a trailing "?", and one
-					// argument
-					if len(listExp) != 2 {
-						return primitive.ArityError()
-					}
-
 					// Get the thing that is being tested.
 					typeName := strings.TrimSuffix(thing.ToString(), "?")
 
@@ -909,15 +891,25 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 					_, ok2 := ev.structs[typeName]
 					if ok2 {
 
+						// OK now we're sure we're not colliding
+						// with another function test the argument
+						// count.
+						if len(listExp) != 2 {
+							return primitive.ArityError()
+						}
+
 						// OK a type-check on a known struct
 						//
-						// Note we evaluate the object
+						// Note we evaluate the object, because it
+						// was probably a symbol, or return object
+						// of some kind.
 						obj := ev.eval(listExp[1], e, expandMacro)
 
 						// is it a hash?
 						hsh, ok2 := obj.(primitive.Hash)
 						if !ok2 {
-							// nope - then not a struct
+							// nope - if it isn't a hash
+							// then it can't be a struct.
 							return primitive.Bool(false)
 						}
 
@@ -930,7 +922,9 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 
 					// just a method call with a trailing "?".
 					//
-					// could be "string?", etc, so we fall-through
+					// could be "string?", "contains?", etc,
+					// so we fall-through and keep processing as
+					// per usual.
 				}
 
 				// Find the thing we're gonna call.
@@ -1213,7 +1207,7 @@ func (ev *Eval) quasiquote(exp primitive.Primitive) primitive.Primitive {
 
 // readExpression uses recursion to read a complete expression from
 // our internal array of tokens - as produced by `tokenize`.
-func (ev *Eval) readExpression() (primitive.Primitive, error) {
+func (ev *Eval) readExpression(e *env.Environment) (primitive.Primitive, error) {
 
 	// Have we walked off the end of the program?
 	if ev.offset >= len(ev.toks) {
@@ -1229,7 +1223,7 @@ func (ev *Eval) readExpression() (primitive.Primitive, error) {
 	switch token {
 	case "'":
 		// '... => (quote ...)
-		quoted, err := ev.readExpression()
+		quoted, err := ev.readExpression(e)
 		if err != nil {
 			return nil, err
 		}
@@ -1237,7 +1231,7 @@ func (ev *Eval) readExpression() (primitive.Primitive, error) {
 
 	case "`":
 		// `... => (quasiquote ...)
-		quoted, err := ev.readExpression()
+		quoted, err := ev.readExpression(e)
 		if err != nil {
 			return nil, err
 		}
@@ -1245,7 +1239,7 @@ func (ev *Eval) readExpression() (primitive.Primitive, error) {
 
 	case "~", ",":
 		// ~... => (unquote ...)
-		quoted, err := ev.readExpression()
+		quoted, err := ev.readExpression(e)
 		if err != nil {
 			return nil, err
 		}
@@ -1253,7 +1247,7 @@ func (ev *Eval) readExpression() (primitive.Primitive, error) {
 
 	case "~@", "`,", ",@":
 		// ~@... => (splice-unquote ...)
-		quoted, err := ev.readExpression()
+		quoted, err := ev.readExpression(e)
 		if err != nil {
 			return nil, err
 		}
@@ -1275,7 +1269,7 @@ func (ev *Eval) readExpression() (primitive.Primitive, error) {
 		for ev.toks[ev.offset] != ")" {
 
 			// Read the sub-expressions, recursively.
-			expr, err := ev.readExpression()
+			expr, err := ev.readExpression(e)
 			if err != nil {
 				return nil, err
 			}
@@ -1309,7 +1303,7 @@ func (ev *Eval) readExpression() (primitive.Primitive, error) {
 		for ev.toks[ev.offset] != "}" {
 
 			// Read the sub-expressions, recursively.
-			key, err := ev.readExpression()
+			key, err := ev.readExpression(e)
 			if err != nil {
 				return nil, err
 			}
@@ -1320,7 +1314,7 @@ func (ev *Eval) readExpression() (primitive.Primitive, error) {
 			}
 
 			// Read the sub-expressions, recursively.
-			val, err2 := ev.readExpression()
+			val, err2 := ev.readExpression(e)
 			if err2 != nil {
 				return nil, err2
 			}
@@ -1330,7 +1324,10 @@ func (ev *Eval) readExpression() (primitive.Primitive, error) {
 				return nil, ErrEOF
 			}
 
-			hash.Set(key.ToString(), val)
+			// Ensure the value is evaluated
+			v := ev.eval(val, e, true)
+
+			hash.Set(key.ToString(), v)
 		}
 
 		// We bump the current read-position one more here,
