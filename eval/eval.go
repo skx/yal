@@ -870,7 +870,7 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 
 					// ensure that we have some fields that
 					// match those we expect.
-					if len(fields) != len(listArgs) {
+					if len(listArgs) > len(fields) {
 						return primitive.ArityError()
 					}
 
@@ -883,7 +883,11 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 
 					// Set the fields, ensuring we evaluate them
 					for i, name := range fields {
-						hash.Set(name, ev.eval(listArgs[i], e, expandMacro))
+						if i < len(listArgs) {
+							hash.Set(name, ev.eval(listArgs[i], e, expandMacro))
+						} else {
+							hash.Set(name, primitive.Nil{})
+						}
 					}
 					return hash
 				}

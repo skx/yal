@@ -266,6 +266,10 @@ a
 		// struct
 		{"(struct foo bar) (set! me (foo 3)) (foo.bar me)", "3"},
 		{"(struct foo bar) (set! me (foo 3)) (foo.bar me 32) (foo.bar me)", "32"},
+		{`(struct cat name age) (set! me (cat "meow" 3)) (cat.name me)`, "meow"},
+		{`(struct cat name age) (set! me (cat "meow")) (cat.name me)`, "meow"},
+		{`(struct cat name age) (set! me (cat "meow" 3)) (cat.age me)`, "3"},
+		{`(struct cat name age) (set! me (cat "meow")) (cat.age me)`, "nil"},
 
 		// maths
 		{"(+ 3 1)", "4"},
