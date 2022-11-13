@@ -359,6 +359,14 @@ If the name of the test is not unique then that will cause an error to be printe
 (deftest binary:1 (list (dec2bin 3) "11"))
 (deftest binary:2 (list (dec2bin 4) "100"))
 
+;; structures
+(deftest struct:1 (list (do (struct person name) (type (person "me")))
+                        "struct-person"))
+(deftest struct:2 (list (do (struct person name) (person? (person "me")))
+                        true))
+(deftest struct:3 (list (do (struct person name) (person.name (person "me")))
+                        "me"))
+
 
 ;;
 ;; Define a function to run all the tests, by iterating over the hash.
