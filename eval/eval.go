@@ -241,6 +241,14 @@ func (ev *Eval) atom(token string) primitive.Primitive {
 }
 
 // eval evaluates a single expression appropriately.
+//
+// We have special cases for the simple values, for example numbers, strings,
+// and similar primitive types just return themselves.
+//
+// Otherwise we have two special cases to handle:
+//
+// Symbols return the appropriate value from the environment, and
+// lists involve invoking functions (or our special built-in forms).
 func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bool) primitive.Primitive {
 
 	// Bump our recursion count
@@ -334,186 +342,23 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 				return listExp
 			}
 
+			//
+			// Is the first term a Symbol?
+			//
+			// If so then we're evaluating a special form,
+			// these are implemented in "specials.go"
+			//
+			spec, ok := listExp[0].(primitive.Symbol)
+			if ok {
+				res, ok := ev.evalSpecialForm(spec.ToString(), listExp[1:], e, expandMacro)
+				if ok {
+					return res
+				}
+			}
+
 			// special handling for some forms, based on the
 			// first token/symbol
 			switch listExp[0] {
-
-			// (alias ..)
-			case primitive.Symbol("alias"):
-				// We need at least one pair.
-				if len(listExp) < 3 {
-					return primitive.ArityError()
-				}
-
-				// The arguments are gonna be a list of pairs
-				args := listExp[1:]
-
-				if len(args)%2 != 0 {
-					return primitive.Error(fmt.Sprintf("(alias ..) must have an even length of arguments, got %v", args))
-				}
-
-				for i := 0; i < len(args); i += 2 {
-
-					// The key/val pair we're working with
-					new := args[i]
-					orig := args[i+1]
-
-					old, ok := e.Get(orig.ToString())
-					if ok {
-						e.Set(new.ToString(), old)
-
-						ev.aliases[new.ToString()] = orig.ToString()
-					}
-				}
-				return primitive.Nil{}
-
-			// (do ..)
-			case primitive.Symbol("do"):
-				var ret primitive.Primitive
-				for _, x := range listExp[1:] {
-					ret = ev.eval(x, e, expandMacro)
-				}
-				return ret
-
-			// (read
-			case primitive.Symbol("read"):
-				if len(listExp) != 2 {
-					return primitive.ArityError()
-				}
-
-				arg := listExp[1].ToString()
-
-				// Create a new evaluator with the list
-				tmp := New(arg)
-
-				// Read an expression with it.
-				//
-				// Note here we just _read_ the expression,
-				// we don't evaluate it.
-				//
-				// So we don't need an environment, etc.
-				//
-				out, err := tmp.readExpression(e)
-				if err != nil {
-					return primitive.Error(fmt.Sprintf("failed to read %s:%s", arg, err.Error()))
-				}
-
-				// Return it.
-				return out
-
-			// (eval
-			case primitive.Symbol("eval"):
-
-				if len(listExp) != 2 {
-					return primitive.ArityError()
-				}
-
-				switch val := listExp[1].(type) {
-
-				// Evaluate
-				case primitive.List:
-					// Evaluate the list
-					res := ev.eval(listExp[1], e, expandMacro)
-
-					// Create a new evaluator with
-					// the result as a string
-					tmp := New(res.ToString())
-
-					// Ensure that we have a suitable
-					// child-environment.
-					nEnv := env.NewEnvironment(e)
-
-					// Now evaluate it.
-					return tmp.Evaluate(nEnv)
-
-				// symbol solely so we can do env. lookup
-				case primitive.Symbol:
-					str, ok := e.Get(val.ToString())
-					if ok {
-						tmp := New(str.(primitive.Primitive).ToString())
-						nEnv := env.NewEnvironment(e)
-						return tmp.Evaluate(nEnv)
-					}
-					return primitive.Nil{}
-
-				// string eval
-				case primitive.String:
-					tmp := New(string(val))
-					nEnv := env.NewEnvironment(e)
-					return tmp.Evaluate(nEnv)
-
-				default:
-					return primitive.Error(fmt.Sprintf("unexpected type for eval %V.", listExp[1]))
-				}
-
-			// (define
-			case primitive.Symbol("define"), primitive.Symbol("def!"):
-				if len(listExp) < 3 {
-					return primitive.ArityError()
-				}
-				symb, ok := listExp[1].(primitive.Symbol)
-				if ok {
-
-					val := ev.eval(listExp[2], e, expandMacro)
-					e.Set(string(symb), val)
-					return primitive.Nil{}
-				}
-				return primitive.Error(fmt.Sprintf("Expected a symbol, got %v", listExp[1]))
-
-			// (defmacro!
-			case primitive.Symbol("defmacro!"):
-				if len(listExp) < 3 {
-					return primitive.ArityError()
-				}
-
-				// name of macro
-				symb, ok := listExp[1].(primitive.Symbol)
-				if !ok {
-					return primitive.Error(fmt.Sprintf("Expected a symbol, got %v", listExp[1]))
-				}
-
-				// macro body
-				val := ev.eval(listExp[2], e, expandMacro)
-
-				mac, ok2 := val.(*primitive.Procedure)
-				if !ok2 {
-					return primitive.Error(fmt.Sprintf("expected a function body for (defmacro..), got %v", val))
-				}
-
-				// this is now a macro
-				mac.Macro = true
-				e.Set(string(symb), mac)
-				return primitive.Nil{}
-
-			// (set!
-			case primitive.Symbol("set!"):
-				if len(listExp) < 3 {
-					return primitive.ArityError()
-				}
-
-				// Get the symbol we're gonna set
-				sym, ok := listExp[1].(primitive.Symbol)
-				if !ok {
-					return primitive.Error(fmt.Sprintf("tried to set a non-symbol %v", listExp[1]))
-				}
-
-				// Get the value.
-				val := ev.eval(listExp[2], e, expandMacro)
-
-				// Now set, either locally or in the parent scope.
-				if len(listExp) == 4 {
-					e.SetOuter(string(sym), val)
-				} else {
-					e.Set(string(sym), val)
-				}
-				return primitive.Nil{}
-
-			// (quote ..)
-			case primitive.Symbol("quote"):
-				if len(listExp) < 2 {
-					return primitive.ArityError()
-				}
-				return listExp[1]
 
 			// (quasiquote ..)
 			case primitive.Symbol("quasiquote"):
@@ -758,53 +603,6 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 				tmpEnv.Set(blkLst[1].ToString(), primitive.String(out.ToString()))
 
 				return ev.eval(blkLst[2], tmpEnv, expandMacro)
-
-			// (lambda
-			case primitive.Symbol("lambda"), primitive.Symbol("fn*"):
-
-				// ensure we have arguments
-				if len(listExp) != 3 && len(listExp) != 4 {
-					return primitive.ArityError()
-				}
-
-				// ensure that our arguments are a list
-				argMarkers, ok := listExp[1].(primitive.List)
-				if !ok {
-					return primitive.Error(fmt.Sprintf("expected a list for arguments, got %v", listExp[1]))
-				}
-
-				// Collect arguments
-				args := []primitive.Symbol{}
-				for _, x := range argMarkers {
-
-					xs, ok := x.(primitive.Symbol)
-					if !ok {
-						return primitive.Error(fmt.Sprintf("expected a symbol for an argument, got %v", x))
-					}
-					args = append(args, xs)
-				}
-
-				body := listExp[2]
-				help := ""
-
-				// If there's an optional help string ..
-				if len(listExp) == 4 {
-					help = listExp[2].ToString()
-					body = listExp[3]
-
-				}
-				// This is a procedure, which will default
-				// to not being a macro.
-				//
-				// To make it a macro it should be set with
-				// "(defmacro!..)"
-				return &primitive.Procedure{
-					Args:  args,
-					Body:  body,
-					Env:   e,
-					Help:  help,
-					Macro: false,
-				}
 
 			// Anything else is either a built-in function,
 			// a structure, or a user-function.
