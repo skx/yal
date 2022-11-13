@@ -91,6 +91,34 @@ func (ev *Eval) evalSpecialForm(name string, args []primitive.Primitive, e *env.
 		}
 		return ret, true
 
+	// (env
+	case "env":
+
+		// create a new list
+		var c primitive.List
+
+		for key, val := range e.Items() {
+
+			v := val.(primitive.Primitive)
+
+			tmp := primitive.NewHash()
+			tmp.Set(":name", primitive.String(key))
+			tmp.Set(":value", v)
+
+			// Is this a procedure?  If so
+			// add the help-text
+			proc, ok := v.(*primitive.Procedure)
+			if ok {
+				if len(proc.Help) > 0 {
+					tmp.Set(":help", primitive.String(proc.Help))
+				}
+			}
+
+			c = append(c, tmp)
+		}
+
+		return c, true
+
 	case "eval":
 		if len(args) != 1 {
 			return primitive.ArityError(), true
@@ -133,6 +161,32 @@ func (ev *Eval) evalSpecialForm(name string, args []primitive.Primitive, e *env.
 		default:
 			return primitive.Error(fmt.Sprintf("unexpected type for eval %V.", args[0])), true
 		}
+
+	// (if
+	case "if":
+		if len(args) < 2 {
+			return primitive.ArityError(), true
+		}
+
+		test := ev.eval(args[0], e, expandMacro)
+
+		// If we got an error inside the `if` then we return it
+		er, eok := test.(primitive.Error)
+		if eok {
+			return er, true
+		}
+
+		// if the test was false then we return
+		// the else-section
+		if b, ok := test.(primitive.Bool); (ok && !bool(b)) || primitive.IsNil(test) {
+			if len(args) < 3 {
+				return primitive.Nil{}, true
+			}
+			return ev.eval(args[2], e, expandMacro), true
+		}
+
+		// otherwise we handle the true-section.
+		return ev.eval(args[1], e, expandMacro), true
 
 	// (lambda
 	case "lambda", "fn*":
@@ -179,6 +233,116 @@ func (ev *Eval) evalSpecialForm(name string, args []primitive.Primitive, e *env.
 			Help:  help,
 			Macro: false,
 		}, true
+
+	// let
+	case "let":
+		if len(args) < 1 {
+			return primitive.ArityError(), true
+		}
+
+		newEnv := env.NewEnvironment(e)
+		bindingsList, ok := args[0].(primitive.List)
+		if !ok {
+			return primitive.Error(fmt.Sprintf("argument is not a list, got %v", args[0])), true
+		}
+
+		for _, binding := range bindingsList {
+
+			// ensure we got a list
+			bl, ok := binding.(primitive.List)
+			if !ok {
+				return primitive.Error(fmt.Sprintf("binding value is not a list, got %v", binding)), true
+			}
+
+			if len(bl) < 2 {
+				return primitive.ArityError(), true
+			}
+
+			// get the value
+			bindingVal := ev.eval(bl[1], newEnv, expandMacro)
+
+			// The thing to set
+			set, ok2 := bl[0].(primitive.Symbol)
+			if !ok2 {
+				return primitive.Error(fmt.Sprintf("binding name is not a symbol, got %v", bl[0])), true
+			}
+
+			// Finally set the parameter
+			newEnv.Set(string(set), bindingVal)
+		}
+
+		// Now we've populated the new
+		// environment with the pairs we received
+		// in the setup phase we can execute
+		// the body.
+		var ret primitive.Primitive
+		for _, x := range args[1:] {
+			ret = ev.eval(x, newEnv, expandMacro)
+		}
+		return ret, true
+
+	// (let*
+	case "let*":
+		// We need to have at least one argument.
+		//
+		// Later we'll test for more.  Because we need a multiple of two.
+		if len(args) < 1 {
+			return primitive.ArityError(), true
+		}
+
+		newEnv := env.NewEnvironment(e)
+		bindingsList, ok := args[0].(primitive.List)
+		if !ok {
+			return primitive.Error(fmt.Sprintf("argument is not a list, got %v", args[0])), true
+		}
+
+		// Length of binding must be %2
+		if len(bindingsList)%2 != 0 {
+			return primitive.Error(fmt.Sprintf("list for (len*) must have even length, got %v", bindingsList)), true
+		}
+
+		for i := 0; i < len(bindingsList); i += 2 {
+
+			// The key/val pair we're working with
+			key := bindingsList[i]
+			val := bindingsList[i+1]
+
+			// evaluate the value - use the new environment.
+			eVal := ev.eval(val, newEnv, expandMacro)
+
+			// The thing to set
+			eKey, ok := key.(primitive.Symbol)
+			if !ok {
+				return primitive.Error(fmt.Sprintf("binding name is not a symbol, got %v", key)), true
+			}
+
+			// Finally set the parameter
+			newEnv.Set(string(eKey), eVal)
+		}
+
+		// Now we've populated the new
+		// environment with the pairs we received
+		// in the setup phase we can execute
+		// the body.
+		var ret primitive.Primitive
+		for _, x := range args[1:] {
+			ret = ev.eval(x, newEnv, expandMacro)
+		}
+		return ret, true
+
+	// (macroexpand ..)
+	case "macroexpand":
+		if len(args) != 1 {
+			return primitive.ArityError(), true
+		}
+		return ev.macroExpand(args[0], e), true
+
+	// (quasiquote ..)
+	case "quasiquote":
+		if len(args) != 1 {
+			return primitive.ArityError(), true
+		}
+		return ev.eval(ev.quasiquote(args[0]), e, expandMacro), true
 
 	// (quote ..)
 	case "quote":
@@ -235,6 +399,84 @@ func (ev *Eval) evalSpecialForm(name string, args []primitive.Primitive, e *env.
 		}
 		return primitive.Nil{}, true
 
+	// (struct
+	case "struct":
+		if len(args) <= 1 {
+			return primitive.ArityError(), true
+		}
+
+		// name of structure
+		name := args[0].ToString()
+
+		// the fields it contains
+		fields := []string{}
+
+		// convert the fields to strings
+		for _, field := range args[1:] {
+
+			f := field.ToString()
+
+			ev.accessors[name+"."+f] = f
+			fields = append(fields, f)
+		}
+
+		// save the structure as a known-thing
+		ev.structs[name] = fields
+		return primitive.Nil{}, true
+
+	case "symbol":
+		if len(args) != 1 {
+			return primitive.ArityError(), true
+		}
+		return ev.atom(args[0].ToString()), true
+
+	// (try
+	case "try":
+		if len(args) < 2 {
+			return primitive.ArityError(), true
+		}
+
+		// first expression is what to execute: a list
+		expr := args[0]
+
+		// Cast the argument to a list
+		expLst, ok1 := expr.(primitive.List)
+		if !ok1 {
+			return primitive.Error(fmt.Sprintf("expected a list for argument, got %v", args[0])), true
+		}
+
+		// second expression is the catch: a list
+		blk := args[1]
+		blkLst, ok2 := blk.(primitive.List)
+		if !ok2 {
+			return primitive.Error(fmt.Sprintf("expected a list for argument, got %v", args[1])), true
+		}
+		if len(blkLst) != 3 {
+			return primitive.Error(fmt.Sprintf("list should have three elements, got %v", blkLst)), true
+		}
+		if !ev.startsWith(blkLst, "catch") {
+			return primitive.Error(fmt.Sprintf("catch list should begin with 'catch', got %v", blkLst)), true
+		}
+
+		// Evaluate the expression
+		out := ev.eval(expLst, e, expandMacro)
+
+		// Evaluating the expression didn't return an error.
+		//
+		// Nothing to catch, all OK
+		_, ok3 := out.(primitive.Error)
+		if !ok3 {
+			return out, true
+		}
+
+		// The catch statement is blkLst[0] - we tested for that already
+		// The variable to bind is blkLst[1]
+		// The form to execute with that is blkLst[2]
+		tmpEnv := env.NewEnvironment(e)
+		tmpEnv.Set(blkLst[1].ToString(), primitive.String(out.ToString()))
+		return ev.eval(blkLst[2], tmpEnv, expandMacro), true
 	}
+
+	// The input was not handled as a special.
 	return primitive.Nil{}, false
 }
