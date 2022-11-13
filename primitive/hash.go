@@ -13,23 +13,6 @@ type Hash struct {
 	StructType string
 }
 
-// IsSimpleType is used to denote whether this object
-// is self-evaluating.
-func (h Hash) IsSimpleType() bool {
-	return true
-}
-
-// SetStruct marks this as a "struct" type instead of a "hash type",
-// when queried by lisp
-func (h *Hash) SetStruct(name string) {
-	h.StructType = name
-}
-
-// GetStruct returns the name of the structure this object contains, if any
-func (h *Hash) GetStruct() string {
-	return h.StructType
-}
-
 // Get returns the value of a given index
 func (h Hash) Get(key string) Primitive {
 	x, ok := h.Entries[key]
@@ -37,6 +20,17 @@ func (h Hash) Get(key string) Primitive {
 		return x
 	}
 	return Nil{}
+}
+
+// GetStruct returns the name of the structure this object contains, if any
+func (h *Hash) GetStruct() string {
+	return h.StructType
+}
+
+// IsSimpleType is used to denote whether this object
+// is self-evaluating.
+func (h Hash) IsSimpleType() bool {
+	return true
 }
 
 // NewHash creates a new hash, and ensures that the storage-space
@@ -50,6 +44,12 @@ func NewHash() Hash {
 // Set stores a value in the hash
 func (h Hash) Set(key string, val Primitive) {
 	h.Entries[key] = val
+}
+
+// SetStruct marks this as a "struct" type instead of a "hash type",
+// when queried by lisp
+func (h *Hash) SetStruct(name string) {
+	h.StructType = name
 }
 
 // ToString converts this object to a string.
