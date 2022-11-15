@@ -319,20 +319,18 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 		}
 
 		//
-		// Behaviour depends on the type of the primitive/expression
-		// we've been given to execute.
+		// After simple types we have to deal with symbols, and lists.
 		//
-		switch exp.(type) {
+		sym, isSymbol := exp.(primitive.Symbol)
+		if isSymbol {
 
-		// Symbols return the value they contain
-		case primitive.Symbol:
 			// A symbol with a ":" prefix is treated as a literal.
-			if strings.HasPrefix(exp.ToString(), ":") {
+			if strings.HasPrefix(sym.ToString(), ":") {
 				return exp
 			}
 
 			// Otherwise it's looked up in the environment.
-			v, ok := e.Get(string(exp.(primitive.Symbol)))
+			v, ok := e.Get(string(sym))
 
 			// If it wasn't found there, return a nil value
 			if !ok {
@@ -341,35 +339,46 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 
 			// We need to cast it (our env. package stores "any")
 			return v.(primitive.Primitive)
+		}
 
-		// Lists return the result of applying the operation.
-		// here we're only going to care if the list involves a
-		// call to a special-function
-		case primitive.List:
+		//
+		// Now we're only dealing with liists
+		//
+		listExp, isList := exp.(primitive.List)
 
-			listExp := exp.(primitive.List)
-
-			// If the list has no entries then we abort
-			if len(listExp) == 0 {
-				return listExp
-			}
-
-			//
-			// Is the first term a Symbol?
-			//
-			// If so then we're evaluating a special form,
-			// these are implemented in "specials.go"
-			//
-			spec, ok := listExp[0].(primitive.Symbol)
-			if ok {
-				res, ok := ev.evalSpecialForm(spec.ToString(), listExp[1:], e, expandMacro)
-				if ok {
-					return res
-				}
-			}
-
-		default:
+		//
+		// Not a list?  Then that's a surprise
+		//
+		if !isList {
 			return primitive.Error(fmt.Sprintf("unexpected type: %s", exp))
+		}
+
+		//
+		// Is this an empty list?  Then just return it
+		//
+		if len(listExp) == 0 {
+			return listExp
+		}
+
+		//
+		// Is the first term a Symbol?
+		//
+		// If so then we're evaluating a special form,
+		// these are implemented in "specials.go"
+		//
+		sym, isSymbol = listExp[0].(primitive.Symbol)
+		if isSymbol {
+
+			//
+			// If that was handled then return the result.
+			//
+			// Otherwise we'll keep going and we'll treat this
+			// as a usual function-call.
+			//
+			res, ok := ev.evalSpecialForm(sym.ToString(), listExp[1:], e, expandMacro)
+			if ok {
+				return res
+			}
 		}
 
 		//
@@ -380,13 +389,8 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 		// So we need to work out whether it is a built-in,
 		// golang-implemented thing, or a lisp-defined thing.
 		//
-		// Either way call it.
-		//
-		listExp := exp.(primitive.List)
 
-		//
 		// The thing we'll call
-		//
 		thing := listExp[0]
 
 		// args supplied to this call
