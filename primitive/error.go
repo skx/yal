@@ -11,6 +11,12 @@ func ArityError() Error {
 	return Error("ArityError - Unexpected argument count")
 }
 
+// TypeError is an error raised when a function is called with invalid
+// typed argument
+func TypeError(msg string) Error {
+	return Error("TypeError - " + msg)
+}
+
 // IsSimpleType is used to denote whether this object
 // is self-evaluating.
 func (e Error) IsSimpleType() bool {

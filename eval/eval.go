@@ -578,9 +578,10 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 		//
 		// Check that the arguments supplied match those that are expected.
 		//
-		// Unless variadic arguments are expected, because in that case "anything" is fine.
+		// Variadic arguments would add _extra_ arguments, so this check
+		// is still safe for those.
 		//
-		if len(args) < min && (variadic == "") {
+		if len(args) < min {
 			return primitive.ArityError()
 		}
 
@@ -610,48 +611,24 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 				// Does the argument have a trailing type?
 				if strings.Contains(tmp, ":") {
 
-					before, after, found := strings.Cut(tmp, ":")
+					//
+					// Type-check the supplied argument
+					//
+					argName, argTypes, found := strings.Cut(tmp, ":")
 
-					// Did we find it?
+					//
+					// Type-check
+					//
 					if found {
+						err := ev.typeCheck(argTypes, x.Type())
 
-						// types that are allowed
-						valid := make(map[string]bool)
-
-						// Is anything possible?
-						any := false
-
-						// Record each one
-						for _, typ := range strings.Split(after, ":") {
-
-							// Any is special
-							if typ == "any" {
-								any = true
-							}
-
-							// Since we're calling `type` we need to
-							// do some rewriting for the function-case,
-							// which has distinct types.
-							if typ == "function" {
-								valid["procedure(lisp)"] = true
-								valid["procedure(golang)"] = true
-								valid["macro"] = true
-								continue
-							}
-
-							valid[typ] = true
-						}
-
-						// See if the type matches
-						_, ok := valid[x.Type()]
-
-						if !ok && !any {
-							return primitive.Error(fmt.Sprintf("type-validation failed: argument %s to %s was supposed to be %s, got %s", before, listExp[0].ToString(), after, x.Type()))
+						if err != nil {
+							return primitive.TypeError(fmt.Sprintf("argument %s to %s was supposed to be %s, got %s", argName, thing.ToString(), argTypes, x.Type()))
 						}
 					}
 
 					// strip off the ":foo" part.
-					tmp = string(before)
+					tmp = string(argName)
 				}
 
 				// And now set the value
@@ -661,18 +638,12 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 
 			}
 
-			// Variadic arguments?  Then save this arg away
+			// Variadic arguments?  Then save this arg away to
+			// our temporary list, and set it.
 			if len(variadic) > 0 {
 				lst = append(lst, x)
+				e.Set(variadic, lst)
 			}
-		}
-
-		// For variadic arguments we can't set the value as we go,
-		// because we have to wait until we've collected them all.
-		//
-		// So set them now.
-		if len(variadic) > 0 {
-			e.Set(variadic, lst)
 		}
 
 		// Here we go round the evaluation loop again.
@@ -953,4 +924,47 @@ func (ev *Eval) tokenize(str string) {
 
 		ev.toks = append(ev.toks, match[1])
 	}
+}
+
+// typeCheck is called to type-check arguments.
+//
+// types contains a ":"-separated list of types that are acceptable, and supplied contains
+// the name of the type which was actually supplied.
+func (ev *Eval) typeCheck(types string, supplied string) error {
+
+	// types that are allowed
+	valid := make(map[string]bool)
+
+	// Is anything possible?
+	any := false
+
+	// Record each one
+	for _, typ := range strings.Split(types, ":") {
+
+		// Any is special
+		if typ == "any" {
+			any = true
+		}
+
+		// Since we're calling `type` we need to
+		// do some rewriting for the function-case,
+		// which has distinct types.
+		if typ == "function" {
+			valid["procedure(lisp)"] = true
+			valid["procedure(golang)"] = true
+			valid["macro"] = true
+		} else {
+			valid[typ] = true
+		}
+	}
+
+	// See if the type matches
+	_, ok := valid[supplied]
+
+	if !ok && !any {
+		return errors.New("invalid type")
+	}
+
+	return nil
+
 }

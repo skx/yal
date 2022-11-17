@@ -394,10 +394,10 @@ a
 		{"(try (/ 1 0) (catch x))", "ERROR{list should have three elements, got [catch x]}"},
 
 		// type failures
-		{input: "(define blah (lambda (a:list) (print a))) (blah 3)", output: "ERROR{type-validation failed: argument a to blah was supposed to be list, got number}"},
-		{input: "(define blah (lambda (a:string) (print a))) (blah 3)", output: "ERROR{type-validation failed: argument a to blah was supposed to be string, got number}"},
-		{input: "(define blah (lambda (a:number) (print a))) (blah '(3))", output: "ERROR{type-validation failed: argument a to blah was supposed to be number, got list}"},
-		{input: "(define blah (lambda (a:function) (print a))) (blah '(3))", output: "ERROR{type-validation failed: argument a to blah was supposed to be function, got list}"},
+		{input: "(define blah (lambda (a:list) (print a))) (blah 3)", output: "ERROR{TypeError - argument a to blah was supposed to be list, got number}"},
+		{input: "(define blah (lambda (a:string) (print a))) (blah 3)", output: "ERROR{TypeError - argument a to blah was supposed to be string, got number}"},
+		{input: "(define blah (lambda (a:number) (print a))) (blah '(3))", output: "ERROR{TypeError - argument a to blah was supposed to be number, got list}"},
+		{input: "(define blah (lambda (a:function) (print a))) (blah '(3))", output: "ERROR{TypeError - argument a to blah was supposed to be function, got list}"},
 		{input: "(define blah (lambda (a:any) (print a))) (blah '(3))", output: "(3)"},
 	}
 
