@@ -11,6 +11,10 @@ func TestBool(t *testing.T) {
 	true := Bool(true)
 	false := Bool(false)
 
+	if !true.IsSimpleType() {
+		t.Fatalf("expected boolean to be a simple type")
+	}
+
 	if true.Type() != "boolean" {
 		t.Fatalf("wrong type")
 	}
@@ -48,6 +52,10 @@ func TestCharacter(t *testing.T) {
 	ok := Character("o")
 	empty := Character("")
 
+	if !nl.IsSimpleType() {
+		t.Fatalf("expected character to be a simple type")
+	}
+
 	if nl.Type() != "character" {
 		t.Fatalf("wrong type")
 	}
@@ -82,6 +90,10 @@ func TestError(t *testing.T) {
 
 	error := Error("no-cheese")
 
+	if !error.IsSimpleType() {
+		t.Fatalf("expected error to be a simple type")
+	}
+
 	if error.Type() != "error" {
 		t.Fatalf("wrong type")
 	}
@@ -91,6 +103,10 @@ func TestError(t *testing.T) {
 
 	if !strings.Contains(ArityError().ToString(), "Arity") {
 		t.Fatalf("arity-error is non-obvious")
+	}
+
+	if !strings.Contains(TypeError("xx").ToString(), "TypeError") {
+		t.Fatalf("TypeError is non-obvious")
 	}
 
 	//
@@ -106,6 +122,10 @@ func TestError(t *testing.T) {
 func TestIsNil(t *testing.T) {
 
 	var n Nil
+
+	if !n.IsSimpleType() {
+		t.Fatalf("expected nil to be a simple type")
+	}
 
 	if n.Type() != "nil" {
 		t.Fatalf("nil -> wrong type")
@@ -144,6 +164,10 @@ func TestList(t *testing.T) {
 		Number(3),
 	})
 
+	if lst.IsSimpleType() {
+		t.Fatalf("Did not expect list to be a simple type")
+	}
+
 	if lst.Type() != "list" {
 		t.Fatalf("wrong type")
 	}
@@ -156,6 +180,10 @@ func TestNumber(t *testing.T) {
 
 	i := Number(3)
 	f := Number(1.0 / 9)
+
+	if !i.IsSimpleType() {
+		t.Fatalf("expected number to be a simple type")
+	}
 
 	if i.Type() != "number" {
 		t.Fatalf("wrong type")
@@ -192,6 +220,10 @@ func TestString(t *testing.T) {
 
 	str := String("i like cake")
 
+	if !str.IsSimpleType() {
+		t.Fatalf("expected string to be a simple type")
+	}
+
 	if str.Type() != "string" {
 		t.Fatalf("wrong type")
 	}
@@ -204,6 +236,9 @@ func TestSymbol(t *testing.T) {
 
 	sym := Symbol("pi")
 
+	if sym.IsSimpleType() {
+		t.Fatalf("did not expected symbol to be a simple type")
+	}
 	if sym.Type() != "symbol" {
 		t.Fatalf("wrong type")
 	}

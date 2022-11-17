@@ -19,6 +19,10 @@ func TestHash(t *testing.T) {
 		t.Fatalf("got wrong value")
 	}
 
+	if !h.IsSimpleType() {
+		t.Fatalf("expected has to be a simple type")
+	}
+
 	if h.Type() != "hash" {
 		t.Fatalf("Wrong type for hash")
 	}
