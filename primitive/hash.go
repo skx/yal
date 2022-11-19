@@ -1,7 +1,5 @@
 package primitive
 
-import "fmt"
-
 // Hash holds a collection of other types, indexed by string
 type Hash struct {
 
@@ -68,5 +66,5 @@ func (h Hash) Type() string {
 	if h.StructType == "" {
 		return "hash"
 	}
-	return fmt.Sprintf("struct-%s", h.StructType)
+	return h.StructType
 }
