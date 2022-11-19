@@ -271,6 +271,10 @@ a
 		{`(struct cat name age) (set! me (cat "meow" 3)) (cat.age me)`, "3"},
 		{`(struct cat name age) (set! me (cat "meow")) (cat.age me)`, "nil"},
 
+		// struct - errors
+		{"(struct foo bar) (foo.bar 3)", "ERROR{expected a hash, got 3}"},
+		{`(struct cat age) (set! me (cat "meow")) (cat.age me 3 4)`, primitive.ArityError().ToString()},
+
 		// maths
 		{"(+ 3 1)", "4"},
 		{"(- 3 1)", "2"},

@@ -342,16 +342,9 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 		}
 
 		//
-		// Now we're only dealing with liists
+		// Now we're only dealing with lists
 		//
-		listExp, isList := exp.(primitive.List)
-
-		//
-		// Not a list?  Then that's a surprise
-		//
-		if !isList {
-			return primitive.Error(fmt.Sprintf("unexpected type: %s", exp))
-		}
+		listExp := exp.(primitive.List)
 
 		//
 		// Is this an empty list?  Then just return it
@@ -386,8 +379,13 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 		// and that is not a list that represents a call to a
 		// built-in "special".
 		//
-		// So we need to work out whether it is a built-in,
-		// golang-implemented thing, or a lisp-defined thing.
+		// So we need to work out what it is:
+		//
+		//  1. A syntethic method, relate to struct.
+		//
+		//  2. A golang-implemented primitive.
+		//
+		//  3. A user-defined function.
 		//
 
 		// The thing we'll call
@@ -400,22 +398,28 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 		access, okA := ev.accessors[thing.ToString()]
 		if okA {
 
-			if len(listArgs) == 1 || len(listArgs) == 2 {
-
-				obj := ev.eval(listArgs[0], e, expandMacro)
-				hsh, okH := obj.(primitive.Hash)
-				if okH {
-
-					if len(listArgs) == 1 {
-						return hsh.Get(access)
-					}
-
-					val := ev.eval(listArgs[1], e, expandMacro)
-					hsh.Set(access, val)
-					return primitive.Nil{}
-				}
+			// We have a single argument for the get-method
+			// and two for the set-method
+			if len(listArgs) != 1 && len(listArgs) != 2 {
+				return primitive.ArityError()
 			}
 
+			// Get the first argument and ensure it is a hash
+			obj := ev.eval(listArgs[0], e, expandMacro)
+			hsh, okH := obj.(primitive.Hash)
+			if okH {
+				// One argument?  Read the value
+				if len(listArgs) == 1 {
+					return hsh.Get(access)
+				}
+
+				// Two arguments?  Set the value, and return it
+				val := ev.eval(listArgs[1], e, expandMacro)
+				hsh.Set(access, val)
+				return val
+			} else {
+				return primitive.Error(fmt.Sprintf("expected a hash, got %v", obj))
+			}
 		}
 
 		// Is this a structure creation?
@@ -436,6 +440,8 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 			hash.SetStruct(thing.ToString())
 
 			// Set the fields, ensuring we evaluate them
+			//
+			// If some fields are unspecified they become nil.
 			for i, name := range fields {
 				if i < len(listArgs) {
 					hash.Set(name, ev.eval(listArgs[i], e, expandMacro))
