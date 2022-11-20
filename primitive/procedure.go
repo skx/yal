@@ -34,6 +34,12 @@ type Procedure struct {
 	Macro bool
 }
 
+// IsSimpleType is used to denote whether this object
+// is self-evaluating.
+func (p *Procedure) IsSimpleType() bool {
+	return false
+}
+
 // ToString converts this object to a string.
 func (p *Procedure) ToString() string {
 	if p.F != nil {

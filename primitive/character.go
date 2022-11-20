@@ -3,6 +3,12 @@ package primitive
 // Character holds a string value.
 type Character string
 
+// IsSimpleType is used to denote whether this object
+// is self-evaluating.
+func (c Character) IsSimpleType() bool {
+	return true
+}
+
 // ToInterface converts this object to a golang value
 func (c Character) ToInterface() any {
 	if len(c) > 0 {

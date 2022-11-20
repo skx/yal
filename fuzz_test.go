@@ -132,7 +132,7 @@ func FuzzYAL(f *testing.F) {
 		"not a number",
 		"not a string",
 		"recursion limit",
-		"type-validation failed",
+		"typeerror - ",
 		"unexpected type",
 	}
 

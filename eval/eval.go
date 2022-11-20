@@ -61,13 +61,26 @@ func New(src string) *Eval {
 
 	// Create with a default context.
 	e := &Eval{
-		context:   context.Background(),
-		symbols:   make(map[string]primitive.Primitive),
-		structs:   make(map[string][]string),
+
+		// aliases holds function aliases
+		aliases: make(map[string]string),
+
+		// context used for timeout-testing
+		context: context.Background(),
+
+		// symbols is an interning cache
+		symbols: make(map[string]primitive.Primitive),
+
+		// structs contains the names and expected field-names
+		// of user-defined structures.
+		structs: make(map[string][]string),
+
+		// accessors contains the names of generated get/set
+		// functions for field access within structs
 		accessors: make(map[string]string),
 	}
 
-	// Setup the default symbol-table entries
+	// Setup the default symbol-table (interned) entries.
 
 	// true
 	t := primitive.Bool(true)
@@ -90,9 +103,6 @@ func New(src string) *Eval {
 	e.symbols["#\\\\n"] = primitive.Character("\n")
 	e.symbols["#\\\\r"] = primitive.Character("\r")
 	e.symbols["#\\\\t"] = primitive.Character("\t")
-
-	// Record aliases here
-	e.aliases = make(map[string]string)
 
 	// tokenize our input program into a series of terms
 	e.tokenize(src)
@@ -207,7 +217,7 @@ func (ev *Eval) atom(token string) primitive.Primitive {
 	if strings.HasPrefix(based, "0x") || strings.HasPrefix(based, "0b") {
 
 		// If so then parse as an integer
-		n, err := strconv.ParseInt(based, 0, 32)
+		n, err := strconv.ParseInt(based, 0, 64)
 		if err == nil {
 
 			// Assuming it worked save it in our interned
@@ -241,6 +251,14 @@ func (ev *Eval) atom(token string) primitive.Primitive {
 }
 
 // eval evaluates a single expression appropriately.
+//
+// We have special cases for the simple values, for example numbers, strings,
+// and similar primitive types just return themselves.
+//
+// Otherwise we have two special cases to handle:
+//
+// Symbols return the appropriate value from the environment, and
+// lists involve invoking functions (or our special built-in forms).
 func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bool) primitive.Primitive {
 
 	// Bump our recursion count
@@ -288,48 +306,31 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 		}
 
 		//
-		// Behaviour depends on the type of the primitive/expression
-		// we've been given to execute.
+		// Simple types return themselves literally.
 		//
-		switch exp.(type) {
-
-		// Booleans return themselves
-		case primitive.Bool:
+		// For example a string returns itself, as
+		// does a number, a boolean, or a hash.
+		//
+		// Lists are the things that are complex in
+		// lisp, as they represent function calls.
+		//
+		if exp.IsSimpleType() {
 			return exp
+		}
 
-		// Characters return themselves
-		case primitive.Character:
-			return exp
+		//
+		// After simple types we have to deal with symbols, and lists.
+		//
+		sym, isSymbol := exp.(primitive.Symbol)
+		if isSymbol {
 
-		// Errors return themselves
-		case primitive.Error:
-			return exp
-
-		// Hashes return themselves
-		case primitive.Hash:
-			return exp
-
-		// Numbers return themselves
-		case primitive.Number:
-			return exp
-
-		// Nil returns itself
-		case primitive.Nil:
-			return exp
-
-		// Strings return themselves
-		case primitive.String:
-			return exp
-
-		// Symbols return the value they contain
-		case primitive.Symbol:
 			// A symbol with a ":" prefix is treated as a literal.
-			if strings.HasPrefix(exp.ToString(), ":") {
+			if strings.HasPrefix(sym.ToString(), ":") {
 				return exp
 			}
 
 			// Otherwise it's looked up in the environment.
-			v, ok := e.Get(string(exp.(primitive.Symbol)))
+			v, ok := e.Get(string(sym))
 
 			// If it wasn't found there, return a nil value
 			if !ok {
@@ -338,787 +339,325 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 
 			// We need to cast it (our env. package stores "any")
 			return v.(primitive.Primitive)
-
-		// Lists return the result of applying the operation
-		case primitive.List:
-
-			listExp := exp.(primitive.List)
-
-			// If the list has no entries then we abort
-			if len(listExp) == 0 {
-				return listExp
-			}
-
-			// special handling for some forms, based on the
-			// first token/symbol
-			switch listExp[0] {
-
-			// (alias ..)
-			case primitive.Symbol("alias"):
-				// We need at least one pair.
-				if len(listExp) < 3 {
-					return primitive.ArityError()
-				}
-
-				// The arguments are gonna be a list of pairs
-				args := listExp[1:]
-
-				if len(args)%2 != 0 {
-					return primitive.Error(fmt.Sprintf("(alias ..) must have an even length of arguments, got %v", args))
-				}
-
-				for i := 0; i < len(args); i += 2 {
-
-					// The key/val pair we're working with
-					new := args[i]
-					orig := args[i+1]
-
-					old, ok := e.Get(orig.ToString())
-					if ok {
-						e.Set(new.ToString(), old)
-
-						ev.aliases[new.ToString()] = orig.ToString()
-					}
-				}
-				return primitive.Nil{}
-
-			// (do ..)
-			case primitive.Symbol("do"):
-				var ret primitive.Primitive
-				for _, x := range listExp[1:] {
-					ret = ev.eval(x, e, expandMacro)
-				}
-				return ret
-
-			// (read
-			case primitive.Symbol("read"):
-				if len(listExp) != 2 {
-					return primitive.ArityError()
-				}
-
-				arg := listExp[1].ToString()
-
-				// Create a new evaluator with the list
-				tmp := New(arg)
-
-				// Read an expression with it.
-				//
-				// Note here we just _read_ the expression,
-				// we don't evaluate it.
-				//
-				// So we don't need an environment, etc.
-				//
-				out, err := tmp.readExpression(e)
-				if err != nil {
-					return primitive.Error(fmt.Sprintf("failed to read %s:%s", arg, err.Error()))
-				}
-
-				// Return it.
-				return out
-
-			// (eval
-			case primitive.Symbol("eval"):
-
-				if len(listExp) != 2 {
-					return primitive.ArityError()
-				}
-
-				switch val := listExp[1].(type) {
-
-				// Evaluate
-				case primitive.List:
-					// Evaluate the list
-					res := ev.eval(listExp[1], e, expandMacro)
-
-					// Create a new evaluator with
-					// the result as a string
-					tmp := New(res.ToString())
-
-					// Ensure that we have a suitable
-					// child-environment.
-					nEnv := env.NewEnvironment(e)
-
-					// Now evaluate it.
-					return tmp.Evaluate(nEnv)
-
-				// symbol solely so we can do env. lookup
-				case primitive.Symbol:
-					str, ok := e.Get(val.ToString())
-					if ok {
-						tmp := New(str.(primitive.Primitive).ToString())
-						nEnv := env.NewEnvironment(e)
-						return tmp.Evaluate(nEnv)
-					}
-					return primitive.Nil{}
-
-				// string eval
-				case primitive.String:
-					tmp := New(string(val))
-					nEnv := env.NewEnvironment(e)
-					return tmp.Evaluate(nEnv)
-
-				default:
-					return primitive.Error(fmt.Sprintf("unexpected type for eval %V.", listExp[1]))
-				}
-
-			// (define
-			case primitive.Symbol("define"), primitive.Symbol("def!"):
-				if len(listExp) < 3 {
-					return primitive.ArityError()
-				}
-				symb, ok := listExp[1].(primitive.Symbol)
-				if ok {
-
-					val := ev.eval(listExp[2], e, expandMacro)
-					e.Set(string(symb), val)
-					return primitive.Nil{}
-				}
-				return primitive.Error(fmt.Sprintf("Expected a symbol, got %v", listExp[1]))
-
-			// (defmacro!
-			case primitive.Symbol("defmacro!"):
-				if len(listExp) < 3 {
-					return primitive.ArityError()
-				}
-
-				// name of macro
-				symb, ok := listExp[1].(primitive.Symbol)
-				if !ok {
-					return primitive.Error(fmt.Sprintf("Expected a symbol, got %v", listExp[1]))
-				}
-
-				// macro body
-				val := ev.eval(listExp[2], e, expandMacro)
-
-				mac, ok2 := val.(*primitive.Procedure)
-				if !ok2 {
-					return primitive.Error(fmt.Sprintf("expected a function body for (defmacro..), got %v", val))
-				}
-
-				// this is now a macro
-				mac.Macro = true
-				e.Set(string(symb), mac)
-				return primitive.Nil{}
-
-			// (set!
-			case primitive.Symbol("set!"):
-				if len(listExp) < 3 {
-					return primitive.ArityError()
-				}
-
-				// Get the symbol we're gonna set
-				sym, ok := listExp[1].(primitive.Symbol)
-				if !ok {
-					return primitive.Error(fmt.Sprintf("tried to set a non-symbol %v", listExp[1]))
-				}
-
-				// Get the value.
-				val := ev.eval(listExp[2], e, expandMacro)
-
-				// Now set, either locally or in the parent scope.
-				if len(listExp) == 4 {
-					e.SetOuter(string(sym), val)
-				} else {
-					e.Set(string(sym), val)
-				}
-				return primitive.Nil{}
-
-			// (quote ..)
-			case primitive.Symbol("quote"):
-				if len(listExp) < 2 {
-					return primitive.ArityError()
-				}
-				return listExp[1]
-
-			// (quasiquote ..)
-			case primitive.Symbol("quasiquote"):
-				if len(listExp) < 2 {
-					return primitive.ArityError()
-				}
-				exp = ev.quasiquote(listExp[1])
-				goto repeat_eval
-
-			// (macroexpand ..)
-			case primitive.Symbol("macroexpand"):
-				if len(listExp) < 2 {
-					return primitive.ArityError()
-				}
-				return ev.macroExpand(listExp[1], e)
-
-			// (let
-			case primitive.Symbol("let"):
-				if len(listExp) < 2 {
-					return primitive.ArityError()
-				}
-
-				newEnv := env.NewEnvironment(e)
-				bindingsList, ok := listExp[1].(primitive.List)
-				if !ok {
-					return primitive.Error(fmt.Sprintf("argument is not a list, got %v", listExp[1]))
-				}
-
-				for _, binding := range bindingsList {
-
-					// ensure we got a list
-					bl, ok := binding.(primitive.List)
-					if !ok {
-						return primitive.Error(fmt.Sprintf("binding value is not a list, got %v", binding))
-					}
-
-					if len(bl) < 2 {
-						return primitive.ArityError()
-					}
-					// get the value
-					bindingVal := ev.eval(bl[1], newEnv, expandMacro)
-
-					// The thing to set
-					set, ok2 := bl[0].(primitive.Symbol)
-					if !ok2 {
-						return primitive.Error(fmt.Sprintf("binding name is not a symbol, got %v", bl[0]))
-					}
-
-					// Finally set the parameter
-					newEnv.Set(string(set), bindingVal)
-				}
-
-				// Now we've populated the new
-				// environment with the pairs we received
-				// in the setup phase we can execute
-				// the body.
-				var ret primitive.Primitive
-				for _, x := range listExp[2:] {
-					ret = ev.eval(x, newEnv, expandMacro)
-				}
-				return ret
-
-			// (let*
-			case primitive.Symbol("let*"):
-				// let should have two entries
-
-				if len(listExp) < 2 {
-					return primitive.ArityError()
-				}
-
-				newEnv := env.NewEnvironment(e)
-				bindingsList, ok := listExp[1].(primitive.List)
-				if !ok {
-					return primitive.Error(fmt.Sprintf("argument is not a list, got %v", listExp[1]))
-				}
-
-				// Length of binding must be %2
-				if len(bindingsList)%2 != 0 {
-					return primitive.Error(fmt.Sprintf("list for (len*) must have even length, got %v", bindingsList))
-				}
-
-				for i := 0; i < len(bindingsList); i += 2 {
-
-					// The key/val pair we're working with
-					key := bindingsList[i]
-					val := bindingsList[i+1]
-
-					// evaluate the value - use the new environment.
-					eVal := ev.eval(val, newEnv, expandMacro)
-
-					// The thing to set
-					eKey, ok := key.(primitive.Symbol)
-					if !ok {
-						return primitive.Error(fmt.Sprintf("binding name is not a symbol, got %v", key))
-					}
-
-					// Finally set the parameter
-					newEnv.Set(string(eKey), eVal)
-				}
-
-				// Now we've populated the new
-				// environment with the pairs we received
-				// in the setup phase we can execute
-				// the body.
-				var ret primitive.Primitive
-				for _, x := range listExp[2:] {
-					ret = ev.eval(x, newEnv, expandMacro)
-				}
-				return ret
-
-			// (symbol
-			case primitive.Symbol("symbol"):
-				if len(listExp) != 2 {
-					return primitive.ArityError()
-				}
-				return ev.atom(listExp[1].ToString())
-
-			// (struct
-			case primitive.Symbol("struct"):
-				if len(listExp) <= 2 {
-					return primitive.ArityError()
-				}
-
-				// name of structure
-				name := listExp[1].ToString()
-
-				// the fields it contains
-				fields := []string{}
-
-				// convert the fields to strings
-				for _, field := range listExp[2:] {
-
-					f := field.ToString()
-
-					ev.accessors[name+"."+f] = f
-					fields = append(fields, f)
-				}
-
-				// save the structure as a known-thing
-				ev.structs[name] = fields
-				return primitive.Nil{}
-
-			// (env
-			case primitive.Symbol("env"):
-
-				// create a new list
-				var c primitive.List
-
-				for key, val := range e.Items() {
-
-					v := val.(primitive.Primitive)
-
-					tmp := primitive.NewHash()
-					tmp.Set(":name", primitive.String(key))
-					tmp.Set(":value", v)
-
-					// Is this a procedure?  If so
-					// add the help-text
-					proc, ok := v.(*primitive.Procedure)
-					if ok {
-						if len(proc.Help) > 0 {
-							tmp.Set(":help", primitive.String(proc.Help))
-						}
-					}
-
-					c = append(c, tmp)
-				}
-
-				return c
-
-			// (if
-			case primitive.Symbol("if"):
-				if len(listExp) < 3 {
-					return primitive.ArityError()
-				}
-
-				test := ev.eval(listExp[1], e, expandMacro)
-
-				// If we got an error inside the `if` then we return it
-				e, eok := test.(primitive.Error)
-				if eok {
-					return e
-				}
-
-				// if the test was false then we return
-				// the else-section
-				if b, ok := test.(primitive.Bool); (ok && !bool(b)) || primitive.IsNil(test) {
-					if len(listExp) < 4 {
-						return primitive.Nil{}
-					}
-					exp = listExp[3]
-					continue
-				}
-
-				// otherwise we handle the true-section.
-				exp = listExp[2]
-				continue
-
-			// (try
-			case primitive.Symbol("try"):
-				if len(listExp) < 3 {
-					return primitive.ArityError()
-				}
-
-				// first expression is what to execute: a list
-				expr := listExp[1]
-
-				// Cast the argument to a list
-				expLst, ok1 := expr.(primitive.List)
-				if !ok1 {
-					return primitive.Error(fmt.Sprintf("expected a list for argument, got %v", listExp[1]))
-				}
-
-				// second expression is the catch: a list
-				blk := listExp[2]
-				blkLst, ok2 := blk.(primitive.List)
-				if !ok2 {
-					return primitive.Error(fmt.Sprintf("expected a list for argument, got %v", listExp[2]))
-				}
-				if len(blkLst) != 3 {
-					return primitive.Error(fmt.Sprintf("list should have three elements, got %v", blkLst))
-				}
-				if !ev.startsWith(blkLst, "catch") {
-					return primitive.Error(fmt.Sprintf("catch list should begin with 'catch', got %v", blkLst))
-				}
-
-				// Evaluate the expression
-				out := ev.eval(expLst, e, expandMacro)
-
-				// Evaluating the expression didn't return an error.
-				//
-				// Nothing to catch, all OK
-				_, ok3 := out.(primitive.Error)
-				if !ok3 {
-					return out
-				}
-
-				// The catch statement is blkLst[0] - we tested for that already
-				// The variable to bind is blkLst[1]
-				// The form to execute with that is blkLst[2]
-				tmpEnv := env.NewEnvironment(e)
-				tmpEnv.Set(blkLst[1].ToString(), primitive.String(out.ToString()))
-
-				return ev.eval(blkLst[2], tmpEnv, expandMacro)
-
-			// (lambda
-			case primitive.Symbol("lambda"), primitive.Symbol("fn*"):
-
-				// ensure we have arguments
-				if len(listExp) != 3 && len(listExp) != 4 {
-					return primitive.ArityError()
-				}
-
-				// ensure that our arguments are a list
-				argMarkers, ok := listExp[1].(primitive.List)
-				if !ok {
-					return primitive.Error(fmt.Sprintf("expected a list for arguments, got %v", listExp[1]))
-				}
-
-				// Collect arguments
-				args := []primitive.Symbol{}
-				for _, x := range argMarkers {
-
-					xs, ok := x.(primitive.Symbol)
-					if !ok {
-						return primitive.Error(fmt.Sprintf("expected a symbol for an argument, got %v", x))
-					}
-					args = append(args, xs)
-				}
-
-				body := listExp[2]
-				help := ""
-
-				// If there's an optional help string ..
-				if len(listExp) == 4 {
-					help = listExp[2].ToString()
-					body = listExp[3]
-
-				}
-				// This is a procedure, which will default
-				// to not being a macro.
-				//
-				// To make it a macro it should be set with
-				// "(defmacro!..)"
-				return &primitive.Procedure{
-					Args:  args,
-					Body:  body,
-					Env:   e,
-					Help:  help,
-					Macro: false,
-				}
-
-			// Anything else is either a built-in function,
-			// a structure, or a user-function.
-			default:
-
-				// first item of the list - i.e. the thing
-				// we're gonna call.
-				thing := listExp[0]
-
-				// args supplied to this call
-				listArgs := listExp[1:]
-
-				// Is this a structure field access
-				access, okA := ev.accessors[thing.ToString()]
-				if okA {
-
-					if len(listArgs) == 1 || len(listArgs) == 2 {
-
-						obj := ev.eval(listArgs[0], e, expandMacro)
-						hsh, okH := obj.(primitive.Hash)
-						if okH {
-
-							if len(listArgs) == 1 {
-								return hsh.Get(access)
-							}
-
-							val := ev.eval(listArgs[1], e, expandMacro)
-							hsh.Set(access, val)
-							return primitive.Nil{}
-						}
-					}
-
-				}
-				// Is this a structure creation?
-				fields, ok := ev.structs[thing.ToString()]
-				if ok {
-
-					// ensure that we have some fields that
-					// match those we expect.
-					if len(listArgs) > len(fields) {
-						return primitive.ArityError()
-					}
-
-					// Create a hash to store the state
-					hash := primitive.NewHash()
-
-					// However mark this as a "struct",
-					// rather than a hash.
-					hash.SetStruct(thing.ToString())
-
-					// Set the fields, ensuring we evaluate them
-					for i, name := range fields {
-						if i < len(listArgs) {
-							hash.Set(name, ev.eval(listArgs[i], e, expandMacro))
-						} else {
-							hash.Set(name, primitive.Nil{})
-						}
-					}
-					return hash
-				}
-
-				// Is this a type-check on a struct?
-				if strings.HasSuffix(thing.ToString(), "?") {
-
-					// Get the thing that is being tested.
-					typeName := strings.TrimSuffix(thing.ToString(), "?")
-
-					// Does that represent a known-type?
-					_, ok2 := ev.structs[typeName]
-					if ok2 {
-
-						// OK now we're sure we're not colliding
-						// with another function test the argument
-						// count.
-						if len(listExp) != 2 {
-							return primitive.ArityError()
-						}
-
-						// OK a type-check on a known struct
-						//
-						// Note we evaluate the object, because it
-						// was probably a symbol, or return object
-						// of some kind.
-						obj := ev.eval(listExp[1], e, expandMacro)
-
-						// is it a hash?
-						hsh, ok2 := obj.(primitive.Hash)
-						if !ok2 {
-							// nope - if it isn't a hash
-							// then it can't be a struct.
-							return primitive.Bool(false)
-						}
-
-						// is the struct-type the same as the type name?
-						if hsh.GetStruct() == typeName {
-							return primitive.Bool(true)
-						}
-						return primitive.Bool(false)
-					}
-
-					// just a method call with a trailing "?".
-					//
-					// could be "string?", "contains?", etc,
-					// so we fall-through and keep processing as
-					// per usual.
-				}
-
-				// Find the thing we're gonna call.
-				procExp := ev.eval(thing, e, expandMacro)
-
-				// Is it really a procedure we can call?
-				proc, ok := procExp.(*primitive.Procedure)
-				if !ok {
-					return primitive.Error(fmt.Sprintf("argument '%s' not a function", thing.ToString()))
-				}
-
-				// build up the arguments
-				args := []primitive.Primitive{}
-
-				// Is this a macro?
-				if proc.Macro {
-
-					// Then the arguments are NOT evaluated
-					args = listExp[1:]
-
-				} else {
-					// We evaluate the arguments
-					for _, argExp := range listExp[1:] {
-
-						// Evaluate the arg
-						evalArgExp := ev.eval(argExp, e, expandMacro)
-
-						// Was it an error?  Then abort
-						x, ok := evalArgExp.(primitive.Error)
-						if ok {
-							return primitive.Error(fmt.Sprintf("error expanding argument %v for call to (%s ..): %s", argExp, listExp[0], x.ToString()))
-						}
-
-						// Otherwise append it to the list we'll supply
-						args = append(args, evalArgExp)
-					}
-				}
-
-				// Is this function implemented in golang?
-				if proc.F != nil {
-
-					// Then call it.
-					return proc.F(e, args)
-				}
-
-				//
-				// Iterate over the arguments the
-				// lambda has and count those that
-				// are mandatory.
-				//
-				// i.e. If we see this we have two args:
-				//
-				// (define foo (lambda (a b) ...
-				//
-				// However for this we accept 1+
-				//
-				// (define bar (lambda (a &b) ..
-				//
-				// We didn't do this in the golang-implemented
-				// primitives as they handle argument counting
-				// themselves.
-				//
-				min := 0
-
-				//
-				// if this is non-empty then we add all parameters here as a llist
-				//
-				variadic := ""
-
-				//
-				// The list of arguments to add when working in a variadic fashion
-				//
-				var lst primitive.List
-
-				//
-				// Count the minimum number of arguments.
-				//
-				// A variadic argument may be nil of course.
-				//
-				for _, arg := range proc.Args {
-					if !strings.HasPrefix(arg.ToString(), "&") {
-						min++
-					}
-				}
-
-				//
-				// Check that the arguments supplied match those that are expected.
-				//
-				// Unless variadic arguments are expected, because in that case "anything" is fine.
-				//
-				if len(args) < min && (variadic == "") {
-					return primitive.ArityError()
-				}
-
-				// Create a new environment/scope to set the
-				// parameter values within.
-				e = env.NewEnvironment(proc.Env)
-
-				// For each of the arguments that have been supplied
-				for i, x := range args {
-
-					// If this is not more than the proc accepts
-					if i < len(proc.Args) {
-
-						// Get the parameter name
-						tmp := proc.Args[i].ToString()
-
-						// Is this variadic?
-						//
-						// Then save the name of the argument away, after removing
-						// the prefix
-						//
-						if strings.HasPrefix(tmp, "&") {
-							tmp = strings.TrimPrefix(tmp, "&")
-							variadic = tmp
-						}
-
-						// Does the argument have a trailing type?
-						if strings.Contains(tmp, ":") {
-
-							before, after, found := strings.Cut(tmp, ":")
-
-							// Did we find it?
-							if found {
-
-								// types that are allowed
-								valid := make(map[string]bool)
-
-								// Is anything possible?
-								any := false
-
-								// Record each one
-								for _, typ := range strings.Split(after, ":") {
-
-									// Any is special
-									if typ == "any" {
-										any = true
-									}
-
-									// Since we're calling `type` we need to
-									// do some rewriting for the function-case,
-									// which has distinct types.
-									if typ == "function" {
-										valid["procedure(lisp)"] = true
-										valid["procedure(golang)"] = true
-										valid["macro"] = true
-										continue
-									}
-
-									valid[typ] = true
-								}
-
-								// See if the type matches
-								_, ok := valid[x.Type()]
-
-								if !ok && !any {
-									return primitive.Error(fmt.Sprintf("type-validation failed: argument %s to %s was supposed to be %s, got %s", before, listExp[0].ToString(), after, x.Type()))
-								}
-							}
-
-							// strip off the ":foo" part.
-							tmp = string(before)
-						}
-
-						// And now set the value
-						if variadic == "" {
-							e.Set(tmp, x)
-						}
-
-					}
-
-					// Variadic arguments?  Then save this arg away
-					if len(variadic) > 0 {
-						lst = append(lst, x)
-					}
-				}
-
-				// For variadic arguments we can't set the value as we go,
-				// because we have to wait until we've collected them all.
-				//
-				// So set them now.
-				if len(variadic) > 0 {
-					e.Set(variadic, lst)
-				}
-
-				// Here we go round the evaluation loop again.
-				//
-				// Which will execute the body of the function this time.
-				//
-				// TCO.
-				exp = proc.Body
+		}
+
+		//
+		// Now we're only dealing with lists
+		//
+		listExp := exp.(primitive.List)
+
+		//
+		// Is this an empty list?  Then just return it
+		//
+		if len(listExp) == 0 {
+			return listExp
+		}
+
+		//
+		// Is the first term a Symbol?
+		//
+		// If so then we're evaluating a special form,
+		// these are implemented in "specials.go"
+		//
+		sym, isSymbol = listExp[0].(primitive.Symbol)
+		if isSymbol {
+
+			//
+			// If that was handled then return the result.
+			//
+			// Otherwise we'll keep going and we'll treat this
+			// as a usual function-call.
+			//
+			res, ok := ev.evalSpecialForm(sym.ToString(), listExp[1:], e, expandMacro)
+			if ok {
+				return res
 			}
 		}
-	repeat_eval:
+
+		//
+		// If we reached here then we've got a list as input,
+		// and that is not a list that represents a call to a
+		// built-in "special".
+		//
+		// So we need to work out what it is:
+		//
+		//  1. A syntethic method, relate to struct.
+		//
+		//  2. A golang-implemented primitive.
+		//
+		//  3. A user-defined function.
+		//
+
+		// The thing we'll call
+		thing := listExp[0]
+
+		// args supplied to this call
+		listArgs := listExp[1:]
+
+		// Is this a structure field access?
+		access, okA := ev.accessors[thing.ToString()]
+		if okA {
+
+			// We have a single argument for the get-method
+			// and two for the set-method
+			if len(listArgs) != 1 && len(listArgs) != 2 {
+				return primitive.ArityError()
+			}
+
+			// Get the first argument and ensure it is a hash
+			obj := ev.eval(listArgs[0], e, expandMacro)
+			hsh, okH := obj.(primitive.Hash)
+			if okH {
+				// One argument?  Read the value
+				if len(listArgs) == 1 {
+					return hsh.Get(access)
+				}
+
+				// Two arguments?  Set the value, and return it
+				val := ev.eval(listArgs[1], e, expandMacro)
+				hsh.Set(access, val)
+				return val
+			} else {
+				return primitive.Error(fmt.Sprintf("expected a hash, got %v", obj))
+			}
+		}
+
+		// Is this a structure creation?
+		fields, ok := ev.structs[thing.ToString()]
+		if ok {
+
+			// ensure that we have some fields that
+			// match those we expect.
+			if len(listArgs) > len(fields) {
+				return primitive.ArityError()
+			}
+
+			// Create a hash to store the state
+			hash := primitive.NewHash()
+
+			// However mark this as a "struct",
+			// rather than a hash.
+			hash.SetStruct(thing.ToString())
+
+			// Set the fields, ensuring we evaluate them
+			//
+			// If some fields are unspecified they become nil.
+			for i, name := range fields {
+				if i < len(listArgs) {
+					hash.Set(name, ev.eval(listArgs[i], e, expandMacro))
+				} else {
+					hash.Set(name, primitive.Nil{})
+				}
+			}
+			return hash
+		}
+
+		// Is this a type-check on a struct?
+		if strings.HasSuffix(thing.ToString(), "?") {
+
+			// Get the thing that is being tested.
+			typeName := strings.TrimSuffix(thing.ToString(), "?")
+
+			// Does that represent a known-type?
+			_, ok2 := ev.structs[typeName]
+			if ok2 {
+
+				// OK now we're sure we're not colliding
+				// with another function test the argument
+				// count.
+				if len(listExp) != 2 {
+					return primitive.ArityError()
+				}
+
+				// OK a type-check on a known struct
+				//
+				// Note we evaluate the object, because it
+				// was probably a symbol, or return object
+				// of some kind.
+				obj := ev.eval(listExp[1], e, expandMacro)
+
+				// is it a hash?
+				hsh, ok2 := obj.(primitive.Hash)
+				if !ok2 {
+					// nope - if it isn't a hash
+					// then it can't be a struct.
+					return primitive.Bool(false)
+				}
+
+				// is the struct-type the same as the type name?
+				if hsh.GetStruct() == typeName {
+					return primitive.Bool(true)
+				}
+				return primitive.Bool(false)
+			}
+
+			// just a method call with a trailing "?".
+			//
+			// could be "string?", "contains?", etc,
+			// so we fall-through and keep processing as
+			// per usual.
+		}
+
+		// Find the thing we're gonna call.
+		procExp := ev.eval(thing, e, expandMacro)
+
+		// Is it really a procedure we can call?
+		proc, ok := procExp.(*primitive.Procedure)
+		if !ok {
+			return primitive.Error(fmt.Sprintf("argument '%s' not a function", thing.ToString()))
+		}
+
+		// build up the arguments
+		args := []primitive.Primitive{}
+
+		// Is this a macro?
+		if proc.Macro {
+
+			// Then the arguments are NOT evaluated
+			args = listExp[1:]
+
+		} else {
+			// We evaluate the arguments
+			for _, argExp := range listExp[1:] {
+
+				// Evaluate the arg
+				evalArgExp := ev.eval(argExp, e, expandMacro)
+
+				// Was it an error?  Then abort
+				x, ok := evalArgExp.(primitive.Error)
+				if ok {
+					return primitive.Error(fmt.Sprintf("error expanding argument %v for call to (%s ..): %s", argExp, listExp[0], x.ToString()))
+				}
+
+				// Otherwise append it to the list we'll supply
+				args = append(args, evalArgExp)
+			}
+		}
+
+		// Is this function implemented in golang?
+		if proc.F != nil {
+
+			// Then call it.
+			return proc.F(e, args)
+		}
+
+		//
+		// Iterate over the arguments the
+		// lambda has and count those that
+		// are mandatory.
+		//
+		// i.e. If we see this we have two args:
+		//
+		// (define foo (lambda (a b) ...
+		//
+		// However for this we accept 1+
+		//
+		// (define bar (lambda (a &b) ..
+		//
+		// We didn't do this in the golang-implemented
+		// primitives as they handle argument counting
+		// themselves.
+		//
+		min := 0
+
+		//
+		// if this is non-empty then we add all parameters here as a list
+		//
+		variadic := ""
+
+		//
+		// The list of arguments to add when working in a variadic fashion
+		//
+		var lst primitive.List
+
+		//
+		// Count the minimum number of arguments.
+		//
+		// A variadic argument may be nil of course.
+		//
+		for _, arg := range proc.Args {
+			if !strings.HasPrefix(arg.ToString(), "&") {
+				min++
+			}
+		}
+
+		//
+		// Check that the arguments supplied match those that are expected.
+		//
+		// Variadic arguments would add _extra_ arguments, so this check
+		// is still safe for those.
+		//
+		if len(args) < min {
+			return primitive.ArityError()
+		}
+
+		// Create a new environment/scope to set the
+		// parameter values within.
+		e = env.NewEnvironment(proc.Env)
+
+		// For each of the arguments that have been supplied
+		for i, x := range args {
+
+			// If this is not more than the proc accepts
+			if i < len(proc.Args) {
+
+				// Get the parameter name
+				tmp := proc.Args[i].ToString()
+
+				// Is this variadic?
+				//
+				// Then save the name of the argument away, after removing
+				// the prefix
+				//
+				if strings.HasPrefix(tmp, "&") {
+					tmp = strings.TrimPrefix(tmp, "&")
+					variadic = tmp
+				}
+
+				// Does the argument have a trailing type?
+				if strings.Contains(tmp, ":") {
+
+					//
+					// Type-check the supplied argument
+					//
+					argName, argTypes, found := strings.Cut(tmp, ":")
+
+					//
+					// Type-check
+					//
+					if found {
+						err := ev.typeCheck(argTypes, x.Type())
+
+						if err != nil {
+							return primitive.TypeError(fmt.Sprintf("argument %s to %s was supposed to be %s, got %s", argName, thing.ToString(), argTypes, x.Type()))
+						}
+					}
+
+					// strip off the ":foo" part.
+					tmp = string(argName)
+				}
+
+				// And now set the value
+				if variadic == "" {
+					e.Set(tmp, x)
+				}
+
+			}
+
+			// Variadic arguments?  Then save this arg away to
+			// our temporary list, and set it.
+			if len(variadic) > 0 {
+				lst = append(lst, x)
+				e.Set(variadic, lst)
+			}
+		}
+
+		// Here we go round the evaluation loop again.
+		//
+		// Which will execute the body of the function this time.
+		//
+		// TCO.
+		exp = proc.Body
 	}
 }
 
@@ -1391,4 +930,47 @@ func (ev *Eval) tokenize(str string) {
 
 		ev.toks = append(ev.toks, match[1])
 	}
+}
+
+// typeCheck is called to type-check arguments.
+//
+// types contains a ":"-separated list of types that are acceptable, and supplied contains
+// the name of the type which was actually supplied.
+func (ev *Eval) typeCheck(types string, supplied string) error {
+
+	// types that are allowed
+	valid := make(map[string]bool)
+
+	// Is anything possible?
+	any := false
+
+	// Record each one
+	for _, typ := range strings.Split(types, ":") {
+
+		// Any is special
+		if typ == "any" {
+			any = true
+		}
+
+		// Since we're calling `type` we need to
+		// do some rewriting for the function-case,
+		// which has distinct types.
+		if typ == "function" {
+			valid["procedure(lisp)"] = true
+			valid["procedure(golang)"] = true
+			valid["macro"] = true
+		} else {
+			valid[typ] = true
+		}
+	}
+
+	// See if the type matches
+	_, ok := valid[supplied]
+
+	if !ok && !any {
+		return errors.New("invalid type")
+	}
+
+	return nil
+
 }
