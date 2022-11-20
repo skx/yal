@@ -334,7 +334,7 @@ a
 		{"(let* (a 3 b))", "ERROR{list for (len*) must have even length, got [a 3 b]}"},
 		{"(let* (a 3 3 b))", "ERROR{binding name is not a symbol, got 3}"},
 
-		{"(struct foo bar)  (type (foo 3))", "struct-foo"},
+		{"(struct foo bar)  (type (foo 3))", "foo"},
 		{"(struct foo bar)  (foo 3 3)", primitive.ArityError().ToString()},
 		{"(struct foo bar)  (foo? nil)", "#f"},
 		{"(struct foo bar)  (foo? (foo 3))", "#t"},

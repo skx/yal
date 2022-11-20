@@ -52,7 +52,7 @@ func TestHashStruct(t *testing.T) {
 		t.Fatalf("got wrong value")
 	}
 
-	if h.Type() != "struct-pie" {
+	if h.Type() != "pie" {
 		t.Fatalf("Wrong type for struct")
 	}
 
