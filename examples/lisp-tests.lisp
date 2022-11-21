@@ -1,4 +1,4 @@
-;;; tests.lisp - Some simple tests of our lisp-written primitives
+;;; tests.lisp - A simple lisp-based testing framework for our primitives.
 
 ;;; About
 ;;

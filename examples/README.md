@@ -8,11 +8,11 @@ This directory contains some simple lisp examples, which can be executed via `ya
 * [fibonacci.lisp](fibonacci.lisp)
   * Calculate the first 25 fibonacci numbers.
 * [fizzbuzz.lisp](fizzbuzz.lisp)
-  * A simple fizzbuzz implementation
+  * Show the fizzbuzz up to 50.
 * [hash.lisp](hash.lisp)
   * Demonstrate working with hashes.
 * [lisp-tests.lisp](lisp-tests.lisp)
-  * Some simple tests of our lisp-written primitives
+  * A simple lisp-based testing framework for our primitives.
 * [mtest.lisp](mtest.lisp)
   * Simple tests of our macro system.
 * [readme.lisp](readme.lisp)
@@ -22,6 +22,6 @@ This directory contains some simple lisp examples, which can be executed via `ya
 * [test.lisp](test.lisp)
   * Simple feature-tests/demonstrations of our system.
 * [time.lisp](time.lisp)
-  * Demonstrate the date/time functions
+  * Demonstrate our date/time functions.
 * [try.lisp](try.lisp)
-  * Demonstrate our try/catch behaviour
+  * Demonstrate our error-handling, with try/catch.

@@ -1,4 +1,4 @@
-;;; try.lisp - Demonstrate our try/catch behaviour
+;;; try.lisp - Demonstrate our error-handling, with try/catch.
 
 ;;
 ;; This file demonstrates our try/catch behaviour, which allows

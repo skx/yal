@@ -1,4 +1,4 @@
-;;; time.lisp - Demonstrate the date/time functions
+;;; time.lisp - Demonstrate our date/time functions.
 
 ;;
 ;; This is a sample input file for our minimal lisp interpreter.

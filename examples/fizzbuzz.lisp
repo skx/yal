@@ -1,4 +1,4 @@
-;;; fizzbuzz2.lisp - A simple fizzbuzz implementation
+;;; fizzbuzz2.lisp - Show the fizzbuzz up to 50.
 
 ;; Taking advantage of our (cond) primitive we can just return the
 ;; string to print for any given number.
