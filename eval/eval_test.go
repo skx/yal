@@ -390,6 +390,10 @@ a
 		{input: "(define blah (lambda (a:number) (print a))) (blah '(3))", output: "ERROR{TypeError - argument a to blah was supposed to be number, got list}"},
 		{input: "(define blah (lambda (a:function) (print a))) (blah '(3))", output: "ERROR{TypeError - argument a to blah was supposed to be function, got list}"},
 		{input: "(define blah (lambda (a:any) (print a))) (blah '(3))", output: "(3)"},
+
+		// fuzz errors
+		{input: "(defmacro! unless(fn*()`(~!)))(unless )", output: "ERROR{argument '(lambda (x) (if x #f #t))' not a function}"},
+		{input: "(ord 0)", output: "ERROR{argument not a character/string, got number}"},
 	}
 
 	for _, test := range tests {
