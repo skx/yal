@@ -177,7 +177,7 @@ A reasonable amount of sample code can be found beneath the [examples/](examples
 * [examples/fizzbuzz.lisp](examples/fizzbuzz.lisp)
   * A standalone sample of solving the fizzbuzz problem.
 * [examples/mtest.lisp](examples/mtest.lisp)
-  * Shows simple some macro examples, but see [examples/lisp-tests.lisp](examples&lisp-tests.lisp) for a more useful example.
+  * Shows simple some macro examples, but see [examples/lisp-tests.lisp](examples/lisp-tests.lisp) for a more useful example.
     * This uses macros in an interesting way.
     * It is also used to actually test the various Lisp-methods we've implemented.
 * [examples/sorting.lisp](examples/sorting.lisp)
