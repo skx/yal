@@ -170,14 +170,16 @@ Here the regular expressions will be matched against the name of the file(s) in 
 
 ## Examples
 
-A reasonable amount of sample code can be found in the various included files:
+A reasonable amount of sample code can be found beneath the [examples/](examples/) directory, including:
 
 * [examples/fibonacci.list](examples/fibonacci.lisp)
   * Calculate the first 25 numbers of the Fibonacci sequence.
 * [examples/fizzbuzz.lisp](examples/fizzbuzz.lisp)
   * A standalone sample of solving the fizzbuzz problem.
 * [examples/mtest.lisp](examples/mtest.lisp)
-  * Shows simple some macro examples, but see [lisp-tests.lisp](lisp-tests.lisp) for a more useful example.
+  * Shows simple some macro examples, but see [examples/lisp-tests.lisp](examples&lisp-tests.lisp) for a more useful example.
+    * This uses macros in an interesting way.
+    * It is also used to actually test the various Lisp-methods we've implemented.
 * [examples/sorting.lisp](examples/sorting.lisp)
   * Demonstrates writing & benchmarking sorting-routines.
 * [examples/test.lisp](examples/test.lisp)
