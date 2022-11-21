@@ -174,14 +174,6 @@ func TestEvaluate(t *testing.T) {
 		// gensym - just test that there's an 11 character return
 		{"(length (split (str (gensym)) \"\"))", "11"},
 
-		// Let
-		{"(let ((a 5)) (nil? a))", "#f"},
-		{"(let ((a 5)) a)", "5"},
-		{"(let ((a 5) (b 6)) a (* a b))", "30"},
-		{"(let ((a 5)) (set! a 44) a)", "44"},
-		{"(let ((a 5)) c)", "nil"},
-		{"(let ((a 3) (b (+ a 3))) b))", "6"},
-
 		// let*
 		{"(let* (z 9) z)", "9"},
 		{"(let* (x 9) x)", "9"},
@@ -192,7 +184,7 @@ func TestEvaluate(t *testing.T) {
 		// (set!) inside (let) will only modify the local scope
 		{`
 (set! a 3)
-(let ((b 33))
+(let* (b 33)
   (set! a 4321))
 a
 `,
@@ -201,7 +193,7 @@ a
 		// (set! a b TRUE) inside (let) will modify the parent scope
 		{`
 (define a 3)
-(let ((b 33))
+(let* (b 33)
   (set! a 4321 true))
 a
 `,
@@ -222,7 +214,7 @@ a
 
 		// eval
 		{"(eval \"(+ 1 2)\")", "3"},
-		{"(let ((a \"(+ 1 23)\")) (eval a))", "24"},
+		{"(let* (a \"(+ 1 23)\") (eval a))", "24"},
 		{"(eval c)", "nil"},
 		{"(read \"(+ 3 4)\")", "(+ 3 4)"},
 		{"(eval (read \"(+ 3 4)\"))", "7"},
@@ -324,11 +316,6 @@ a
 		{"(set! 3 4)", "ERROR{tried to set a non-symbol 3}"},
 		{"(eval 'foo 'bar)", primitive.ArityError().ToString()},
 		{"(eval 3)", "ERROR{unexpected type for eval %!V(primitive.Number=3).}"},
-		{"(let 3)", "ERROR{argument is not a list, got 3}"},
-		{"(let ((0 0)) )", "ERROR{binding name is not a symbol, got 0}"},
-		{"(let ((0 )) )", primitive.ArityError().ToString()},
-		{"(let (3 3) )", "ERROR{binding value is not a list, got 3}"},
-
 		{"(let*)", primitive.ArityError().ToString()},
 		{"(let* 32)", "ERROR{argument is not a list, got 32}"},
 		{"(let* (a 3 b))", "ERROR{list for (len*) must have even length, got [a 3 b]}"},
@@ -357,7 +344,7 @@ a
 		{"(print (/ 3 0))", "ERROR{error expanding argument [/ 3 0] for call to (print ..): ERROR{attempted division by zero}}"},
 		{"(lambda (x 3) (nil))}", "ERROR{expected a symbol for an argument, got 3}"},
 		{"(set! )", primitive.ArityError().ToString()},
-		{"(let )", primitive.ArityError().ToString()},
+		{"(let* )", primitive.ArityError().ToString()},
 		{`
 (define fizz (lambda (n:number)
   (cond
