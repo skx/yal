@@ -344,7 +344,14 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 		//
 		// Now we're only dealing with lists
 		//
-		listExp := exp.(primitive.List)
+		listExp, listOk := exp.(primitive.List)
+
+		//
+		// But just in case we're not ..
+		//
+		if !listOk {
+			return primitive.Error(fmt.Sprintf("argument not a list for a function call: %v", exp))
+		}
 
 		//
 		// Is this an empty list?  Then just return it

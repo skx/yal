@@ -126,6 +126,7 @@ func FuzzYAL(f *testing.F) {
 		"invalid character literal",
 		"is not a symbol",
 		"must have even length",
+		"not a character",
 		"not a function",
 		"not a hash",
 		"not a list",
