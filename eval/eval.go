@@ -407,19 +407,20 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 			// Get the first argument and ensure it is a hash
 			obj := ev.eval(listArgs[0], e, expandMacro)
 			hsh, okH := obj.(primitive.Hash)
-			if okH {
-				// One argument?  Read the value
-				if len(listArgs) == 1 {
-					return hsh.Get(access)
-				}
-
-				// Two arguments?  Set the value, and return it
-				val := ev.eval(listArgs[1], e, expandMacro)
-				hsh.Set(access, val)
-				return val
-			} else {
+			if !okH {
 				return primitive.Error(fmt.Sprintf("expected a hash, got %v", obj))
 			}
+
+			// One argument?  Read the value
+			if len(listArgs) == 1 {
+				return hsh.Get(access)
+			}
+
+			// Two arguments?  Set the value, and return it
+			val := ev.eval(listArgs[1], e, expandMacro)
+			hsh.Set(access, val)
+			return val
+
 		}
 
 		// Is this a structure creation?
