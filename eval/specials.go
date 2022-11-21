@@ -21,6 +21,7 @@ import (
 func (ev *Eval) evalSpecialForm(name string, args []primitive.Primitive, e *env.Environment, expandMacro bool) (primitive.Primitive, bool) {
 
 	switch name {
+
 	case "alias":
 		// We need at least one pair.
 		if len(args) < 2 {
@@ -46,7 +47,6 @@ func (ev *Eval) evalSpecialForm(name string, args []primitive.Primitive, e *env.
 		}
 		return primitive.Nil{}, true
 
-	// (define
 	case "define", "def!":
 		if len(args) < 2 {
 			return primitive.ArityError(), true
@@ -59,7 +59,6 @@ func (ev *Eval) evalSpecialForm(name string, args []primitive.Primitive, e *env.
 		}
 		return primitive.Error(fmt.Sprintf("Expected a symbol, got %v", args[0])), true
 
-	// (defmacro!
 	case "defmacro!":
 		if len(args) < 2 {
 			return primitive.ArityError(), true
@@ -91,7 +90,6 @@ func (ev *Eval) evalSpecialForm(name string, args []primitive.Primitive, e *env.
 		}
 		return ret, true
 
-	// (env
 	case "env":
 
 		// create a new list
@@ -162,7 +160,6 @@ func (ev *Eval) evalSpecialForm(name string, args []primitive.Primitive, e *env.
 			return primitive.Error(fmt.Sprintf("unexpected type for eval %V.", args[0])), true
 		}
 
-	// (if
 	case "if":
 		if len(args) < 2 {
 			return primitive.ArityError(), true
@@ -188,7 +185,6 @@ func (ev *Eval) evalSpecialForm(name string, args []primitive.Primitive, e *env.
 		// otherwise we handle the true-section.
 		return ev.eval(args[1], e, expandMacro), true
 
-	// (lambda
 	case "lambda", "fn*":
 		// ensure we have arguments
 		if len(args) != 2 && len(args) != 3 {
@@ -234,54 +230,6 @@ func (ev *Eval) evalSpecialForm(name string, args []primitive.Primitive, e *env.
 			Macro: false,
 		}, true
 
-	// let
-	case "let":
-		if len(args) < 1 {
-			return primitive.ArityError(), true
-		}
-
-		newEnv := env.NewEnvironment(e)
-		bindingsList, ok := args[0].(primitive.List)
-		if !ok {
-			return primitive.Error(fmt.Sprintf("argument is not a list, got %v", args[0])), true
-		}
-
-		for _, binding := range bindingsList {
-
-			// ensure we got a list
-			bl, ok := binding.(primitive.List)
-			if !ok {
-				return primitive.Error(fmt.Sprintf("binding value is not a list, got %v", binding)), true
-			}
-
-			if len(bl) < 2 {
-				return primitive.ArityError(), true
-			}
-
-			// get the value
-			bindingVal := ev.eval(bl[1], newEnv, expandMacro)
-
-			// The thing to set
-			set, ok2 := bl[0].(primitive.Symbol)
-			if !ok2 {
-				return primitive.Error(fmt.Sprintf("binding name is not a symbol, got %v", bl[0])), true
-			}
-
-			// Finally set the parameter
-			newEnv.Set(string(set), bindingVal)
-		}
-
-		// Now we've populated the new
-		// environment with the pairs we received
-		// in the setup phase we can execute
-		// the body.
-		var ret primitive.Primitive
-		for _, x := range args[1:] {
-			ret = ev.eval(x, newEnv, expandMacro)
-		}
-		return ret, true
-
-	// (let*
 	case "let*":
 		// We need to have at least one argument.
 		//
@@ -330,21 +278,18 @@ func (ev *Eval) evalSpecialForm(name string, args []primitive.Primitive, e *env.
 		}
 		return ret, true
 
-	// (macroexpand ..)
 	case "macroexpand":
 		if len(args) != 1 {
 			return primitive.ArityError(), true
 		}
 		return ev.macroExpand(args[0], e), true
 
-	// (quasiquote ..)
 	case "quasiquote":
 		if len(args) != 1 {
 			return primitive.ArityError(), true
 		}
 		return ev.eval(ev.quasiquote(args[0]), e, expandMacro), true
 
-	// (quote ..)
 	case "quote":
 		if len(args) != 1 {
 			return primitive.ArityError(), true
@@ -376,7 +321,6 @@ func (ev *Eval) evalSpecialForm(name string, args []primitive.Primitive, e *env.
 		// Return it.
 		return out, true
 
-	// (set!
 	case "set!":
 		if len(args) < 2 {
 			return primitive.ArityError(), true
@@ -399,7 +343,6 @@ func (ev *Eval) evalSpecialForm(name string, args []primitive.Primitive, e *env.
 		}
 		return primitive.Nil{}, true
 
-	// (struct
 	case "struct":
 		if len(args) <= 1 {
 			return primitive.ArityError(), true
@@ -430,7 +373,6 @@ func (ev *Eval) evalSpecialForm(name string, args []primitive.Primitive, e *env.
 		}
 		return ev.atom(args[0].ToString()), true
 
-	// (try
 	case "try":
 		if len(args) < 2 {
 			return primitive.ArityError(), true
