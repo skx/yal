@@ -111,6 +111,7 @@ func PopulateEnvironment(env *env.Environment) {
 	env.Set("date", &primitive.Procedure{F: dateFn, Help: helpMap["date"]})
 	env.Set("directory:entries", &primitive.Procedure{F: directoryEntriesFn, Help: helpMap["directory:entries"]})
 	env.Set("directory?", &primitive.Procedure{F: directoryFn, Help: helpMap["directory?"], Args: []primitive.Symbol{primitive.Symbol("path")}})
+	env.Set("env", &primitive.Procedure{F: envFn, Help: helpMap["env"], Args: []primitive.Symbol{}})
 	env.Set("eq", &primitive.Procedure{F: eqFn, Help: helpMap["eq"], Args: []primitive.Symbol{primitive.Symbol("a"), primitive.Symbol("b")}})
 	env.Set("error", &primitive.Procedure{F: errorFn, Help: helpMap["error"], Args: []primitive.Symbol{primitive.Symbol("message")}})
 	env.Set("exists?", &primitive.Procedure{F: existsFn, Help: helpMap["exists?"], Args: []primitive.Symbol{primitive.Symbol("path")}})
@@ -456,6 +457,34 @@ func divideFn(env *env.Environment, args []primitive.Primitive) primitive.Primit
 		}
 	}
 	return primitive.Number(v)
+}
+
+// envFn returns registered "things" from our environment
+func envFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+	// create a new list
+	var c primitive.List
+
+	for key, val := range env.Items() {
+
+		v := val.(primitive.Primitive)
+
+		tmp := primitive.NewHash()
+		tmp.Set(":name", primitive.String(key))
+		tmp.Set(":value", v)
+
+		// Is this a procedure?  If so
+		// add the help-text
+		proc, ok := v.(*primitive.Procedure)
+		if ok {
+			if len(proc.Help) > 0 {
+				tmp.Set(":help", primitive.String(proc.Help))
+			}
+		}
+
+		c = append(c, tmp)
+	}
+
+	return c
 }
 
 // eqFn implements "eq"
