@@ -944,6 +944,44 @@ func TestEnsureHelpPresent(t *testing.T) {
 	}
 }
 
+// TestEnv tests env
+func TestEnv(t *testing.T) {
+
+	// Load our standard library
+	st := stdlib.Contents()
+	std := string(st)
+
+	// Create a new interpreter
+	l := eval.New(std + "\n")
+
+	env := env.New()
+	l.Evaluate(env)
+
+	// No arguments
+	out := envFn(env, []primitive.Primitive{})
+
+	// Will lead to a list
+	e, ok := out.(primitive.List)
+	if !ok {
+		t.Fatalf("expected list, got %v", out)
+	}
+
+	// Ensure our list of items contains only hashes.
+	for _, x := range e {
+
+		// Get the hash
+		_, ok2 := x.(primitive.Hash)
+		if !ok2 {
+			t.Fatalf("env should have a list of hashes, found element %v", x)
+		}
+
+	}
+
+	if len(e) < 100 {
+		t.Fatalf("expected a lot of entries, got %d", len(e))
+	}
+}
+
 // TestEq tests "eq" (non-numerical equality)
 func TestEq(t *testing.T) {
 

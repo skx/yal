@@ -90,33 +90,6 @@ func (ev *Eval) evalSpecialForm(name string, args []primitive.Primitive, e *env.
 		}
 		return ret, true
 
-	case "env":
-
-		// create a new list
-		var c primitive.List
-
-		for key, val := range e.Items() {
-
-			v := val.(primitive.Primitive)
-
-			tmp := primitive.NewHash()
-			tmp.Set(":name", primitive.String(key))
-			tmp.Set(":value", v)
-
-			// Is this a procedure?  If so
-			// add the help-text
-			proc, ok := v.(*primitive.Procedure)
-			if ok {
-				if len(proc.Help) > 0 {
-					tmp.Set(":help", primitive.String(proc.Help))
-				}
-			}
-
-			c = append(c, tmp)
-		}
-
-		return c, true
-
 	case "eval":
 		if len(args) != 1 {
 			return primitive.ArityError(), true

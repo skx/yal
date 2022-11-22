@@ -105,6 +105,10 @@ path, recursively.  It is a helper function used to implement directory:walk
 
 See also: directory:walk, glob
 %%
+env
+
+env returns all the registered symbols from the environment, as a list of hashes.
+%%
 eq
 
 eq returns true if the two values supplied as parameters have the same type, and string representation.
