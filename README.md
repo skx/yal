@@ -62,7 +62,7 @@ Once installed there are three ways to execute code:
 * By specifying an expression to execute upon the command-line:
   * `yal -e '(print (os))'`
 * By passing the name of a file containing lisp code to read and execute:
-  * `yal test.lisp`
+  * `yal examples/test.lisp`
 * By launching the interpreter with zero arguments, which will start the interactive REPL mode.
   * If present the file `~/.yalrc` is loaded before the REPL starts.
   * Here is a sample [.yalrc](.yalrc) file which shows the kind of thing you might wish to do.
@@ -170,17 +170,19 @@ Here the regular expressions will be matched against the name of the file(s) in 
 
 ## Examples
 
-A reasonable amount of sample code can be found in the various included files:
+A reasonable amount of sample code can be found beneath the [examples/](examples/) directory, including:
 
-* [fibonacci.list](fibonacci.lisp)
+* [examples/fibonacci.list](examples/fibonacci.lisp)
   * Calculate the first 25 numbers of the Fibonacci sequence.
-* [fizzbuzz.lisp](fizzbuzz.lisp)
+* [examples/fizzbuzz.lisp](examples/fizzbuzz.lisp)
   * A standalone sample of solving the fizzbuzz problem.
-* [mtest.lisp](mtest.lisp)
-  * Shows simple some macro examples, but see [lisp-tests.lisp](lisp-tests.lisp) for a more useful example.
-* [sorting.lisp](sorting.lisp)
+* [examples/mtest.lisp](examples/mtest.lisp)
+  * Shows simple some macro examples, but see [examples/lisp-tests.lisp](examples/lisp-tests.lisp) for a more useful example.
+    * This uses macros in an interesting way.
+    * It is also used to actually test the various Lisp-methods we've implemented.
+* [examples/sorting.lisp](examples/sorting.lisp)
   * Demonstrates writing & benchmarking sorting-routines.
-* [test.lisp](test.lisp)
+* [examples/test.lisp](examples/test.lisp)
   * A misc. collection of sample code, functions, and notes.
 
 As noted there is a standard-library of functions which are loaded along with any user-supplied script - that library of functions may also provide a useful reference and example of yal-code:
@@ -189,7 +191,7 @@ As noted there is a standard-library of functions which are loaded along with an
 
 The standard-library contains its own series of test-cases written in Lisp:
 
-* [lisp-tests.lisp](lisp-tests.lisp)
+* [examples/lisp-tests.lisp](examples/lisp-tests.lisp)
 
 The lisp-tests.lisp file contains a simple macro for defining test-cases, and uses that to good effect to test a range of our lisp-implemented primitives.
 
