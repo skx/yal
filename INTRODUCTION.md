@@ -129,6 +129,8 @@ That concludes the brief overview, note that `lambda` can be used as a synonym f
 
 ## See Also
 
+* [LSP.md](LSP.md)
+  * LSP support.
 * [README.md](README.md)
   * More details of the project.
 * [PRIMITIVES.md](PRIMITIVES.md)
