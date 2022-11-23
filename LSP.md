@@ -10,14 +10,20 @@
 
 # Language Server Provider
 
-LSP is a new standard which makes it easier for editors to support
-advanced features in a portable way.
+Adding features like auto complete, go to definition, or documentation
+on hover for a programming language takes significant effort. Traditionally
+this work had to be repeated for each development tool, as each tool
+provides different APIs for implementing the same feature.
 
-In brief a "language server" provides the ability to show help,
-provide completions, etc, and a users' editor just needs to speak the
-appropriate protocol to get all those features - without implementing them
-directly.
+A Language Server is meant to provide the language-specific smarts and
+communicate with development tools over a protocol that enables
+inter-process communication.
 
+The idea behind the Language Server Protocol (LSP) is to standardize
+the protocol for how such servers and development tools communicate.
+This way, a single Language Server can be re-used in multiple
+development tools, which in turn can support multiple languages with
+minimal effort.
 
 
 ## LSP Features
@@ -33,10 +39,16 @@ We support a minimal LSP implementation that:
 ## Configuration
 
 The specific configuration will depend upon which editor/environment you're using.
-You'll want to configure things such that "`yal -lsp`" is launched to provide the LSP-support though.
+
+Typically configuration will involve specifying at least the type of files that
+should use LSP (i.e. based on filename suffixes), and specifying the way to launch
+the LSP-server, or communicate with a long-running one.
+
+For our implementation you'll need to launch "`yal -lsp`" to startup the LSP-process.
 
 
 ### Configuration Emacs
+
 For GNU Emacs the following file should provide all the help you need:
 
 * [_misc/yal.el](_misc/yal.el)
