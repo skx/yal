@@ -55,7 +55,11 @@ func lspStart() {
 
 	server := server.NewServer(&handler, lsName, false)
 
-	server.RunStdio()
+	err := server.RunStdio()
+	if err != nil {
+		fmt.Printf("Internal Error Running LSP Process\n%s", err)
+		os.Exit(1)
+	}
 }
 
 // textDocumentCompletion should return appropriate completions.
