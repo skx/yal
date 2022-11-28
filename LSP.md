@@ -58,7 +58,10 @@ For GNU Emacs the following file should provide all the help you need:
 
 ## Configuration: neovim
 
-* TODO
+Create the file `~/.config/nvim/init.lua` with contents as below:
+
+* [_misc/init.lua](_misc/init.lua)
+
 
 
 # Screenshots
