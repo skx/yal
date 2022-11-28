@@ -1,11 +1,11 @@
 
 * [Language Server Provider](#language-server-provider)
-  * [LSP Features](#lsp-features)
-  * [Configuration](#configuration)
-    * [Emacs](#configuration-emacs)
-  * [Screenshots](#screenshots)
-  * [Notes](#notes)
-  * [See Also](#see-also)
+  * [Our LSP Features](#our-lsp-features)
+* [Configuration](#configuration)
+  * [Emacs](#configuration-emacs)
+* [Screenshots](#screenshots)
+* [Notes](#notes)
+* [See Also](#see-also)
 
 
 # Language Server Provider
@@ -26,37 +26,41 @@ development tools, which in turn can support multiple languages with
 minimal effort.
 
 
-## LSP Features
+## Our LSP Features
 
-We support a minimal LSP implementation that:
+We only support the bare minimum LSP features:
 
-* Provides completion for the names of all standard-library functions.
+* Provide completion for the names of all standard-library functions.
 * Shows information on standard-library functions, on hover.
 
 
 
 
-## Configuration
+# Configuration
 
-The specific configuration will depend upon which editor/environment you're using.
+To use our LSP implementation you'll need to configure your editor, IDE, or environment appropriately.  Configuration will vary depending on what you're using.
 
-Typically configuration will involve specifying at least the type of files that
-should use LSP (i.e. based on filename suffixes), and specifying the way to launch
-the LSP-server, or communicate with a long-running one.
+Typically configuration will involve at least:
+
+* Specifying the type of files that hould use LSP (i.e. a filename suffixes).
+* Specifying the name/arguments to use for the LSP server.
 
 For our implementation you'll need to launch "`yal -lsp`" to startup the LSP-process.
 
 
-### Configuration Emacs
+## Configuration: Emacs
 
 For GNU Emacs the following file should provide all the help you need:
 
 * [_misc/yal.el](_misc/yal.el)
 
 
+## Configuration: neovim
+
+* TODO
 
 
-## Screenshots
+# Screenshots
 
 Here we see what completion might look like:
 
@@ -68,13 +72,19 @@ Here's our help-text being displayed on-hover:
 
 
 
-## Notes
+# Notes
 
-TODO
+As stated above we only support hover-text, and completion, from the
+standard library.  Supporting the users' own code is harder because that
+would involve evaluating it - and that might cause side-effects.
+
+It should be noted that our completion-support is very naive - it literally
+returns the names of __all__ available methods, and relies upon the editor
+to narrow down the selection - that seems to work though.
 
 
 
-## See Also
+# See Also
 
 * [README.md](README.md)
   * More details of the project.
