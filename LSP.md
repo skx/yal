@@ -3,6 +3,7 @@
   * [Our LSP Features](#our-lsp-features)
 * [Configuration](#configuration)
   * [Emacs](#configuration-emacs)
+  * [NeoVim](#configuration-neovim)
 * [Screenshots](#screenshots)
 * [Notes](#notes)
 * [See Also](#see-also)
