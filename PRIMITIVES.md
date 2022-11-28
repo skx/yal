@@ -472,6 +472,8 @@ Adding new tests is easy enough that this file should be updated over time with 
 
 # See Also
 
+* [LSP.md](LSP.md)
+  * LSP support.
 * [README.md](README.md)
   * More details of the project.
 * [INTRODUCTION.md](INTRODUCTION.md)

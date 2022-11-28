@@ -3,8 +3,6 @@
 // All the logic is contained within the `main` function, and it merely
 // reads the contents of the user-supplied filename, prepends the standard
 // library to that content, and executes it.
-//
-// Notably we don't contain a REPL-mode at the moment.
 package main
 
 import (
@@ -189,6 +187,7 @@ func main() {
 	// Parse our command-line flags
 	exp := flag.String("e", "", "A string to evaluate.")
 	hlp := flag.Bool("h", false, "Show help information and exit.")
+	lsp := flag.Bool("lsp", false, "Launch the LSP mode")
 	ver := flag.Bool("v", false, "Show our version and exit.")
 	flag.Parse()
 
@@ -212,6 +211,12 @@ func main() {
 	//     that present too.
 	//
 	create()
+
+	// LSP?
+	if *lsp {
+		lspStart()
+		return
+	}
 
 	// showing the help?
 	if *hlp {

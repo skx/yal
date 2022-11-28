@@ -25,7 +25,7 @@
 * [A list of primitives we have implemented](PRIMITIVES.md).
   * This describes the functions we support, whether implemented in lisp or golang.
   * For example `(car)`, `(cdr)`, `(file:lines)`, `(shell)`, etc.
-
+* Notes on our [LSP](LSP.md) support.
 
 
 ## Building / Installing

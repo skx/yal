@@ -361,7 +361,7 @@ If the name of the test is not unique then that will cause an error to be printe
 
 ;; structures
 (deftest struct:1 (list (do (struct person name) (type (person "me")))
-                        "struct-person"))
+                        "person"))
 (deftest struct:2 (list (do (struct person name) (person? (person "me")))
                         true))
 (deftest struct:3 (list (do (struct person name) (person.name (person "me")))
