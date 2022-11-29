@@ -66,6 +66,13 @@ Here's our help-text being displayed on-hover:
 
 ![Help](_misc/help.png?raw=true "Help")
 
+Here's the same again, using neovim:
+
+![Neovim Completion](_misc/neovim-complete.png?raw=true "Completion")
+
+![Neovim Help](_misc/neovim-help.png?raw=true "Help")
+
+
 
 
 ## Notes
