@@ -12,21 +12,30 @@
 --
 --     https://www.reddit.com/r/neovim/comments/rs47cx/tsserver_and_vimlspomnifunc/
 --
--- I'm sure there are other approaches, but neovim is new to me.
---
+-- I'm sure there are better approaches.
 
+
+--
+-- When *.yal files are loaded then set the filetype to be lisp
+--
+vim.filetype.add {
+   pattern = {
+      ['.*.yal'] = 'lisp',
+   }
+}
 
 --
 -- Define a helper function which will associate our LSP
 -- magic with the appropriate filenames.
 --
+-- It'll setup completion too.
+--
 local launch_yal_server = function()
    local autocmd
+
+
    local filetypes = {
       'lisp',
-      'yal',
-      '*.lisp',
-      '*.yal',
    }
 
    local config = {
