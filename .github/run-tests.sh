@@ -39,3 +39,7 @@ echo "Completed shadowed-variable check .."
 
 # Run golang tests
 go test ./...
+
+# Run the lisp tests
+go build .
+./yal examples/lisp-tests.lisp | _misc/tapview
