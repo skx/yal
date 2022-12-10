@@ -371,9 +371,6 @@ If the name of the test is not unique then that will cause an error to be printe
 (deftest binary:1 (list (dec2bin 3) "11"))
 (deftest binary:2 (list (dec2bin 4) "100"))
 
-;; Fail the CI
-(deftest fail:1 (list "true" "false"))
-
 ;; structures
 (deftest struct:1 (list (do (struct person name) (type (person "me")))
                         "person"))
