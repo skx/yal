@@ -246,10 +246,23 @@ If the name of the test is not unique then that will cause an error to be printe
 (deftest cmp:=:3 (list (eq 1       -1) false))
 (deftest cmp:=:4 (list (eq .5 (/ 1 2)) true))
 
-;;TODO char<
-;;TODO char>
-;;TODO char>=
-;;TODO char<=
+;; char<
+(deftest char<:1 (list (char< #\a #\b ) true))
+(deftest char<:2 (list (char< #\b #\a ) false))
+
+;; char<=
+(deftest char<=:1 (list (char<= #\a #\b ) true))
+(deftest char<=:2 (list (char<= #\b #\a ) false))
+(deftest char<=:3 (list (char<= #\b #\b ) true))
+
+;; char>
+(deftest char>:1 (list (char> #\a #\b ) false))
+(deftest char>:2 (list (char> #\b #\a ) true))
+
+;; char>=
+(deftest char>=:1 (list (char>= #\a #\b ) false))
+(deftest char>=:2 (list (char>= #\b #\a ) true))
+(deftest char>=:3 (list (char>= #\b #\b ) true))
 
 ;; zero? test
 (deftest tst:zero:1 (list (zero?  0) true))
@@ -304,7 +317,6 @@ If the name of the test is not unique then that will cause an error to be printe
 
 ;; TODO / FIXME / BUG - should intersection return nil if there are no common elements?
 (deftest intersection:3 (list (intersection (list 1) (list 2 3 4 )) nil))
-
 
 ;; reverse
 (deftest reverse:1 (list (reverse  (list "m" "e")) (list "e" "m")))
