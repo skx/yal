@@ -10,6 +10,7 @@ import (
 	"fmt"
 	"os"
 	"sort"
+	"strings"
 
 	"github.com/skx/yal/primitive"
 	"github.com/tliron/glsp"
@@ -28,6 +29,13 @@ const lsName = "yal"
 // handler contains the pointer to our handler
 var handler protocol.Handler
 
+// completions are the completion things we can support.
+//
+// Since we only support completion of the functions within our
+// standard-library they will not change, and we can calculate
+// the complete list once and reuse it.
+var completions []protocol.CompletionItem
+
 // initialize is called to setup a new buffer.
 func initialize(context *glsp.Context, params *protocol.InitializeParams) (any, error) {
 	capabilities := handler.CreateServerCapabilities()
@@ -35,12 +43,13 @@ func initialize(context *glsp.Context, params *protocol.InitializeParams) (any, 
 	return protocol.InitializeResult{
 		Capabilities: capabilities,
 		ServerInfo: &protocol.InitializeResultServerInfo{
-			Name:    "yal",
+			Name:    lsName,
 			Version: &version,
 		},
 	}, nil
 }
 
+// lspStart launches our LSP server in the foreground, and doesn't return.
 func lspStart() {
 	logging.Configure(1, nil)
 
@@ -62,11 +71,17 @@ func lspStart() {
 	}
 }
 
-// textDocumentCompletion should return appropriate completions.
+// textDocumentCompletion should return available completions.
 //
-// However we just always return a list of all known functions, the
-// client can sort it out.
+// Since we only offer completion of the functions defined within
+// our standard library we only calculate the (sorted) list once,
+// and reuse it thereafter.
 func textDocumentCompletion(context *glsp.Context, params *protocol.CompletionParams) (interface{}, error) {
+
+	// If we've already discovered our completions then return them.
+	if len(completions) > 0 {
+		return completions, nil
+	}
 
 	// Build up a list of all things known in the environment
 	keys := []string{}
@@ -81,39 +96,41 @@ func textDocumentCompletion(context *glsp.Context, params *protocol.CompletionPa
 	sort.Strings(keys)
 
 	// Create the return value
-	out := make([]protocol.CompletionItem, len(keys))
+	completions = make([]protocol.CompletionItem, len(keys))
 
-	// The kind of completion we have
+	// We're only going to provide completion of things
+	// which are functions.
 	kind := protocol.CompletionItemKindFunction
 
 	// Now we have a list of sorted things.
 	for i, key := range keys {
 
-		out[i] = protocol.CompletionItem{
+		// Save the details in our global completions-array
+		completions[i] = protocol.CompletionItem{
 			Label:  key,
 			Kind:   &kind,
 			Detail: &key,
 		}
 	}
-	return out, nil
+
+	// And return them.
+	return completions, nil
 }
 
-// textDocumentHover is called when the client hovers over a token
+// textDocumentHover is called when the client hovers over a token.
 //
 // We need to find out what text is being hovered over, and return
 // something "useful" to the client.
 func textDocumentHover(context *glsp.Context, params *protocol.HoverParams) (*protocol.Hover, error) {
 
-	// Get the file
+	// Get the file the user is visiting.
 	_uri, err := uri.Parse(params.TextDocument.URI)
 	if err != nil {
 		return nil, err
 	}
 
-	// open the file
+	// open the file, and read the content
 	var content []byte
-
-	// read the content
 	content, err = os.ReadFile(_uri.Filename())
 	if err != nil {
 		return nil, err
@@ -170,8 +187,20 @@ func textDocumentHover(context *glsp.Context, params *protocol.HoverParams) (*pr
 		return nil, nil
 	}
 
-	// The text we'll show.
-	help := fmt.Sprintf("**%s**\n%s", token, prc.Help)
+	// Build up the arguments to the procedure.
+	args := ""
+
+	if len(prc.Args) > 0 {
+
+		for _, arg := range prc.Args {
+			args += " " + arg.ToString()
+		}
+		args = strings.TrimSpace(args)
+		args = " (" + args + ")"
+	}
+
+	// The text we'll show - name args, and help.
+	help := fmt.Sprintf("**%s%s**\n%s", token, args, prc.Help)
 
 	return &protocol.Hover{
 		Contents: protocol.MarkupContent{
