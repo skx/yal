@@ -75,6 +75,23 @@ If the name of the test is not unique then that will cause an error to be printe
                         ))
 
 
+;;
+;; Some data for testing-purposes
+;;
+;; Define a "person" object
+(struct person forename surname)
+
+;; Create some people
+(set! people (list (person "Ralph" "Wiggum")
+                   (person "Lisa" "Simpson")
+                   (person "Apu" "Nahasapeemapetilon")
+                   (person "Marge" "Bouvier")
+                   (person "Artie" "Ziff")
+                   (person "Edna", "Crabapple")
+                   (person "Homer" "Simpson")))
+
+
+
 
 ;;
 ;; Test cases now follow, defined with the macro above.
@@ -352,6 +369,24 @@ If the name of the test is not unique then that will cause an error to be printe
 (deftest append:2 (list (append (list 2) "2") (list 2 "2")))
 (deftest append:3 (list (append (list 2 3) 5) (list 2 3 5)))
 
+;; string<
+(deftest string<:1 (list (string< "a" "b") true))
+(deftest string<:2 (list (string< "b" "a") false))
+
+;; string<=
+(deftest string<=:1 (list (string<= "a" "b") true))
+(deftest string<=:2 (list (string<= "b" "a") false))
+(deftest string<=:3 (list (string<= "b" "b") true))
+
+;; string>
+(deftest string>:1 (list (string> "a" "b") false))
+(deftest string>:2 (list (string> "B" "A") true))
+
+;; string>=
+(deftest string>=:1 (list (string>= "a" "b") false))
+(deftest string>=:2 (list (string>= "b" "a") true))
+(deftest string>=:3 (list (string>= "b" "b") true))
+
 ;; strlen
 (deftest strlen:1 (list (strlen      "") 0))
 (deftest strlen:2 (list (strlen "steve") 5))
@@ -378,6 +413,44 @@ If the name of the test is not unique then that will cause an error to be printe
                         true))
 (deftest struct:3 (list (do (struct person name) (person.name (person "me")))
                         "me"))
+
+
+
+;; Define two helpers for sorting, by one/other field.
+(set! people-surname-sort (fn* (a b) (string< (person.surname a) (person.surname b))))
+(set! people-forename-sort (fn* (a b) (string< (person.forename a) (person.forename b))))
+
+
+;; sort-by
+(deftest sort-by:1 (list (type (person "foo" "bar")) "person"))
+(deftest sort-by:2 (list (type (car people)) "person"))
+(deftest sort-by:3 (list (type people-surname-sort) "procedure(lisp)"))
+(deftest sort-by:4 (list (type people-forename-sort) "procedure(lisp)"))
+
+;; forename-sort, first and last
+(deftest sort-by:5 (list (let* (sorted (sort-by people-forename-sort people))
+                           (sprintf "%s %s"
+                                    (person.forename (car sorted))
+                                    (person.surname (car sorted))))
+                         "Apu Nahasapeemapetilon"))
+(deftest sort-by:6 (list (let* (sorted (sort-by people-forename-sort people))
+                           (sprintf "%s %s"
+                                    (person.forename (last sorted))
+                                    (person.surname (last sorted))))
+                         "Ralph Wiggum"))
+
+;; surname-sort, first and last
+(deftest sort-by:7 (list (let* (sorted (sort-by people-surname-sort people))
+                           (sprintf "%s %s"
+                                    (person.forename (car sorted))
+                                    (person.surname (car sorted))))
+                         "Marge Bouvier"))
+(deftest sort-by:8 (list (let* (sorted (sort-by people-surname-sort people))
+                           (sprintf "%s %s"
+                                    (person.forename (last sorted))
+                                    (person.surname (last sorted))))
+                         "Artie Ziff"))
+
 
 
 ;;

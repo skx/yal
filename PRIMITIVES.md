@@ -215,6 +215,14 @@ Things you'll find here include:
   * Generate a string, using a format-string.
 * `str`
   * Convert the specified parameter to a string.
+* `string<`
+  * Return true if the first string is less than the second.
+* `string<=`
+  * Return true if the first string is less than, or equal to the second.
+* `string>`
+  * Return true if the first string is greater than the second.
+* `string>=`
+  * Return true if the first string is greater than, or equal to the second.
 * `time`
   * Return values relating to the current time, as a list.
   * Demonstrated in [time.lisp](time.lisp).
@@ -395,6 +403,8 @@ Functions here include:
   * Return a list of numbers from 0 to N.
 * `sign`
   * Return the sign of the given number.  (1 for positive, -1 for negative).
+* `sort-by`
+  * Sort the given list, using the supplied comparison method.
 * `sqrt`
   * Return the square-root of the supplied number.
 * `string?`

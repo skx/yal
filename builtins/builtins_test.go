@@ -218,7 +218,7 @@ func TestCdr(t *testing.T) {
 	}
 }
 
-// TestCharEquals tests "chare=" (character equality)
+// TestCharEquals tests "char=" (character equality)
 func TestCharEquals(t *testing.T) {
 
 	// No arguments
@@ -403,8 +403,8 @@ func TestCharLt(t *testing.T) {
 	if n != true {
 		t.Fatalf("got wrong result")
 	}
-
 }
+
 func TestChr(t *testing.T) {
 
 	// no arguments
@@ -3345,6 +3345,150 @@ func TestStr(t *testing.T) {
 	}
 	if e != "32" {
 		t.Fatalf("got wrong result %v", out)
+	}
+}
+
+// TestStringEquals tests "string=" (character equality)
+func TestStringEquals(t *testing.T) {
+
+	// No arguments
+	out := stringEqualsFn(ENV, []primitive.Primitive{})
+
+	// Will lead to an error
+	e, ok := out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if e != primitive.ArityError() {
+		t.Fatalf("got error, but wrong one %v", out)
+	}
+
+	// One bogus argument
+	out = stringEqualsFn(ENV, []primitive.Primitive{
+		primitive.Number(33),
+		primitive.String("a"),
+	})
+
+	// Will lead to an error
+	e, ok = out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if !strings.Contains(string(e), "not a string") {
+		t.Fatalf("got error, but wrong one %v", out)
+	}
+
+	//
+	// Now a real one: equal
+	//
+	out = stringEqualsFn(ENV, []primitive.Primitive{
+		primitive.String("foo"),
+		primitive.String("foo"),
+	})
+
+	// Will work
+	n, ok2 := out.(primitive.Bool)
+	if !ok2 {
+		t.Fatalf("expected bool, got %v", out)
+	}
+	if n != true {
+		t.Fatalf("got wrong result")
+	}
+
+	//
+	// Now a real one: unequal values
+	//
+	out = stringEqualsFn(ENV, []primitive.Primitive{
+		primitive.String("a"),
+		primitive.String("b"),
+	})
+
+	// Will work
+	n, ok2 = out.(primitive.Bool)
+	if !ok2 {
+		t.Fatalf("expected bool, got %v", out)
+	}
+	if n != false {
+		t.Fatalf("got wrong result")
+	}
+
+	//
+	// Now with wrong types - last one is wrong
+	//
+	out = stringEqualsFn(ENV, []primitive.Primitive{
+		primitive.String("a"),
+		primitive.Number(32),
+	})
+
+	e, ok = out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if !strings.Contains(string(e), "not a string") {
+		t.Fatalf("got error, but wrong one '%v'", e)
+	}
+}
+
+// test string<
+func TestStringLt(t *testing.T) {
+
+	// No arguments
+	out := stringLtFn(ENV, []primitive.Primitive{})
+
+	// Will lead to an error
+	e, ok := out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if e != primitive.ArityError() {
+		t.Fatalf("got error, but wrong one %v", out)
+	}
+
+	// Argument which isn't a string
+	out = stringLtFn(ENV, []primitive.Primitive{
+		primitive.Character("f"),
+		primitive.String("foo"),
+	})
+
+	// Will lead to an error
+	e, ok = out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if !strings.Contains(string(e), "not a string") {
+		t.Fatalf("got error, but wrong one %v", out)
+	}
+
+	// Argument which isn't a string
+	out = stringLtFn(ENV, []primitive.Primitive{
+		primitive.String("a"),
+		primitive.Number(332),
+	})
+
+	// Will lead to an error
+	e, ok = out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if !strings.Contains(string(e), "not a string") {
+		t.Fatalf("got error, but wrong one %v", out)
+	}
+
+	//
+	// Now a real one
+	//
+	out = stringLtFn(ENV, []primitive.Primitive{
+		primitive.String("a"),
+		primitive.String("b"),
+	})
+
+	// Will work
+	n, ok2 := out.(primitive.Bool)
+	if !ok2 {
+		t.Fatalf("expected bool, got %v", out)
+	}
+	if n != true {
+		t.Fatalf("got wrong result")
 	}
 }
 
