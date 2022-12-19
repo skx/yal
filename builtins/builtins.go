@@ -145,6 +145,8 @@ func PopulateEnvironment(env *env.Environment) {
 	env.Set("split", &primitive.Procedure{F: splitFn, Help: helpMap["split"], Args: []primitive.Symbol{primitive.Symbol("str"), primitive.Symbol("by")}})
 	env.Set("sprintf", &primitive.Procedure{F: sprintfFn, Help: helpMap["sprintf"], Args: []primitive.Symbol{primitive.Symbol("arg1..argN")}})
 	env.Set("str", &primitive.Procedure{F: strFn, Help: helpMap["str"], Args: []primitive.Symbol{primitive.Symbol("object")}})
+	env.Set("string=", &primitive.Procedure{F: stringEqualsFn, Help: helpMap["string="], Args: []primitive.Symbol{primitive.Symbol("a"), primitive.Symbol("b")}})
+	env.Set("string<", &primitive.Procedure{F: stringLtFn, Help: helpMap["string<"], Args: []primitive.Symbol{primitive.Symbol("a"), primitive.Symbol("b")}})
 	env.Set("time", &primitive.Procedure{F: timeFn, Help: helpMap["time"]})
 	env.Set("type", &primitive.Procedure{F: typeFn, Help: helpMap["type"], Args: []primitive.Symbol{primitive.Symbol("object")}})
 	env.Set("vals", &primitive.Procedure{F: valsFn, Help: helpMap["vals"], Args: []primitive.Symbol{primitive.Symbol("hash")}})
@@ -1568,6 +1570,42 @@ func strFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive
 		return primitive.ArityError()
 	}
 	return primitive.String(args[0].ToString())
+}
+
+// stringEqualsFn implements "string="
+func stringEqualsFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+	if len(args) != 2 {
+		return primitive.ArityError()
+	}
+
+	a, ok1 := args[0].(primitive.String)
+	if !ok1 {
+		return primitive.Error("argument not a string")
+	}
+
+	b, ok2 := args[1].(primitive.String)
+	if !ok2 {
+		return primitive.Error("argument not a string")
+	}
+	return primitive.Bool(a == b)
+}
+
+// stringLtFn implements "string<"
+func stringLtFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+	if len(args) != 2 {
+		return primitive.ArityError()
+	}
+
+	a, ok1 := args[0].(primitive.String)
+	if !ok1 {
+		return primitive.Error("argument not a string")
+	}
+
+	b, ok2 := args[1].(primitive.String)
+	if !ok2 {
+		return primitive.Error("argument not a string")
+	}
+	return primitive.Bool(a < b)
 }
 
 // timeFn returns the current (HH, MM, SS) as a list.

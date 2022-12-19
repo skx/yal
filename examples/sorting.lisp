@@ -12,7 +12,11 @@
 ;;
 ;;  3.  sort, implemented in golang
 ;;
-
+;;
+;; See-also the "sorting.lisp" file in our standard-library, which is
+;; an unfolded version of this quicksort - with the use of a user-defined
+;; comparison function.
+;;
 
 (set! random:list (fn* (n max)
                        "Return a list of random numbers, of the length n, ranging from -max to +max."

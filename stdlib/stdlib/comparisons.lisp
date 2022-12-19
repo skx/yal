@@ -31,6 +31,21 @@
               (! (char> a b))))
 
 
+;; We've defined "string<" in natively, in golang.
+;;
+;; We can define the other relational comparisons in terms of that.
+(set! string>  (fn* (a b)
+              "Return true if a is greater than b."
+              (string< b a)))
+
+(set! string>= (fn* (a b)
+              "Return true if a is greater than, or equal to b."
+              (! (string< a b))))
+(set! string<= (fn* (a b)
+              "Return true if a is less than, or equal to, b."
+              (! (string> a b))))
+
+
 ;;
 ;; Some simple tests of specific numbers.
 ;;

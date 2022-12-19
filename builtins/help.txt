@@ -30,7 +30,7 @@ returns true if the numerical values supplied are all equal to each other.
 Note that multiple values may be specified, so it is possible to compare
 three, or more, values as per the second example below.
 
-See also: char=, eq
+See also: char=, eq, string=
 Example : (print (= 3 a))
 Example : (print (= 3 a b))
 %%
@@ -62,7 +62,7 @@ char=
 
 char= returns true if the supplied parameters were characters, and were equal.
 
-See also: = char<
+See also: = char< string=
 %%
 char<
 
@@ -328,6 +328,10 @@ sort
 
 sort will sort the items in the list specified as the single argument, and return them as a new list.
 
+Note that the sort is naive; numbers will be sorted correctly, any other type
+will be converted to a string and sorted that way.  If you want more flexibility
+see also sort-by.
+
 Example: (print (sort 3 43  1 "Steve" "Adam"))
 %%
 split
@@ -360,6 +364,18 @@ str converts the parameter supplied to a string, and returns it.
 
 Example: (print (str 3))
 See also: base, number
+%%
+string=
+
+string= returns true if the supplied parameters were both strings, and have equal values.
+
+See also: = char= string<
+%%
+string<
+
+string< returns true if the supplied parameters were both strings, and the first is less than the second.
+
+See also: < char< string=
 %%
 time
 
