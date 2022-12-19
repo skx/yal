@@ -87,7 +87,7 @@ If the name of the test is not unique then that will cause an error to be printe
                    (person "Apu" "Nahasapeemapetilon")
                    (person "Marge" "Bouvier")
                    (person "Artie" "Ziff")
-                   (person "Edna", "Crabapple")
+                   (person "Edna", "Krabappel")
                    (person "Homer" "Simpson")))
 
 
