@@ -9,6 +9,12 @@
                "dec will subtract one from the supplied value, and return the result."
                (- n 1)))
 
+;; PI
+(set! pi (fn* ()
+              "Return the value of PI, calculated via arctan, as per https://en.m.wikibooks.org/wiki/Trigonometry/Calculating_Pi"
+              (* 4 (+ (* 6 (atan (/ 1 8))) (* 2 (atan (/ 1 57))) (atan (/ 1 239))))
+              ))
+
 ;; Square root
 (set! sqrt (fn* (x:number)
                 "Calculate the square root of the given value."

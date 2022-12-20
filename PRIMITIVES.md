@@ -110,8 +110,14 @@ Things you'll find here include:
 * `=`
   * Numerical comparison function.
   * Note that multiple arguments are supported, not just two.
+* `acos`
+  * Trig. function.
 * `arch`
   * Return the operating system architecture.
+* `asin`
+  * Trig. function.
+* `atan`
+  * Trig. function.
 * `base`
   * Convert the specified integer to a string, in the given base.
 * `car`
@@ -134,6 +140,10 @@ Things you'll find here include:
   * Add the element to the start of the given (potentialy empty) list.
 * `contains?`
   * Does the specified hash contain the given key?
+* `cos`
+  * Trig. function.
+* `cosh`
+  * Trig. function.
 * `date`
   * Return details of today's date, as a list.
   * Demonstrated in [time.lisp](time.lisp).
@@ -207,6 +217,10 @@ Things you'll find here include:
   * Update the value of the specified hash-key.
 * `shell`
   * Run a command via the shell, and return STDOUT and STDERR it generated.
+* `sin`
+  * Trig. function.
+* `sinh`
+  * Trig. function.
 * `sort`
   * Sort the given list.
 * `split`
@@ -223,6 +237,10 @@ Things you'll find here include:
   * Return true if the first string is greater than the second.
 * `string>=`
   * Return true if the first string is greater than, or equal to the second.
+* `tan`
+  * Trig. function.
+* `tanh`
+  * Trig. function.
 * `time`
   * Return values relating to the current time, as a list.
   * Demonstrated in [time.lisp](time.lisp).
@@ -384,6 +402,8 @@ Functions here include:
   * Is the given number equal to one?
 * `or`
   * Logical operator, are any elements true?
+* `pi`
+  * Return the value of PI - calculated via `atan` as per [this reference](https://en.m.wikibooks.org/wiki/Trigonometry/Calculating_Pi).
 * `pos?`
   * Is the given number positive?
 * `range`
