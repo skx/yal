@@ -99,15 +99,20 @@ func PopulateEnvironment(env *env.Environment) {
 	env.Set("/=", &primitive.Procedure{F: inequalityFn, Help: helpMap["/="], Args: []primitive.Symbol{primitive.Symbol("N"), primitive.Symbol("arg1..argN")}})
 	env.Set("<", &primitive.Procedure{F: ltFn, Help: helpMap["<"], Args: []primitive.Symbol{primitive.Symbol("a"), primitive.Symbol("b")}})
 	env.Set("=", &primitive.Procedure{F: equalsFn, Help: helpMap["="], Args: []primitive.Symbol{primitive.Symbol("arg1"), primitive.Symbol("arg2 .. argN")}})
+	env.Set("acos", &primitive.Procedure{F: acosFn, Help: helpMap["acos"], Args: []primitive.Symbol{primitive.Symbol("n")}})
 	env.Set("arch", &primitive.Procedure{F: archFn, Help: helpMap["arch"]})
+	env.Set("asin", &primitive.Procedure{F: asinFn, Help: helpMap["asin"], Args: []primitive.Symbol{primitive.Symbol("n")}})
+	env.Set("atan", &primitive.Procedure{F: atanFn, Help: helpMap["atan"], Args: []primitive.Symbol{primitive.Symbol("n")}})
 	env.Set("base", &primitive.Procedure{F: baseFn, Help: helpMap["base"], Args: []primitive.Symbol{primitive.Symbol("number"), primitive.Symbol("base")}})
 	env.Set("car", &primitive.Procedure{F: carFn, Help: helpMap["car"], Args: []primitive.Symbol{primitive.Symbol("list")}})
 	env.Set("cdr", &primitive.Procedure{F: cdrFn, Help: helpMap["cdr"], Args: []primitive.Symbol{primitive.Symbol("list")}})
-	env.Set("char=", &primitive.Procedure{F: charEqualsFn, Help: helpMap["char="], Args: []primitive.Symbol{primitive.Symbol("a"), primitive.Symbol("b")}})
 	env.Set("char<", &primitive.Procedure{F: charLtFn, Help: helpMap["char<"], Args: []primitive.Symbol{primitive.Symbol("a"), primitive.Symbol("b")}})
+	env.Set("char=", &primitive.Procedure{F: charEqualsFn, Help: helpMap["char="], Args: []primitive.Symbol{primitive.Symbol("a"), primitive.Symbol("b")}})
 	env.Set("chr", &primitive.Procedure{F: chrFn, Help: helpMap["chr"], Args: []primitive.Symbol{primitive.Symbol("num")}})
 	env.Set("cons", &primitive.Procedure{F: consFn, Help: helpMap["cons"], Args: []primitive.Symbol{primitive.Symbol("a"), primitive.Symbol("b")}})
 	env.Set("contains?", &primitive.Procedure{F: containsFn, Help: helpMap["contains?"], Args: []primitive.Symbol{primitive.Symbol("hash"), primitive.Symbol("key")}})
+	env.Set("cos", &primitive.Procedure{F: cosFn, Help: helpMap["cos"], Args: []primitive.Symbol{primitive.Symbol("n")}})
+	env.Set("cosh", &primitive.Procedure{F: coshFn, Help: helpMap["cosh"], Args: []primitive.Symbol{primitive.Symbol("n")}})
 	env.Set("date", &primitive.Procedure{F: dateFn, Help: helpMap["date"]})
 	env.Set("directory:entries", &primitive.Procedure{F: directoryEntriesFn, Help: helpMap["directory:entries"]})
 	env.Set("directory?", &primitive.Procedure{F: directoryFn, Help: helpMap["directory?"], Args: []primitive.Symbol{primitive.Symbol("path")}})
@@ -141,22 +146,81 @@ func PopulateEnvironment(env *env.Environment) {
 	env.Set("random", &primitive.Procedure{F: randomFn, Help: helpMap["random"], Args: []primitive.Symbol{primitive.Symbol("max")}})
 	env.Set("set", &primitive.Procedure{F: setFn, Help: helpMap["set"], Args: []primitive.Symbol{primitive.Symbol("hash"), primitive.Symbol("key"), primitive.Symbol("val")}})
 	env.Set("shell", &primitive.Procedure{F: shellFn, Help: helpMap["shell"], Args: []primitive.Symbol{primitive.Symbol("list")}})
+	env.Set("sin", &primitive.Procedure{F: sinFn, Help: helpMap["sin"], Args: []primitive.Symbol{primitive.Symbol("n")}})
+	env.Set("sinh", &primitive.Procedure{F: sinhFn, Help: helpMap["sinh"], Args: []primitive.Symbol{primitive.Symbol("n")}})
 	env.Set("sort", &primitive.Procedure{F: sortFn, Help: helpMap["sort"], Args: []primitive.Symbol{primitive.Symbol("list")}})
 	env.Set("split", &primitive.Procedure{F: splitFn, Help: helpMap["split"], Args: []primitive.Symbol{primitive.Symbol("str"), primitive.Symbol("by")}})
 	env.Set("sprintf", &primitive.Procedure{F: sprintfFn, Help: helpMap["sprintf"], Args: []primitive.Symbol{primitive.Symbol("arg1..argN")}})
 	env.Set("str", &primitive.Procedure{F: strFn, Help: helpMap["str"], Args: []primitive.Symbol{primitive.Symbol("object")}})
-	env.Set("string=", &primitive.Procedure{F: stringEqualsFn, Help: helpMap["string="], Args: []primitive.Symbol{primitive.Symbol("a"), primitive.Symbol("b")}})
 	env.Set("string<", &primitive.Procedure{F: stringLtFn, Help: helpMap["string<"], Args: []primitive.Symbol{primitive.Symbol("a"), primitive.Symbol("b")}})
+	env.Set("string=", &primitive.Procedure{F: stringEqualsFn, Help: helpMap["string="], Args: []primitive.Symbol{primitive.Symbol("a"), primitive.Symbol("b")}})
+	env.Set("tan", &primitive.Procedure{F: tanFn, Help: helpMap["tan"], Args: []primitive.Symbol{primitive.Symbol("n")}})
+	env.Set("tanh", &primitive.Procedure{F: tanhFn, Help: helpMap["tanh"], Args: []primitive.Symbol{primitive.Symbol("n")}})
 	env.Set("time", &primitive.Procedure{F: timeFn, Help: helpMap["time"]})
 	env.Set("type", &primitive.Procedure{F: typeFn, Help: helpMap["type"], Args: []primitive.Symbol{primitive.Symbol("object")}})
 	env.Set("vals", &primitive.Procedure{F: valsFn, Help: helpMap["vals"], Args: []primitive.Symbol{primitive.Symbol("hash")}})
+
 }
 
 // Built in functions
 
+
+
+// acos implements acos
+func acosFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+
+	// We only need a single argument
+	if len(args) != 1 {
+		return primitive.ArityError()
+	}
+
+	// Which is a number
+	n, ok := args[0].(primitive.Number)
+	if !ok {
+		return primitive.Error("argument not a number")
+	}
+
+	return primitive.Number( math.Acos(float64(n)))
+}
+
 // archFn implements (os)
 func archFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 	return primitive.String(runtime.GOARCH)
+}
+
+
+// asin implements asin
+func asinFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+
+	// We only need a single argument
+	if len(args) != 1 {
+		return primitive.ArityError()
+	}
+
+	// Which is a number
+	n, ok := args[0].(primitive.Number)
+	if !ok {
+		return primitive.Error("argument not a number")
+	}
+
+	return primitive.Number( math.Asin(float64(n)))
+}
+
+// atan implements atan
+func atanFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+
+	// We only need a single argument
+	if len(args) != 1 {
+		return primitive.ArityError()
+	}
+
+	// Which is a number
+	n, ok := args[0].(primitive.Number)
+	if !ok {
+		return primitive.Error("argument not a number")
+	}
+
+	return primitive.Number( math.Atan(float64(n)))
 }
 
 // baseFn implements (base)
@@ -344,6 +408,40 @@ func containsFn(env *env.Environment, args []primitive.Primitive) primitive.Prim
 
 	return primitive.Bool(false)
 
+}
+
+// cosFn implements cos
+func cosFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+
+	// We only need a single argument
+	if len(args) != 1 {
+		return primitive.ArityError()
+	}
+
+	// Which is a number
+	n, ok := args[0].(primitive.Number)
+	if !ok {
+		return primitive.Error("argument not a number")
+	}
+
+	return primitive.Number( math.Cos(float64(n)))
+}
+
+// coshFn implements cosh
+func coshFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+
+	// We only need a single argument
+	if len(args) != 1 {
+		return primitive.ArityError()
+	}
+
+	// Which is a number
+	n, ok := args[0].(primitive.Number)
+	if !ok {
+		return primitive.Error("argument not a number")
+	}
+
+	return primitive.Number( math.Cosh(float64(n)))
 }
 
 // dateFn returns the current (Weekday, DD, MM, YYYY) as a list.
@@ -1465,6 +1563,41 @@ func shellFn(env *env.Environment, args []primitive.Primitive) primitive.Primiti
 	return ret
 }
 
+
+// sinFn implements sin
+func sinFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+
+	// We only need a single argument
+	if len(args) != 1 {
+		return primitive.ArityError()
+	}
+
+	// Which is a number
+	n, ok := args[0].(primitive.Number)
+	if !ok {
+		return primitive.Error("argument not a number")
+	}
+
+	return primitive.Number( math.Sin(float64(n)))
+}
+
+// sinhFn implements sinh
+func sinhFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+
+	// We only need a single argument
+	if len(args) != 1 {
+		return primitive.ArityError()
+	}
+
+	// Which is a number
+	n, ok := args[0].(primitive.Number)
+	if !ok {
+		return primitive.Error("argument not a number")
+	}
+
+	return primitive.Number( math.Sinh(float64(n)))
+}
+
 // sortFn implements (sort)
 func sortFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 	// If we have only a single argument
@@ -1606,6 +1739,41 @@ func stringLtFn(env *env.Environment, args []primitive.Primitive) primitive.Prim
 		return primitive.Error("argument not a string")
 	}
 	return primitive.Bool(a < b)
+}
+
+
+// tanFn implements tan
+func tanFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+
+	// We only need a single argument
+	if len(args) != 1 {
+		return primitive.ArityError()
+	}
+
+	// Which is a number
+	n, ok := args[0].(primitive.Number)
+	if !ok {
+		return primitive.Error("argument not a number")
+	}
+
+	return primitive.Number( math.Tan(float64(n)))
+}
+
+// tanhFn implements tanh
+func tanhFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+
+	// We only need a single argument
+	if len(args) != 1 {
+		return primitive.ArityError()
+	}
+
+	// Which is a number
+	n, ok := args[0].(primitive.Number)
+	if !ok {
+		return primitive.Error("argument not a number")
+	}
+
+	return primitive.Number( math.Tanh(float64(n)))
 }
 
 // timeFn returns the current (HH, MM, SS) as a list.

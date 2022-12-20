@@ -3492,6 +3492,60 @@ func TestStringLt(t *testing.T) {
 	}
 }
 
+func TestTrig(t *testing.T ) {
+
+	funs := []primitive.GolangPrimitiveFn{
+		acosFn,
+		asinFn,
+		atanFn,
+		cosFn,
+		coshFn,
+		sinFn,
+		sinhFn,
+		tanFn,
+		tanhFn,
+	}
+
+	for _, fn := range(funs) {
+
+		out := fn(nil, []primitive.Primitive{} )
+
+		// Will lead to an error
+		e, ok := out.(primitive.Error)
+		if !ok {
+			t.Fatalf("expected error, got %v", out)
+		}
+		if !strings.Contains(string(e), "argument") {
+			t.Fatalf("got error, but wrong one")
+		}
+
+		// Argument must be an umber
+		out = fn(ENV, []primitive.Primitive{
+			primitive.String("foo"),
+		})
+
+		// Will lead to an error
+		e, ok = out.(primitive.Error)
+		if !ok {
+			t.Fatalf("expected error, got %v", out)
+		}
+		if !strings.Contains(string(e), "not a number") {
+			t.Fatalf("got error, but wrong one %v", out)
+		}
+
+		// Now a valid result
+		res := fn(ENV, []primitive.Primitive{
+			primitive.Number(3),
+		})
+
+		// don't care about the result
+		_, ok2 := res.(primitive.Number)
+		if !ok2 {
+			t.Fatalf("expected number, got %v", out)
+		}
+	}
+}
+
 func TestType(t *testing.T) {
 
 	// No arguments
