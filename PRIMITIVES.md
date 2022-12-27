@@ -382,6 +382,8 @@ Functions here include:
     * Return the results of applying the specified function to every pair of elements in the given list.
 * `max`
   * Return the maximum value in the specified list.
+* `mean`
+  * Return the average of the numbers in the specified list.
 * `member`
   * Return true if the specified item is contained within the given list.
 * `min`
@@ -433,6 +435,8 @@ Functions here include:
   * Return the length of the specified string.
 * `substr`
   * Return part of the specified string, identified by offset and length.
+* `sum`
+  * Return the sum of the numbers in the specified list.
 * `symbol?`
   * Is the given thing a symbol?
 * `take`

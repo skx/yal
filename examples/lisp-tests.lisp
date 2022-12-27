@@ -415,6 +415,13 @@ If the name of the test is not unique then that will cause an error to be printe
                         "me"))
 
 
+;; sum and mean
+(deftest sum:1 (list (sum (list 1)) 1))
+(deftest sum:2 (list (sum (list 1 2 3)) 6))
+(deftest sum:3 (list (sum (list 100 21 32)) 153))
+(deftest mean:1 (list (mean (list 3 3 3)) 3))
+(deftest mean:2 (list (mean (list 10 6)) 8))
+
 
 ;; Define two helpers for sorting, by one/other field.
 (set! people-surname-sort (fn* (a b) (string< (person.surname a) (person.surname b))))

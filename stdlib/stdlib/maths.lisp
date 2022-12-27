@@ -59,3 +59,15 @@
                          (lambda (a b)
                            (if (< a b) b a))
                          (car xs)))))
+
+
+(set! sum (fn* (xs:list)
+               "Return the sum of numbers in the specified list"
+               (reduce xs
+                       (lambda (a b)
+                         (+ a b))
+                         0)))
+
+(set! mean (fn* (xs:list)
+                "Return the average (mean) of the numbers in the given list"
+                (/ (sum xs) (count xs))))
