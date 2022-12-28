@@ -5,6 +5,7 @@ package main
 
 import (
 	"context"
+	"path"
 	"os"
 	"strings"
 	"testing"
@@ -109,6 +110,23 @@ func FuzzYAL(f *testing.F) {
 	f.Add([]byte(`define blah (lambda (a:any) (print "I received the arg %s" a)))`))
 	f.Add([]byte(`define blah (lambda (a) (print "I received the arg %s" a)))`))
 
+	// Find each of our examples, as these are valid code samples
+	files, err := os.ReadDir("examples")
+	if err != nil {
+		f.Fatalf("failed to read examples/ directory %s", err)
+	}
+
+	// Load each example as a fuzz-source
+	for _, file := range files {
+		path := path.Join( "examples", file.Name())
+
+		data, err := os.ReadFile(path)
+		if err != nil {
+			f.Fatalf("Failed to load %s %s", path, err)
+		}
+		f.Add(data)
+	}
+
 	// Known errors are listed here.
 	//
 	// The purpose of fuzzing is to find panics, or unexpected errors.
@@ -118,21 +136,30 @@ func FuzzYAL(f *testing.F) {
 	known := []string{
 		"arityerror",
 		"deadline exceeded", // context timeout
+		"catch list should begin with 'catch'",  // try/catch
 		"division by zero",
 		"error expanding argument",
 		"expected a function body",
 		"expected a list",
 		"expected a symbol",
+		"failed to compile regexp",
+		"failed to open", // file:lines
 		"invalid character literal",
 		"is not a symbol",
+		"list should have three elements", // try
 		"must have even length",
+		"must be greater than zero", // random
 		"not a character",
 		"not a function",
 		"not a hash",
 		"not a list",
 		"not a number",
+		"not a procedure",
 		"not a string",
+		"out of bounds", // nth
 		"recursion limit",
+		"syntax error in pattern", // glob
+		"tried to set a non-symbol",
 		"typeerror - ",
 		"unexpected type",
 	}
