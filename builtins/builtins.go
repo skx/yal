@@ -241,6 +241,9 @@ func baseFn(env *env.Environment, args []primitive.Primitive) primitive.Primitiv
 		return primitive.Error("argument not a number")
 	}
 
+	if int(base) < 2 || int(base) > 36 {
+		return primitive.Error("invalid base - must be >=2 and <=36")
+	}
 	return primitive.String(strconv.FormatInt(int64(n), int(base)))
 }
 
@@ -1496,6 +1499,10 @@ func randomFn(env *env.Environment, args []primitive.Primitive) primitive.Primit
 
 	if !ok {
 		return primitive.Error("argument not a number")
+	}
+
+	if int(num) <= 0 {
+		return primitive.Error("argument must be greater than zero")
 	}
 
 	return primitive.Number(rand.Intn(int(num)))
