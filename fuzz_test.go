@@ -5,8 +5,8 @@ package main
 
 import (
 	"context"
-	"path"
 	"os"
+	"path"
 	"strings"
 	"testing"
 	"time"
@@ -118,7 +118,7 @@ func FuzzYAL(f *testing.F) {
 
 	// Load each example as a fuzz-source
 	for _, file := range files {
-		path := path.Join( "examples", file.Name())
+		path := path.Join("examples", file.Name())
 
 		data, err := os.ReadFile(path)
 		if err != nil {
@@ -130,13 +130,13 @@ func FuzzYAL(f *testing.F) {
 	// Known errors are listed here.
 	//
 	// The purpose of fuzzing is to find panics, or unexpected errors.
-	//
-	// Some programs are obviously invalid though, so we don't want to
+	// Some programs are obviously invalid though, and we don't want to
 	// report those known-bad things.
+	//
 	known := []string{
 		"arityerror",
-		"deadline exceeded", // context timeout
-		"catch list should begin with 'catch'",  // try/catch
+		"catch list should begin with 'catch'", // try/catch
+		"deadline exceeded",                    // context timeout
 		"division by zero",
 		"error expanding argument",
 		"expected a function body",
@@ -147,8 +147,8 @@ func FuzzYAL(f *testing.F) {
 		"invalid character literal",
 		"is not a symbol",
 		"list should have three elements", // try
+		"must be greater than zero",       // random
 		"must have even length",
-		"must be greater than zero", // random
 		"not a character",
 		"not a function",
 		"not a hash",
@@ -164,6 +164,9 @@ func FuzzYAL(f *testing.F) {
 		"unexpected type",
 	}
 
+	// Read the standard library only once.
+	std := string(stdlib.Contents()) + "\n"
+
 	f.Fuzz(func(t *testing.T, input []byte) {
 
 		// Timeout after a second
@@ -176,13 +179,10 @@ func FuzzYAL(f *testing.F) {
 		// Populate the default primitives
 		builtins.PopulateEnvironment(environment)
 
-		// Read the standard library
-		pre := stdlib.Contents()
+		// Prepend the standard-library to the users' script
+		src := std + string(input)
 
-		// Prepend that to the users' script
-		src := string(pre) + "\n" + string(input)
-
-		// Create a new interpreter with that source
+		// Create a new interpreter with the combined source
 		interpreter := eval.New(src)
 
 		// Ensure we timeout after 1 second
@@ -191,8 +191,6 @@ func FuzzYAL(f *testing.F) {
 		// Now evaluate the input using the specified environment
 		out := interpreter.Evaluate(environment)
 
-		found := false
-
 		switch out.(type) {
 		case *primitive.Error, primitive.Error:
 			str := strings.ToLower(out.ToString())
@@ -200,14 +198,10 @@ func FuzzYAL(f *testing.F) {
 			// does it look familiar?
 			for _, v := range known {
 				if strings.Contains(str, v) {
-					found = true
+					return
 				}
 			}
-
-			// raise an error
-			if !found {
-				t.Fatalf("error parsing %s:%v", input, out)
-			}
+			t.Fatalf("error processing input %s:%v", input, out)
 		}
 	})
 }
