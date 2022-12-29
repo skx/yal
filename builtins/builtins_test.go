@@ -90,13 +90,32 @@ func TestBase(t *testing.T) {
 		primitive.Number(2),
 	})
 
-	// Will lead to an error
+	// Will lead to a string
 	r, ok2 := result.(primitive.String)
 	if !ok2 {
 		t.Fatalf("expected string, got %v", result)
 	}
 	if !strings.Contains(string(r), "11111111") {
 		t.Fatalf("got string, but wrong one %v", r)
+	}
+
+	// However bases must be 2-36 inclusive, so outside that range we
+	// expect errors
+	for _, bs := range []int{0, 1, 40, 100, 200} {
+
+		res := baseFn(ENV, []primitive.Primitive{
+			primitive.Number(255),
+			primitive.Number(bs),
+		})
+
+		// Will lead to an error
+		r, ok3 := res.(primitive.Error)
+		if !ok3 {
+			t.Fatalf("expected error, got %v", res)
+		}
+		if !strings.Contains(string(r), "invalid base") {
+			t.Fatalf("got error, but wrong one %v", r)
+		}
 	}
 }
 
@@ -3064,6 +3083,19 @@ func TestRandom(t *testing.T) {
 	_, ok2 := out.(primitive.Number)
 	if !ok2 {
 		t.Fatalf("expected string, got %v", out)
+	}
+
+	// Calling with a number less than zero returns an error
+	out = randomFn(ENV, []primitive.Primitive{
+		primitive.Number(-3),
+	})
+
+	e, ok = out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if !strings.Contains(string(e), "greater than zero") {
+		t.Fatalf("got error, but wrong one %v", out)
 	}
 }
 
