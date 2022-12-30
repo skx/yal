@@ -21,6 +21,9 @@ import (
 // ErrEOF is used to indicate when we've finished parsing
 var ErrEOF = errors.New("unexpected EOF")
 
+// ErrTimeout is used to say that we've timed out
+var ErrTimeout = errors.New("context timeout - deadline exceeded")
+
 // Eval holds our program/state
 type Eval struct {
 
@@ -293,7 +296,7 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 		//
 		select {
 		case <-ev.context.Done():
-			return primitive.Error("context timeout - deadline exceeded")
+			return primitive.Error(ErrTimeout.Error())
 		default:
 			// nop
 		}

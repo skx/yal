@@ -85,6 +85,10 @@ func (ev *Eval) evalSpecialForm(name string, args []primitive.Primitive, e *env.
 
 	case "do":
 		var ret primitive.Primitive
+
+		// default return value is nil
+		ret = primitive.Nil{}
+
 		for _, x := range args {
 			ret = ev.eval(x, e, expandMacro)
 		}
@@ -246,6 +250,10 @@ func (ev *Eval) evalSpecialForm(name string, args []primitive.Primitive, e *env.
 		// in the setup phase we can execute
 		// the body.
 		var ret primitive.Primitive
+
+		// default return value is nil
+		ret = primitive.Nil{}
+
 		for _, x := range args[1:] {
 			ret = ev.eval(x, newEnv, expandMacro)
 		}
@@ -392,6 +400,6 @@ func (ev *Eval) evalSpecialForm(name string, args []primitive.Primitive, e *env.
 		return ev.eval(blkLst[2], tmpEnv, expandMacro), true
 	}
 
-	// The input was not handled as a special.
+	// The input was not handled as a special form.
 	return primitive.Nil{}, false
 }

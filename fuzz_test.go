@@ -141,6 +141,7 @@ func FuzzYAL(f *testing.F) {
 		"error expanding argument",
 		"expected a function body",
 		"expected a list",
+		"expected a hash",
 		"expected a symbol",
 		"failed to compile regexp",
 		"failed to open", // file:lines
@@ -168,6 +169,17 @@ func FuzzYAL(f *testing.F) {
 	std := string(stdlib.Contents()) + "\n"
 
 	f.Fuzz(func(t *testing.T, input []byte) {
+
+		// Avoid pathological cases with numerous backticks
+		bc := 0
+		for _, c := range input {
+			if c == '`' {
+				bc++
+			}
+		}
+		if bc > 15 {
+			return
+		}
 
 		// Timeout after a second
 		ctx, cancel := context.WithTimeout(context.Background(), 1000*time.Millisecond)

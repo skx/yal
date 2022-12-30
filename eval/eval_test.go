@@ -373,6 +373,12 @@ a
 		{"{ :age 333  ", "nil"},
 		{"}}}}}}", "nil"},
 
+		// empty forms used to return a nil pointer, in go.
+		// now we explicitly ensure empty "let*" and "do"
+		// forms return nil.
+		{`(sprintf "%s" (type (do)))`, "nil"},
+		{`(sprintf "%s" (type (let* () )))`, "nil"},
+
 		{"(alias foo)", primitive.ArityError().ToString()},
 		{"(alias foo print)", "nil"},
 		{"(alias foo bar print)", "ERROR{(alias ..) must have an even length of arguments, got [foo bar print]}"},
