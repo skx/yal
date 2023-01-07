@@ -55,3 +55,16 @@ NOTE: This is a non-portable function!
 (def! load-file (fn* (filename)
                      "Load and execute the contents of the supplied filename."
                      (eval (join (list "(do " (slurp filename) "\nnil)")))))
+
+
+;; Similar to load-file, but with automatic suffix addition and error-testing.
+(def! require (fn* (name)
+                   "Load and execute the given file, adding a .yal suffix.
+
+To load and execute foo.yal, returning nil if that doesn't exist:
+
+Example: (require 'foo)"
+                   (let* (fname (sprintf "%s%s" name ".yal"))
+                     (if (file:stat fname)
+                         (load-file fname)
+                       nil))))
