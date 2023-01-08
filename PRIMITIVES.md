@@ -416,6 +416,8 @@ Functions here include:
   * Run the given body N times.
 * `repeated`
   * Return a list of length N whose elements are all X.
+* `require`
+  * Allow loading a file, by name.
 * `rest`
   * Return the rest of the list, except the first element.
   * This is the same as `cdr`.
