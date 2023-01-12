@@ -227,6 +227,14 @@ Things you'll find here include:
   * Split the given string, by the specified character.
 * `sprintf`
   * Generate a string, using a format-string.
+* `stack:empty?`
+  * Is the stack empty?  If so return true, else false.
+* `stack:push`
+  * Add an item to the given stack.
+* `stack:pop`
+  * Add an item to the given stack.
+* `stack:size`
+  * Return the size of the given stack.
 * `str`
   * Convert the specified parameter to a string.
 * `string<`
