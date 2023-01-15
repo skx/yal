@@ -164,8 +164,6 @@ func PopulateEnvironment(env *env.Environment) {
 
 // Built in functions
 
-
-
 // acos implements acos
 func acosFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 
@@ -180,14 +178,13 @@ func acosFn(env *env.Environment, args []primitive.Primitive) primitive.Primitiv
 		return primitive.Error("argument not a number")
 	}
 
-	return primitive.Number( math.Acos(float64(n)))
+	return primitive.Number(math.Acos(float64(n)))
 }
 
 // archFn implements (os)
 func archFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 	return primitive.String(runtime.GOARCH)
 }
-
 
 // asin implements asin
 func asinFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
@@ -203,7 +200,7 @@ func asinFn(env *env.Environment, args []primitive.Primitive) primitive.Primitiv
 		return primitive.Error("argument not a number")
 	}
 
-	return primitive.Number( math.Asin(float64(n)))
+	return primitive.Number(math.Asin(float64(n)))
 }
 
 // atan implements atan
@@ -220,7 +217,7 @@ func atanFn(env *env.Environment, args []primitive.Primitive) primitive.Primitiv
 		return primitive.Error("argument not a number")
 	}
 
-	return primitive.Number( math.Atan(float64(n)))
+	return primitive.Number(math.Atan(float64(n)))
 }
 
 // baseFn implements (base)
@@ -427,7 +424,7 @@ func cosFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive
 		return primitive.Error("argument not a number")
 	}
 
-	return primitive.Number( math.Cos(float64(n)))
+	return primitive.Number(math.Cos(float64(n)))
 }
 
 // coshFn implements cosh
@@ -444,7 +441,7 @@ func coshFn(env *env.Environment, args []primitive.Primitive) primitive.Primitiv
 		return primitive.Error("argument not a number")
 	}
 
-	return primitive.Number( math.Cosh(float64(n)))
+	return primitive.Number(math.Cosh(float64(n)))
 }
 
 // dateFn returns the current (Weekday, DD, MM, YYYY) as a list.
@@ -1570,7 +1567,6 @@ func shellFn(env *env.Environment, args []primitive.Primitive) primitive.Primiti
 	return ret
 }
 
-
 // sinFn implements sin
 func sinFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 
@@ -1585,7 +1581,7 @@ func sinFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive
 		return primitive.Error("argument not a number")
 	}
 
-	return primitive.Number( math.Sin(float64(n)))
+	return primitive.Number(math.Sin(float64(n)))
 }
 
 // sinhFn implements sinh
@@ -1602,7 +1598,7 @@ func sinhFn(env *env.Environment, args []primitive.Primitive) primitive.Primitiv
 		return primitive.Error("argument not a number")
 	}
 
-	return primitive.Number( math.Sinh(float64(n)))
+	return primitive.Number(math.Sinh(float64(n)))
 }
 
 // sortFn implements (sort)
@@ -1748,7 +1744,6 @@ func stringLtFn(env *env.Environment, args []primitive.Primitive) primitive.Prim
 	return primitive.Bool(a < b)
 }
 
-
 // tanFn implements tan
 func tanFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 
@@ -1763,7 +1758,7 @@ func tanFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive
 		return primitive.Error("argument not a number")
 	}
 
-	return primitive.Number( math.Tan(float64(n)))
+	return primitive.Number(math.Tan(float64(n)))
 }
 
 // tanhFn implements tanh
@@ -1780,7 +1775,7 @@ func tanhFn(env *env.Environment, args []primitive.Primitive) primitive.Primitiv
 		return primitive.Error("argument not a number")
 	}
 
-	return primitive.Number( math.Tanh(float64(n)))
+	return primitive.Number(math.Tanh(float64(n)))
 }
 
 // timeFn returns the current (HH, MM, SS) as a list.

@@ -4,6 +4,7 @@ package eval
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/skx/yal/env"
 	"github.com/skx/yal/primitive"
@@ -278,8 +279,20 @@ func (ev *Eval) evalSpecialForm(name string, args []primitive.Primitive, e *env.
 		return args[0], true
 
 	case "read":
-		if len(args) != 1 {
+		// we accept zero or one argument.
+		if len(args) > 1 {
 			return primitive.ArityError(), true
+		}
+
+		// zero arguments: read from STDIN
+		if len(args) == 0 {
+			input, err := ev.STDIN.ReadString('\n')
+			if err != nil {
+				return primitive.Error(
+					fmt.Sprintf("failed to read from STDIN %s", err)), true
+			}
+			input = strings.TrimRight(input, "\n")
+			return primitive.String(input), true
 		}
 
 		arg := args[0].ToString()
