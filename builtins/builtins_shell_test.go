@@ -75,8 +75,12 @@ func TestShell(t *testing.T) {
 	//
 	// Now: Pretend we're running under a fuzzer
 	//
+	// Preserve any previous content of $FUZZ
+	//
+	old := os.Getenv("FUZZ")
 	os.Setenv("FUZZ", "FUZZ")
 	res = shellFn(ENV, []primitive.Primitive{cmd})
+	os.Setenv("FUZZ", old)
 
 	// Response should still be a list
 	lst, ok2 = res.(primitive.List)
