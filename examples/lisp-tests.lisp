@@ -1,4 +1,4 @@
-;;; tests.lisp - A simple lisp-based testing framework for our primitives.
+;;; lisp-tests.lisp - A simple testing framework for our primitives.
 
 ;;; About
 ;;
@@ -406,6 +406,20 @@ If the name of the test is not unique then that will cause an error to be printe
 (deftest binary:1 (list (dec2bin 3) "11"))
 (deftest binary:2 (list (dec2bin 4) "100"))
 
+;; stacks
+;;
+;; uses "foof" as a variable/stack but that doesn't persist between runs.
+;;
+(deftest stack:1 (list (do (stack:push 3 foof) (stack:push 4 foof) foof) (list 4 3)))
+(deftest stack:2 (list (stack:empty? foof) true))
+(deftest stack:3 (list (stack:size foof) 0))
+(deftest stack:4 (list (do (stack:push 3 foof) (stack:push 4 foof) (stack:empty? foof)) false))
+(deftest stack:5 (list (do (stack:push 3 foof) (stack:push 4 foof) (stack:size foof)) 2))
+;; popping from an empty stack returns nil
+(deftest stack:6 (list (do (stack:pop foof) (stack:pop foof)) nil))
+(deftest stack:7 (list (do (stack:pop "") (stack:pop "")) nil))
+
+
 ;; structures
 (deftest struct:1 (list (do (struct person name) (type (person "me")))
                         "person"))
@@ -461,13 +475,19 @@ If the name of the test is not unique then that will cause an error to be printe
 
 
 ;;
-;; Define a function to run all the tests, by iterating over the hash.
+;; Define a function to run all the tests, by iterating over the
+;; contents of the global hash, to which the tests were stored via
+;; the deftest macro.
 ;;
 (set! run-tests (fn* (hsh)
-                     "Run all the registered tests, by iterating over the global supplied hash.
+                     "Run all the tests, by iterating over the supplied hash:
 
-The hash will contain a key naming the test.   The value of the hash will be a function to
-invoke to run the test."
+- The hash will contain a key naming the test.
+- The value of the hash will be a function to invoke to run the test.
+
+If the result is not a list containing two entries it is an immediate failure.
+
+If the two values don't match then we fail, otherwise it is a pass."
                      (do
                          (print "TAP version 14")
                          (apply-hash hsh (lambda (test fun)
