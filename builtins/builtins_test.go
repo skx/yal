@@ -26,7 +26,7 @@ func init() {
 func TestArch(t *testing.T) {
 
 	// No arguments
-	out := archFn(ENV, []primitive.Primitive{})
+	out := archFn(nil, ENV, []primitive.Primitive{})
 
 	// Will lead to a number
 	e, ok := out.(primitive.String)
@@ -43,7 +43,7 @@ func TestArch(t *testing.T) {
 func TestBase(t *testing.T) {
 
 	// No arguments
-	out := baseFn(ENV, []primitive.Primitive{})
+	out := baseFn(nil, ENV, []primitive.Primitive{})
 
 	// Will lead to an error
 	e, ok := out.(primitive.Error)
@@ -55,7 +55,7 @@ func TestBase(t *testing.T) {
 	}
 
 	// Arguments must be numbers
-	out = baseFn(ENV, []primitive.Primitive{
+	out = baseFn(nil, ENV, []primitive.Primitive{
 		primitive.Number(3),
 		primitive.String("foo"),
 	})
@@ -70,7 +70,7 @@ func TestBase(t *testing.T) {
 	}
 
 	// Arguments must be numbers
-	out = baseFn(ENV, []primitive.Primitive{
+	out = baseFn(nil, ENV, []primitive.Primitive{
 		primitive.String("foo"),
 		primitive.Number(3),
 	})
@@ -85,7 +85,7 @@ func TestBase(t *testing.T) {
 	}
 
 	// Valid result
-	result := baseFn(ENV, []primitive.Primitive{
+	result := baseFn(nil, ENV, []primitive.Primitive{
 		primitive.Number(255),
 		primitive.Number(2),
 	})
@@ -103,7 +103,7 @@ func TestBase(t *testing.T) {
 	// expect errors
 	for _, bs := range []int{0, 1, 40, 100, 200} {
 
-		res := baseFn(ENV, []primitive.Primitive{
+		res := baseFn(nil, ENV, []primitive.Primitive{
 			primitive.Number(255),
 			primitive.Number(bs),
 		})
@@ -123,7 +123,7 @@ func TestBase(t *testing.T) {
 func TestCar(t *testing.T) {
 
 	// No arguments
-	out := carFn(ENV, []primitive.Primitive{})
+	out := carFn(nil, ENV, []primitive.Primitive{})
 
 	// Will lead to an error
 	e, ok := out.(primitive.Error)
@@ -135,7 +135,7 @@ func TestCar(t *testing.T) {
 	}
 
 	// One argument
-	out = carFn(ENV, []primitive.Primitive{
+	out = carFn(nil, ENV, []primitive.Primitive{
 		primitive.Number(3),
 	})
 
@@ -149,7 +149,7 @@ func TestCar(t *testing.T) {
 	}
 
 	// Now a list
-	out = carFn(ENV, []primitive.Primitive{
+	out = carFn(nil, ENV, []primitive.Primitive{
 		primitive.List{
 			primitive.Number(3),
 			primitive.Number(4),
@@ -166,7 +166,7 @@ func TestCar(t *testing.T) {
 	}
 
 	// Now a list which is empty
-	out = carFn(ENV, []primitive.Primitive{
+	out = carFn(nil, ENV, []primitive.Primitive{
 		primitive.List{},
 	})
 
@@ -182,7 +182,7 @@ func TestCar(t *testing.T) {
 func TestCdr(t *testing.T) {
 
 	// No arguments
-	out := cdrFn(ENV, []primitive.Primitive{})
+	out := cdrFn(nil, ENV, []primitive.Primitive{})
 
 	// Will lead to an error
 	e, ok := out.(primitive.Error)
@@ -194,7 +194,7 @@ func TestCdr(t *testing.T) {
 	}
 
 	// One argument
-	out = cdrFn(ENV, []primitive.Primitive{
+	out = cdrFn(nil, ENV, []primitive.Primitive{
 		primitive.Number(3),
 	})
 
@@ -208,7 +208,7 @@ func TestCdr(t *testing.T) {
 	}
 
 	// Now a list
-	out = cdrFn(ENV, []primitive.Primitive{
+	out = cdrFn(nil, ENV, []primitive.Primitive{
 		primitive.List{
 			primitive.Number(3),
 			primitive.Number(4),
@@ -226,7 +226,7 @@ func TestCdr(t *testing.T) {
 	}
 
 	// Now a list which is empty
-	out = cdrFn(ENV, []primitive.Primitive{
+	out = cdrFn(nil, ENV, []primitive.Primitive{
 		primitive.List{},
 	})
 
@@ -241,7 +241,7 @@ func TestCdr(t *testing.T) {
 func TestCharEquals(t *testing.T) {
 
 	// No arguments
-	out := charEqualsFn(ENV, []primitive.Primitive{})
+	out := charEqualsFn(nil, ENV, []primitive.Primitive{})
 
 	// Will lead to an error
 	e, ok := out.(primitive.Error)
@@ -253,7 +253,7 @@ func TestCharEquals(t *testing.T) {
 	}
 
 	// One bogus argument
-	out = charEqualsFn(ENV, []primitive.Primitive{
+	out = charEqualsFn(nil, ENV, []primitive.Primitive{
 		primitive.Number(33),
 		primitive.Character("a"),
 	})
@@ -270,7 +270,7 @@ func TestCharEquals(t *testing.T) {
 	//
 	// Now a real one: equal
 	//
-	out = charEqualsFn(ENV, []primitive.Primitive{
+	out = charEqualsFn(nil, ENV, []primitive.Primitive{
 		primitive.Character("a"),
 		primitive.Character("a"),
 	})
@@ -287,7 +287,7 @@ func TestCharEquals(t *testing.T) {
 	//
 	// Now a real one: equal - but multiple values
 	//
-	out = charEqualsFn(ENV, []primitive.Primitive{
+	out = charEqualsFn(nil, ENV, []primitive.Primitive{
 		primitive.Character("b"),
 		primitive.Character("b"),
 		primitive.Character("b"),
@@ -308,7 +308,7 @@ func TestCharEquals(t *testing.T) {
 	//
 	// Now a real one: unequal values
 	//
-	out = charEqualsFn(ENV, []primitive.Primitive{
+	out = charEqualsFn(nil, ENV, []primitive.Primitive{
 		primitive.Character("a"),
 		primitive.Character("b"),
 		primitive.Character("c"),
@@ -327,7 +327,7 @@ func TestCharEquals(t *testing.T) {
 	//
 	// Now with wrong types - last one is wrong
 	//
-	out = charEqualsFn(ENV, []primitive.Primitive{
+	out = charEqualsFn(nil, ENV, []primitive.Primitive{
 		primitive.Character("a"),
 		primitive.Character("b"),
 		primitive.Character("c"),
@@ -346,7 +346,7 @@ func TestCharEquals(t *testing.T) {
 	//
 	// Now with wrong types
 	//
-	out = charEqualsFn(ENV, []primitive.Primitive{
+	out = charEqualsFn(nil, ENV, []primitive.Primitive{
 		primitive.Character("b"),
 		primitive.Number(9),
 	})
@@ -365,7 +365,7 @@ func TestCharEquals(t *testing.T) {
 func TestCharLt(t *testing.T) {
 
 	// No arguments
-	out := charLtFn(ENV, []primitive.Primitive{})
+	out := charLtFn(nil, ENV, []primitive.Primitive{})
 
 	// Will lead to an error
 	e, ok := out.(primitive.Error)
@@ -377,7 +377,7 @@ func TestCharLt(t *testing.T) {
 	}
 
 	// Argument which isn't a character
-	out = charLtFn(ENV, []primitive.Primitive{
+	out = charLtFn(nil, ENV, []primitive.Primitive{
 		primitive.String("foo"),
 		primitive.String("foo"),
 	})
@@ -392,7 +392,7 @@ func TestCharLt(t *testing.T) {
 	}
 
 	// Argument which isn't a character
-	out = charLtFn(ENV, []primitive.Primitive{
+	out = charLtFn(nil, ENV, []primitive.Primitive{
 		primitive.Character("a"),
 		primitive.String("foo"),
 	})
@@ -409,7 +409,7 @@ func TestCharLt(t *testing.T) {
 	//
 	// Now a real one
 	//
-	out = charLtFn(ENV, []primitive.Primitive{
+	out = charLtFn(nil, ENV, []primitive.Primitive{
 		primitive.Character("a"),
 		primitive.Character("b"),
 	})
@@ -427,7 +427,7 @@ func TestCharLt(t *testing.T) {
 func TestChr(t *testing.T) {
 
 	// no arguments
-	out := chrFn(ENV, []primitive.Primitive{})
+	out := chrFn(nil, ENV, []primitive.Primitive{})
 
 	// Will lead to an error
 	e, ok := out.(primitive.Error)
@@ -439,7 +439,7 @@ func TestChr(t *testing.T) {
 	}
 
 	// First argument must be a number
-	out = chrFn(ENV, []primitive.Primitive{
+	out = chrFn(nil, ENV, []primitive.Primitive{
 		primitive.String("4"),
 	})
 
@@ -453,7 +453,7 @@ func TestChr(t *testing.T) {
 	}
 
 	// Now a valid call 42 => "*"
-	val := chrFn(ENV, []primitive.Primitive{
+	val := chrFn(nil, ENV, []primitive.Primitive{
 		primitive.Number(42),
 	})
 
@@ -469,7 +469,7 @@ func TestChr(t *testing.T) {
 func TestCons(t *testing.T) {
 
 	// No arguments
-	out := consFn(ENV, []primitive.Primitive{})
+	out := consFn(nil, ENV, []primitive.Primitive{})
 
 	// Will lead to an error
 	e, ok := out.(primitive.Error)
@@ -481,7 +481,7 @@ func TestCons(t *testing.T) {
 	}
 
 	// one argument, string -> list
-	out = consFn(ENV, []primitive.Primitive{
+	out = consFn(nil, ENV, []primitive.Primitive{
 		primitive.String("steve"),
 	})
 
@@ -494,7 +494,7 @@ func TestCons(t *testing.T) {
 	}
 
 	// A list with a nil second element is gonna be truncated
-	out = consFn(ENV, []primitive.Primitive{
+	out = consFn(nil, ENV, []primitive.Primitive{
 		primitive.String("steve"),
 		primitive.Nil{},
 	})
@@ -526,7 +526,7 @@ func TestCons(t *testing.T) {
 	}
 
 	// first one
-	out = consFn(ENV, a)
+	out = consFn(nil, ENV, a)
 	out, ok2 = out.(primitive.List)
 	if !ok2 {
 		t.Errorf("expected list")
@@ -536,7 +536,7 @@ func TestCons(t *testing.T) {
 	}
 
 	// second one
-	out = consFn(ENV, b)
+	out = consFn(nil, ENV, b)
 	out, ok2 = out.(primitive.List)
 	if !ok2 {
 		t.Errorf("expected list")
@@ -549,7 +549,7 @@ func TestCons(t *testing.T) {
 func TestContains(t *testing.T) {
 
 	// no arguments
-	out := containsFn(ENV, []primitive.Primitive{})
+	out := containsFn(nil, ENV, []primitive.Primitive{})
 
 	// Will lead to an error
 	e, ok := out.(primitive.Error)
@@ -561,7 +561,7 @@ func TestContains(t *testing.T) {
 	}
 
 	// First argument must be a hash
-	out = containsFn(ENV, []primitive.Primitive{
+	out = containsFn(nil, ENV, []primitive.Primitive{
 		primitive.String("foo"),
 		primitive.String("bar"),
 	})
@@ -583,7 +583,7 @@ func TestContains(t *testing.T) {
 	h.Set("Location", primitive.String("Helsinki"))
 
 	// Should have Age
-	res := containsFn(ENV, []primitive.Primitive{
+	res := containsFn(nil, ENV, []primitive.Primitive{
 		h,
 		primitive.String("Age"),
 	})
@@ -598,7 +598,7 @@ func TestContains(t *testing.T) {
 	}
 
 	// Should have Age - as a symbol
-	res = containsFn(ENV, []primitive.Primitive{
+	res = containsFn(nil, ENV, []primitive.Primitive{
 		h,
 		primitive.Symbol("Age"),
 	})
@@ -613,7 +613,7 @@ func TestContains(t *testing.T) {
 	}
 
 	// Should NOT have Cake
-	res = containsFn(ENV, []primitive.Primitive{
+	res = containsFn(nil, ENV, []primitive.Primitive{
 		h,
 		primitive.String("Cake"),
 	})
@@ -632,8 +632,8 @@ func TestContains(t *testing.T) {
 func TestDateTime(t *testing.T) {
 
 	// No arguments
-	dt := dateFn(ENV, []primitive.Primitive{})
-	tm := timeFn(ENV, []primitive.Primitive{})
+	dt := dateFn(nil, ENV, []primitive.Primitive{})
+	tm := timeFn(nil, ENV, []primitive.Primitive{})
 
 	// date should return a list
 	out, ok := dt.(primitive.List)
@@ -663,7 +663,7 @@ func TestDateTime(t *testing.T) {
 func TestDirectory(t *testing.T) {
 
 	// No arguments
-	out := directoryFn(ENV, []primitive.Primitive{})
+	out := directoryFn(nil, ENV, []primitive.Primitive{})
 
 	// Will lead to an error
 	e, ok := out.(primitive.Error)
@@ -675,7 +675,7 @@ func TestDirectory(t *testing.T) {
 	}
 
 	// One argument, wrong type
-	out = directoryFn(ENV, []primitive.Primitive{primitive.Number(33)})
+	out = directoryFn(nil, ENV, []primitive.Primitive{primitive.Number(33)})
 
 	// Will lead to an error
 	e, ok = out.(primitive.Error)
@@ -693,7 +693,7 @@ func TestDirectory(t *testing.T) {
 	}
 
 	// directory? should return true
-	res := directoryFn(ENV, []primitive.Primitive{primitive.String(path)})
+	res := directoryFn(nil, ENV, []primitive.Primitive{primitive.String(path)})
 
 	// So we need a boolean result
 	r, ok2 := res.(primitive.Bool)
@@ -709,7 +709,7 @@ func TestDirectory(t *testing.T) {
 	os.RemoveAll(path)
 
 	// directory? should return false
-	res = directoryFn(ENV, []primitive.Primitive{primitive.String(path)})
+	res = directoryFn(nil, ENV, []primitive.Primitive{primitive.String(path)})
 
 	// So we need a booelan result
 	r, ok2 = res.(primitive.Bool)
@@ -726,7 +726,7 @@ func TestDirectory(t *testing.T) {
 func TestDirectoryEntries(t *testing.T) {
 
 	// No arguments
-	out := directoryEntriesFn(ENV, []primitive.Primitive{})
+	out := directoryEntriesFn(nil, ENV, []primitive.Primitive{})
 
 	// Will lead to an error
 	e, ok := out.(primitive.Error)
@@ -738,7 +738,7 @@ func TestDirectoryEntries(t *testing.T) {
 	}
 
 	// One argument, wrong type
-	out = directoryEntriesFn(ENV, []primitive.Primitive{primitive.Number(33)})
+	out = directoryEntriesFn(nil, ENV, []primitive.Primitive{primitive.Number(33)})
 
 	// Will lead to an error
 	e, ok = out.(primitive.Error)
@@ -770,7 +770,7 @@ func TestDirectoryEntries(t *testing.T) {
 
 	// Now we should find a list of two files if we walk the
 	// temporary directory.
-	res := directoryEntriesFn(ENV, []primitive.Primitive{
+	res := directoryEntriesFn(nil, ENV, []primitive.Primitive{
 		primitive.String(path),
 	})
 
@@ -787,7 +787,7 @@ func TestDirectoryEntries(t *testing.T) {
 	os.Remove(a)
 
 	// walk again
-	res = directoryEntriesFn(ENV, []primitive.Primitive{
+	res = directoryEntriesFn(nil, ENV, []primitive.Primitive{
 		primitive.String(path),
 	})
 
@@ -804,7 +804,7 @@ func TestDirectoryEntries(t *testing.T) {
 	os.RemoveAll(path)
 
 	// walk a missing directory
-	res = directoryEntriesFn(ENV, []primitive.Primitive{
+	res = directoryEntriesFn(nil, ENV, []primitive.Primitive{
 		primitive.String("/ fdsf dsf /this doesnt exist"),
 	})
 
@@ -835,7 +835,7 @@ func TestDivide(t *testing.T) {
 	}
 
 	// No arguments
-	out := divideFn(ENV, []primitive.Primitive{})
+	out := divideFn(nil, ENV, []primitive.Primitive{})
 
 	// Will lead to an error
 	e, ok := out.(primitive.Error)
@@ -847,7 +847,7 @@ func TestDivide(t *testing.T) {
 	}
 
 	// Argument which isn't a number
-	out = divideFn(ENV, []primitive.Primitive{
+	out = divideFn(nil, ENV, []primitive.Primitive{
 		primitive.String("foo"),
 	})
 
@@ -861,7 +861,7 @@ func TestDivide(t *testing.T) {
 	}
 
 	// Argument which isn't a number
-	out = divideFn(ENV, []primitive.Primitive{
+	out = divideFn(nil, ENV, []primitive.Primitive{
 		primitive.Number(32),
 		primitive.String("foo"),
 	})
@@ -876,7 +876,7 @@ func TestDivide(t *testing.T) {
 	}
 
 	// Division by zero
-	out = divideFn(ENV, []primitive.Primitive{
+	out = divideFn(nil, ENV, []primitive.Primitive{
 		primitive.Number(32),
 		primitive.Number(0),
 	})
@@ -893,7 +893,7 @@ func TestDivide(t *testing.T) {
 	//
 	// Now a real one
 	//
-	out = divideFn(ENV, []primitive.Primitive{
+	out = divideFn(nil, ENV, []primitive.Primitive{
 		primitive.Number(12),
 		primitive.Number(3),
 	})
@@ -908,7 +908,7 @@ func TestDivide(t *testing.T) {
 	}
 
 	// Test only a single argument.
-	out = divideFn(ENV, []primitive.Primitive{
+	out = divideFn(nil, ENV, []primitive.Primitive{
 		primitive.Number(12),
 	})
 
@@ -922,7 +922,7 @@ func TestDivide(t *testing.T) {
 	}
 
 	// Another test
-	out = divideFn(ENV, []primitive.Primitive{
+	out = divideFn(nil, ENV, []primitive.Primitive{
 		primitive.Number(-3),
 	})
 
@@ -977,7 +977,7 @@ func TestEnv(t *testing.T) {
 	l.Evaluate(env)
 
 	// No arguments
-	out := envFn(env, []primitive.Primitive{})
+	out := envFn(nil, env, []primitive.Primitive{})
 
 	// Will lead to a list
 	e, ok := out.(primitive.List)
@@ -1005,7 +1005,7 @@ func TestEnv(t *testing.T) {
 func TestEq(t *testing.T) {
 
 	// No arguments
-	out := eqFn(ENV, []primitive.Primitive{})
+	out := eqFn(nil, ENV, []primitive.Primitive{})
 
 	// Will lead to an error
 	e, ok := out.(primitive.Error)
@@ -1019,7 +1019,7 @@ func TestEq(t *testing.T) {
 	//
 	// Now a real one: equal
 	//
-	out = eqFn(ENV, []primitive.Primitive{
+	out = eqFn(nil, ENV, []primitive.Primitive{
 		primitive.Number(9),
 		primitive.Number(9),
 	})
@@ -1036,7 +1036,7 @@ func TestEq(t *testing.T) {
 	//
 	// Now a real one: unequal values
 	//
-	out = eqFn(ENV, []primitive.Primitive{
+	out = eqFn(nil, ENV, []primitive.Primitive{
 		primitive.String("99"),
 		primitive.String("9"),
 	})
@@ -1053,7 +1053,7 @@ func TestEq(t *testing.T) {
 	//
 	// Now a real one: unequal types
 	//
-	out = eqFn(ENV, []primitive.Primitive{
+	out = eqFn(nil, ENV, []primitive.Primitive{
 		primitive.Number(9),
 		primitive.String("9"),
 	})
@@ -1072,7 +1072,7 @@ func TestEq(t *testing.T) {
 func TestEquals(t *testing.T) {
 
 	// No arguments
-	out := equalsFn(ENV, []primitive.Primitive{})
+	out := equalsFn(nil, ENV, []primitive.Primitive{})
 
 	// Will lead to an error
 	e, ok := out.(primitive.Error)
@@ -1086,7 +1086,7 @@ func TestEquals(t *testing.T) {
 	//
 	// Now a real one: equal
 	//
-	out = equalsFn(ENV, []primitive.Primitive{
+	out = equalsFn(nil, ENV, []primitive.Primitive{
 		primitive.Number(9),
 		primitive.Number(9),
 	})
@@ -1103,7 +1103,7 @@ func TestEquals(t *testing.T) {
 	//
 	// Now a real one: equal - but multiple values
 	//
-	out = equalsFn(ENV, []primitive.Primitive{
+	out = equalsFn(nil, ENV, []primitive.Primitive{
 		primitive.Number(9),
 		primitive.Number(9),
 		primitive.Number(9),
@@ -1124,7 +1124,7 @@ func TestEquals(t *testing.T) {
 	//
 	// Now a real one: unequal values
 	//
-	out = equalsFn(ENV, []primitive.Primitive{
+	out = equalsFn(nil, ENV, []primitive.Primitive{
 		primitive.Number(99),
 		primitive.Number(9),
 		primitive.Number(99),
@@ -1143,7 +1143,7 @@ func TestEquals(t *testing.T) {
 	//
 	// Now with wrong types - last one is wrong
 	//
-	out = equalsFn(ENV, []primitive.Primitive{
+	out = equalsFn(nil, ENV, []primitive.Primitive{
 		primitive.Number(1),
 		primitive.Number(2),
 		primitive.Number(3),
@@ -1162,7 +1162,7 @@ func TestEquals(t *testing.T) {
 	//
 	// Now with wrong types
 	//
-	out = equalsFn(ENV, []primitive.Primitive{
+	out = equalsFn(nil, ENV, []primitive.Primitive{
 		primitive.String("9"),
 		primitive.Number(9),
 	})
@@ -1181,7 +1181,7 @@ func TestEquals(t *testing.T) {
 func TestError(t *testing.T) {
 
 	// No arguments
-	out := errorFn(ENV, []primitive.Primitive{})
+	out := errorFn(nil, ENV, []primitive.Primitive{})
 
 	// Will lead to an error
 	e, ok := out.(primitive.Error)
@@ -1193,7 +1193,7 @@ func TestError(t *testing.T) {
 	}
 
 	// calling with an arg
-	out = errorFn(ENV, []primitive.Primitive{
+	out = errorFn(nil, ENV, []primitive.Primitive{
 		primitive.String("No Cheese Detected"),
 	})
 
@@ -1211,7 +1211,7 @@ func TestError(t *testing.T) {
 func TestExists(t *testing.T) {
 
 	// No arguments
-	out := existsFn(ENV, []primitive.Primitive{})
+	out := existsFn(nil, ENV, []primitive.Primitive{})
 
 	// Will lead to an error
 	e, ok := out.(primitive.Error)
@@ -1223,7 +1223,7 @@ func TestExists(t *testing.T) {
 	}
 
 	// One argument, wrong type
-	out = existsFn(ENV, []primitive.Primitive{primitive.Number(33)})
+	out = existsFn(nil, ENV, []primitive.Primitive{primitive.Number(33)})
 
 	// Will lead to an error
 	e, ok = out.(primitive.Error)
@@ -1241,7 +1241,7 @@ func TestExists(t *testing.T) {
 	}
 
 	// Exists should return true
-	res := existsFn(ENV, []primitive.Primitive{primitive.String(tmpfile.Name())})
+	res := existsFn(nil, ENV, []primitive.Primitive{primitive.String(tmpfile.Name())})
 
 	// So we need a booelan result
 	r, ok2 := res.(primitive.Bool)
@@ -1257,7 +1257,7 @@ func TestExists(t *testing.T) {
 	os.Remove(tmpfile.Name())
 
 	// Exists should return false
-	res = existsFn(ENV, []primitive.Primitive{primitive.String(tmpfile.Name())})
+	res = existsFn(nil, ENV, []primitive.Primitive{primitive.String(tmpfile.Name())})
 
 	// So we need a booelan result
 	r, ok2 = res.(primitive.Bool)
@@ -1302,7 +1302,7 @@ func TestExpandString(t *testing.T) {
 func TestExplode(t *testing.T) {
 
 	// No arguments
-	out := explodeFn(ENV, []primitive.Primitive{})
+	out := explodeFn(nil, ENV, []primitive.Primitive{})
 
 	// Will lead to an error
 	e, ok := out.(primitive.Error)
@@ -1314,7 +1314,7 @@ func TestExplode(t *testing.T) {
 	}
 
 	// An argument that isn't a string
-	out = explodeFn(ENV, []primitive.Primitive{
+	out = explodeFn(nil, ENV, []primitive.Primitive{
 		primitive.Number(3),
 	})
 
@@ -1330,7 +1330,7 @@ func TestExplode(t *testing.T) {
 	//
 	// Now a proper string
 	//
-	out = explodeFn(ENV, []primitive.Primitive{
+	out = explodeFn(nil, ENV, []primitive.Primitive{
 		primitive.String("fooπs"),
 	})
 
@@ -1351,7 +1351,7 @@ func TestExplode(t *testing.T) {
 func TestExpn(t *testing.T) {
 
 	// No arguments
-	out := expnFn(ENV, []primitive.Primitive{})
+	out := expnFn(nil, ENV, []primitive.Primitive{})
 
 	// Will lead to an error
 	e, ok := out.(primitive.Error)
@@ -1363,7 +1363,7 @@ func TestExpn(t *testing.T) {
 	}
 
 	// Argument which isn't a number
-	out = expnFn(ENV, []primitive.Primitive{
+	out = expnFn(nil, ENV, []primitive.Primitive{
 		primitive.String("foo"),
 		primitive.String("foo"),
 	})
@@ -1378,7 +1378,7 @@ func TestExpn(t *testing.T) {
 	}
 
 	// Argument which isn't a number
-	out = expnFn(ENV, []primitive.Primitive{
+	out = expnFn(nil, ENV, []primitive.Primitive{
 		primitive.Number(32),
 		primitive.String("foo"),
 	})
@@ -1395,7 +1395,7 @@ func TestExpn(t *testing.T) {
 	//
 	// Now a real one
 	//
-	out = expnFn(ENV, []primitive.Primitive{
+	out = expnFn(nil, ENV, []primitive.Primitive{
 		primitive.Number(9),
 		primitive.Number(0.5),
 	})
@@ -1414,7 +1414,7 @@ func TestExpn(t *testing.T) {
 func TestFile(t *testing.T) {
 
 	// No arguments
-	out := fileFn(ENV, []primitive.Primitive{})
+	out := fileFn(nil, ENV, []primitive.Primitive{})
 
 	// Will lead to an error
 	e, ok := out.(primitive.Error)
@@ -1426,7 +1426,7 @@ func TestFile(t *testing.T) {
 	}
 
 	// One argument, wrong type
-	out = fileFn(ENV, []primitive.Primitive{primitive.Number(33)})
+	out = fileFn(nil, ENV, []primitive.Primitive{primitive.Number(33)})
 
 	// Will lead to an error
 	e, ok = out.(primitive.Error)
@@ -1444,7 +1444,7 @@ func TestFile(t *testing.T) {
 	}
 
 	// file? should return false
-	res := fileFn(ENV, []primitive.Primitive{primitive.String(path)})
+	res := fileFn(nil, ENV, []primitive.Primitive{primitive.String(path)})
 
 	// So we need a boolean result
 	r, ok2 := res.(primitive.Bool)
@@ -1468,7 +1468,7 @@ func TestFile(t *testing.T) {
 	defer os.Remove(tmp.Name())
 
 	// file? should return true
-	res = fileFn(ENV, []primitive.Primitive{primitive.String(tmp.Name())})
+	res = fileFn(nil, ENV, []primitive.Primitive{primitive.String(tmp.Name())})
 
 	// So we need a boolean result
 	r, ok2 = res.(primitive.Bool)
@@ -1486,7 +1486,7 @@ func TestFile(t *testing.T) {
 func TestFileLines(t *testing.T) {
 
 	// calling with no argument
-	out := fileLinesFn(ENV, []primitive.Primitive{})
+	out := fileLinesFn(nil, ENV, []primitive.Primitive{})
 
 	// Will lead to an error
 	_, ok := out.(primitive.Error)
@@ -1495,7 +1495,7 @@ func TestFileLines(t *testing.T) {
 	}
 
 	// calling with the wrong argument type.
-	out = fileLinesFn(ENV, []primitive.Primitive{
+	out = fileLinesFn(nil, ENV, []primitive.Primitive{
 		primitive.Number(3)})
 
 	// Will lead to an error
@@ -1505,7 +1505,7 @@ func TestFileLines(t *testing.T) {
 	}
 
 	// Call with a file that doesn't exist
-	out = fileLinesFn(ENV, []primitive.Primitive{
+	out = fileLinesFn(nil, ENV, []primitive.Primitive{
 		primitive.String("path/not/found")})
 
 	_, ok = out.(primitive.Error)
@@ -1521,7 +1521,7 @@ func TestFileLines(t *testing.T) {
 	}
 	defer os.Remove(tmp.Name())
 
-	str := fileLinesFn(ENV, []primitive.Primitive{
+	str := fileLinesFn(nil, ENV, []primitive.Primitive{
 		primitive.String(tmp.Name())})
 
 	// Will lead to a list
@@ -1539,7 +1539,7 @@ func TestFileLines(t *testing.T) {
 func TestFileRead(t *testing.T) {
 
 	// calling with no argument
-	out := fileReadFn(ENV, []primitive.Primitive{})
+	out := fileReadFn(nil, ENV, []primitive.Primitive{})
 
 	// Will lead to an error
 	_, ok := out.(primitive.Error)
@@ -1548,7 +1548,7 @@ func TestFileRead(t *testing.T) {
 	}
 
 	// Call with the wrong type
-	out = fileReadFn(ENV, []primitive.Primitive{
+	out = fileReadFn(nil, ENV, []primitive.Primitive{
 		primitive.Number(3)})
 
 	_, ok = out.(primitive.Error)
@@ -1557,7 +1557,7 @@ func TestFileRead(t *testing.T) {
 	}
 
 	// Call with a file that doesn't exist
-	out = fileReadFn(ENV, []primitive.Primitive{
+	out = fileReadFn(nil, ENV, []primitive.Primitive{
 		primitive.String("path/not/found")})
 
 	_, ok = out.(primitive.Error)
@@ -1573,7 +1573,7 @@ func TestFileRead(t *testing.T) {
 	}
 	defer os.Remove(tmp.Name())
 
-	str := fileReadFn(ENV, []primitive.Primitive{
+	str := fileReadFn(nil, ENV, []primitive.Primitive{
 		primitive.String(tmp.Name())})
 
 	// Will lead to a string
@@ -1591,7 +1591,7 @@ func TestFileRead(t *testing.T) {
 func TestFileStat(t *testing.T) {
 
 	// calling with no argument
-	out := fileStatFn(ENV, []primitive.Primitive{})
+	out := fileStatFn(nil, ENV, []primitive.Primitive{})
 
 	// Will lead to an error
 	_, ok := out.(primitive.Error)
@@ -1600,7 +1600,7 @@ func TestFileStat(t *testing.T) {
 	}
 
 	// Call with the wrong type
-	out = fileStatFn(ENV, []primitive.Primitive{
+	out = fileStatFn(nil, ENV, []primitive.Primitive{
 		primitive.Number(3)})
 
 	_, ok = out.(primitive.Error)
@@ -1609,7 +1609,7 @@ func TestFileStat(t *testing.T) {
 	}
 
 	// Call with a file that doesn't exist
-	out = fileStatFn(ENV, []primitive.Primitive{
+	out = fileStatFn(nil, ENV, []primitive.Primitive{
 		primitive.String("path/not/found")})
 
 	_, ok = out.(primitive.Nil)
@@ -1626,7 +1626,7 @@ func TestFileStat(t *testing.T) {
 	defer os.Remove(tmp.Name())
 
 	// stat that
-	str := fileStatFn(ENV, []primitive.Primitive{
+	str := fileStatFn(nil, ENV, []primitive.Primitive{
 		primitive.String(tmp.Name())})
 
 	// Will lead to a list
@@ -1645,7 +1645,7 @@ func TestFileStat(t *testing.T) {
 func TestFileWrite(t *testing.T) {
 
 	// calling with no argument
-	out := fileWriteFn(ENV, []primitive.Primitive{})
+	out := fileWriteFn(nil, ENV, []primitive.Primitive{})
 
 	// Will lead to an error
 	_, ok := out.(primitive.Error)
@@ -1655,7 +1655,7 @@ func TestFileWrite(t *testing.T) {
 	}
 
 	// Call with the wrong type
-	out = fileWriteFn(ENV, []primitive.Primitive{
+	out = fileWriteFn(nil, ENV, []primitive.Primitive{
 		primitive.Number(3),
 		primitive.String("cake")})
 
@@ -1665,7 +1665,7 @@ func TestFileWrite(t *testing.T) {
 	}
 
 	// Call with the wrong type
-	out = fileWriteFn(ENV, []primitive.Primitive{
+	out = fileWriteFn(nil, ENV, []primitive.Primitive{
 		primitive.String("/tmp/blah.txt"),
 		primitive.Number(3)})
 
@@ -1682,7 +1682,7 @@ func TestFileWrite(t *testing.T) {
 	}
 	defer os.Remove(tmpfile.Name())
 	// Try to write there
-	result := fileWriteFn(ENV, []primitive.Primitive{
+	result := fileWriteFn(nil, ENV, []primitive.Primitive{
 		primitive.String(tmpfile.Name()),
 		primitive.String("cake")})
 
@@ -1706,7 +1706,7 @@ func TestFileWrite(t *testing.T) {
 	// remove the direcotry
 	os.RemoveAll(path)
 
-	failure := fileWriteFn(ENV, []primitive.Primitive{
+	failure := fileWriteFn(nil, ENV, []primitive.Primitive{
 		primitive.String(target),
 		primitive.String("cake")})
 
@@ -1722,7 +1722,7 @@ func TestFileWrite(t *testing.T) {
 func TestGenSym(t *testing.T) {
 
 	// no arguments are required
-	out := gensymFn(ENV, []primitive.Primitive{})
+	out := gensymFn(nil, ENV, []primitive.Primitive{})
 
 	// Will lead to a symbol
 	_, ok := out.(primitive.Symbol)
@@ -1735,7 +1735,7 @@ func TestGenSym(t *testing.T) {
 func TestGet(t *testing.T) {
 
 	// no arguments
-	out := getFn(ENV, []primitive.Primitive{})
+	out := getFn(nil, ENV, []primitive.Primitive{})
 
 	// Will lead to an error
 	e, ok := out.(primitive.Error)
@@ -1747,7 +1747,7 @@ func TestGet(t *testing.T) {
 	}
 
 	// First argument must be a hash
-	out = getFn(ENV, []primitive.Primitive{
+	out = getFn(nil, ENV, []primitive.Primitive{
 		primitive.String("foo"),
 		primitive.String("foo"),
 	})
@@ -1768,7 +1768,7 @@ func TestGet(t *testing.T) {
 	h.Set("Name", primitive.String("STEVE"))
 
 	// Now get it
-	out2 := getFn(ENV, []primitive.Primitive{
+	out2 := getFn(nil, ENV, []primitive.Primitive{
 		h,
 		primitive.String("Name"),
 	})
@@ -1787,7 +1787,7 @@ func TestGet(t *testing.T) {
 func TestGetenv(t *testing.T) {
 
 	// No arguments
-	out := getenvFn(ENV, []primitive.Primitive{})
+	out := getenvFn(nil, ENV, []primitive.Primitive{})
 
 	// Will lead to an error
 	e, ok := out.(primitive.Error)
@@ -1799,7 +1799,7 @@ func TestGetenv(t *testing.T) {
 	}
 
 	// Argument that isn't a string
-	out = getenvFn(ENV, []primitive.Primitive{
+	out = getenvFn(nil, ENV, []primitive.Primitive{
 		primitive.Number(3),
 	})
 
@@ -1814,7 +1814,7 @@ func TestGetenv(t *testing.T) {
 
 	// Valid result
 	x := os.Getenv("USER")
-	y := getenvFn(ENV, []primitive.Primitive{
+	y := getenvFn(nil, ENV, []primitive.Primitive{
 		primitive.String("USER"),
 	})
 
@@ -1830,7 +1830,7 @@ func TestGetenv(t *testing.T) {
 func TestGlob(t *testing.T) {
 
 	// No arguments
-	out := globFn(ENV, []primitive.Primitive{})
+	out := globFn(nil, ENV, []primitive.Primitive{})
 
 	// Will lead to an error
 	e, ok := out.(primitive.Error)
@@ -1842,7 +1842,7 @@ func TestGlob(t *testing.T) {
 	}
 
 	// One argument, wrong type
-	out = globFn(ENV, []primitive.Primitive{primitive.Number(33)})
+	out = globFn(nil, ENV, []primitive.Primitive{primitive.Number(33)})
 
 	// Will lead to an error
 	e, ok = out.(primitive.Error)
@@ -1873,7 +1873,7 @@ func TestGlob(t *testing.T) {
 	}
 
 	// Glob with two files
-	files := globFn(ENV, []primitive.Primitive{primitive.String(path + "/*.*")})
+	files := globFn(nil, ENV, []primitive.Primitive{primitive.String(path + "/*.*")})
 	// Should get a list
 	lst, ok2 := files.(primitive.List)
 	if !ok2 {
@@ -1888,7 +1888,7 @@ func TestGlob(t *testing.T) {
 	os.RemoveAll(path)
 
 	// Finally an impossible glob
-	out = globFn(ENV, []primitive.Primitive{primitive.String("[]")})
+	out = globFn(nil, ENV, []primitive.Primitive{primitive.String("[]")})
 
 	// Will lead to an error
 	e, ok = out.(primitive.Error)
@@ -1904,7 +1904,7 @@ func TestGlob(t *testing.T) {
 // TestHelp tests help
 func TestHelp(t *testing.T) {
 	// no arguments
-	out := helpFn(ENV, []primitive.Primitive{})
+	out := helpFn(nil, ENV, []primitive.Primitive{})
 
 	// Will lead to an error
 	e, ok := out.(primitive.Error)
@@ -1916,7 +1916,7 @@ func TestHelp(t *testing.T) {
 	}
 
 	// First argument must be a procedure
-	out = helpFn(ENV, []primitive.Primitive{
+	out = helpFn(nil, ENV, []primitive.Primitive{
 		primitive.String("foo"),
 	})
 
@@ -1951,7 +1951,7 @@ func TestHelp(t *testing.T) {
 			t.Fatalf("failed to lookup function %s in environment", name)
 		}
 
-		result := helpFn(ENV, []primitive.Primitive{fn.(*primitive.Procedure)})
+		result := helpFn(nil, ENV, []primitive.Primitive{fn.(*primitive.Procedure)})
 
 		txt, ok2 := result.(primitive.String)
 		if !ok2 {
@@ -1967,7 +1967,7 @@ func TestHelp(t *testing.T) {
 func TestInequality(t *testing.T) {
 
 	// No arguments
-	out := inequalityFn(ENV, []primitive.Primitive{})
+	out := inequalityFn(nil, ENV, []primitive.Primitive{})
 
 	// Will lead to an error
 	e, ok := out.(primitive.Error)
@@ -1981,7 +1981,7 @@ func TestInequality(t *testing.T) {
 	//
 	// Now a real one: unequal
 	//
-	out = inequalityFn(ENV, []primitive.Primitive{
+	out = inequalityFn(nil, ENV, []primitive.Primitive{
 		primitive.Number(9),
 		primitive.Number(8),
 	})
@@ -1998,7 +1998,7 @@ func TestInequality(t *testing.T) {
 	//
 	// Now a real one: unequal - but multiple values
 	//
-	out = inequalityFn(ENV, []primitive.Primitive{
+	out = inequalityFn(nil, ENV, []primitive.Primitive{
 		primitive.Number(1),
 		primitive.Number(2),
 		primitive.Number(3),
@@ -2019,7 +2019,7 @@ func TestInequality(t *testing.T) {
 	//
 	// Now a real one: unequal values
 	//
-	out = inequalityFn(ENV, []primitive.Primitive{
+	out = inequalityFn(nil, ENV, []primitive.Primitive{
 		primitive.Number(1),
 		primitive.Number(2),
 		primitive.Number(2),
@@ -2038,7 +2038,7 @@ func TestInequality(t *testing.T) {
 	//
 	// Now with wrong types - last one is wrong
 	//
-	out = inequalityFn(ENV, []primitive.Primitive{
+	out = inequalityFn(nil, ENV, []primitive.Primitive{
 		primitive.Number(1),
 		primitive.Number(2),
 		primitive.Number(3),
@@ -2057,7 +2057,7 @@ func TestInequality(t *testing.T) {
 	//
 	// Now with wrong types
 	//
-	out = inequalityFn(ENV, []primitive.Primitive{
+	out = inequalityFn(nil, ENV, []primitive.Primitive{
 		primitive.String("9"),
 		primitive.Number(9),
 	})
@@ -2076,7 +2076,7 @@ func TestInequality(t *testing.T) {
 func TestJoin(t *testing.T) {
 
 	// No arguments
-	out := joinFn(ENV, []primitive.Primitive{})
+	out := joinFn(nil, ENV, []primitive.Primitive{})
 
 	// Will lead to an error
 	e, ok := out.(primitive.Error)
@@ -2088,7 +2088,7 @@ func TestJoin(t *testing.T) {
 	}
 
 	// Not a list
-	out = joinFn(ENV, []primitive.Primitive{
+	out = joinFn(nil, ENV, []primitive.Primitive{
 		primitive.String("s"),
 	})
 
@@ -2102,7 +2102,7 @@ func TestJoin(t *testing.T) {
 	}
 
 	// Now a list
-	out = joinFn(ENV, []primitive.Primitive{
+	out = joinFn(nil, ENV, []primitive.Primitive{
 		primitive.List{
 			primitive.Number(3),
 			primitive.Number(4),
@@ -2122,7 +2122,7 @@ func TestJoin(t *testing.T) {
 func TestKeys(t *testing.T) {
 
 	// no arguments
-	out := keysFn(ENV, []primitive.Primitive{})
+	out := keysFn(nil, ENV, []primitive.Primitive{})
 
 	// Will lead to an error
 	e, ok := out.(primitive.Error)
@@ -2134,7 +2134,7 @@ func TestKeys(t *testing.T) {
 	}
 
 	// First argument must be a hash
-	out = keysFn(ENV, []primitive.Primitive{
+	out = keysFn(nil, ENV, []primitive.Primitive{
 		primitive.String("foo"),
 	})
 
@@ -2155,7 +2155,7 @@ func TestKeys(t *testing.T) {
 	h.Set("Location", primitive.String("Helsinki"))
 
 	// Get the keys
-	res := keysFn(ENV, []primitive.Primitive{
+	res := keysFn(nil, ENV, []primitive.Primitive{
 		h,
 	})
 
@@ -2185,7 +2185,7 @@ func TestKeys(t *testing.T) {
 func TestList(t *testing.T) {
 
 	// No arguments
-	out := listFn(ENV, []primitive.Primitive{})
+	out := listFn(nil, ENV, []primitive.Primitive{})
 
 	// No error
 	e, ok := out.(primitive.List)
@@ -2197,7 +2197,7 @@ func TestList(t *testing.T) {
 	}
 
 	// Two arguments
-	out = listFn(ENV, []primitive.Primitive{
+	out = listFn(nil, ENV, []primitive.Primitive{
 		primitive.Number(3),
 		primitive.Number(43),
 	})
@@ -2216,7 +2216,7 @@ func TestList(t *testing.T) {
 func TestLt(t *testing.T) {
 
 	// No arguments
-	out := ltFn(ENV, []primitive.Primitive{})
+	out := ltFn(nil, ENV, []primitive.Primitive{})
 
 	// Will lead to an error
 	e, ok := out.(primitive.Error)
@@ -2228,7 +2228,7 @@ func TestLt(t *testing.T) {
 	}
 
 	// Argument which isn't a number
-	out = ltFn(ENV, []primitive.Primitive{
+	out = ltFn(nil, ENV, []primitive.Primitive{
 		primitive.String("foo"),
 		primitive.String("foo"),
 	})
@@ -2243,7 +2243,7 @@ func TestLt(t *testing.T) {
 	}
 
 	// Argument which isn't a number
-	out = ltFn(ENV, []primitive.Primitive{
+	out = ltFn(nil, ENV, []primitive.Primitive{
 		primitive.Number(32),
 		primitive.String("foo"),
 	})
@@ -2260,7 +2260,7 @@ func TestLt(t *testing.T) {
 	//
 	// Now a real one
 	//
-	out = ltFn(ENV, []primitive.Primitive{
+	out = ltFn(nil, ENV, []primitive.Primitive{
 		primitive.Number(9),
 		primitive.Number(100),
 	})
@@ -2279,7 +2279,7 @@ func TestLt(t *testing.T) {
 func TestMatches(t *testing.T) {
 
 	// no arguments
-	out := matchFn(ENV, []primitive.Primitive{})
+	out := matchFn(nil, ENV, []primitive.Primitive{})
 
 	// Will lead to an error
 	e, ok := out.(primitive.Error)
@@ -2291,7 +2291,7 @@ func TestMatches(t *testing.T) {
 	}
 
 	// First argument must be a string
-	out = matchFn(ENV, []primitive.Primitive{
+	out = matchFn(nil, ENV, []primitive.Primitive{
 		primitive.Number(3),
 		primitive.Number(4),
 	})
@@ -2306,7 +2306,7 @@ func TestMatches(t *testing.T) {
 	}
 
 	// Regexp must be valid
-	out = matchFn(ENV, []primitive.Primitive{
+	out = matchFn(nil, ENV, []primitive.Primitive{
 		primitive.String("+"),
 		primitive.Number(4),
 	})
@@ -2321,7 +2321,7 @@ func TestMatches(t *testing.T) {
 	}
 
 	// Now we have a valid call: no match
-	fail := matchFn(ENV, []primitive.Primitive{
+	fail := matchFn(nil, ENV, []primitive.Primitive{
 		primitive.String("foo"),
 		primitive.String("bar"),
 	})
@@ -2332,7 +2332,7 @@ func TestMatches(t *testing.T) {
 	}
 
 	// Now we have a valid call: a match
-	res := matchFn(ENV, []primitive.Primitive{
+	res := matchFn(nil, ENV, []primitive.Primitive{
 		primitive.String("[Ff]ood"),
 		primitive.String("Food"),
 	})
@@ -2347,7 +2347,7 @@ func TestMatches(t *testing.T) {
 	}
 
 	// Now we have a valid call: a match with capture group
-	res = matchFn(ENV, []primitive.Primitive{
+	res = matchFn(nil, ENV, []primitive.Primitive{
 		primitive.String("([a-z]+)\\s*=\\s*([a-z]+)"),
 		primitive.String("key = value"),
 	})
@@ -2376,7 +2376,7 @@ func TestMatches(t *testing.T) {
 func TestMinus(t *testing.T) {
 
 	// No arguments
-	out := minusFn(ENV, []primitive.Primitive{})
+	out := minusFn(nil, ENV, []primitive.Primitive{})
 
 	// Will lead to an error
 	e, ok := out.(primitive.Error)
@@ -2388,7 +2388,7 @@ func TestMinus(t *testing.T) {
 	}
 
 	// Argument which isn't a number
-	out = minusFn(ENV, []primitive.Primitive{
+	out = minusFn(nil, ENV, []primitive.Primitive{
 		primitive.String("foo"),
 	})
 
@@ -2402,7 +2402,7 @@ func TestMinus(t *testing.T) {
 	}
 
 	// Argument which isn't a number
-	out = minusFn(ENV, []primitive.Primitive{
+	out = minusFn(nil, ENV, []primitive.Primitive{
 		primitive.Number(32),
 		primitive.String("foo"),
 	})
@@ -2419,7 +2419,7 @@ func TestMinus(t *testing.T) {
 	//
 	// Now a real one
 	//
-	out = minusFn(ENV, []primitive.Primitive{
+	out = minusFn(nil, ENV, []primitive.Primitive{
 		primitive.Number(10),
 		primitive.Number(3),
 	})
@@ -2438,7 +2438,7 @@ func TestMinus(t *testing.T) {
 func TestMod(t *testing.T) {
 
 	// No arguments
-	out := modFn(ENV, []primitive.Primitive{})
+	out := modFn(nil, ENV, []primitive.Primitive{})
 
 	// Will lead to an error
 	e, ok := out.(primitive.Error)
@@ -2450,7 +2450,7 @@ func TestMod(t *testing.T) {
 	}
 
 	// Argument which isn't a number
-	out = modFn(ENV, []primitive.Primitive{
+	out = modFn(nil, ENV, []primitive.Primitive{
 		primitive.String("foo"),
 		primitive.String("foo"),
 	})
@@ -2465,7 +2465,7 @@ func TestMod(t *testing.T) {
 	}
 
 	// Argument which isn't a number
-	out = modFn(ENV, []primitive.Primitive{
+	out = modFn(nil, ENV, []primitive.Primitive{
 		primitive.Number(32),
 		primitive.String("foo"),
 	})
@@ -2482,7 +2482,7 @@ func TestMod(t *testing.T) {
 	//
 	// Mod 0
 	//
-	out = modFn(ENV, []primitive.Primitive{
+	out = modFn(nil, ENV, []primitive.Primitive{
 		primitive.Number(32),
 		primitive.Number(0),
 	})
@@ -2499,7 +2499,7 @@ func TestMod(t *testing.T) {
 	//
 	// Now a real one
 	//
-	out = modFn(ENV, []primitive.Primitive{
+	out = modFn(nil, ENV, []primitive.Primitive{
 		primitive.Number(12),
 		primitive.Number(3),
 	})
@@ -2517,7 +2517,7 @@ func TestMod(t *testing.T) {
 func TestMs(t *testing.T) {
 
 	// No arguments
-	out := msFn(ENV, []primitive.Primitive{})
+	out := msFn(nil, ENV, []primitive.Primitive{})
 
 	// Will lead to a number
 	e, ok := out.(primitive.Number)
@@ -2538,7 +2538,7 @@ func TestMs(t *testing.T) {
 func TestMultiply(t *testing.T) {
 
 	// No arguments
-	out := multiplyFn(ENV, []primitive.Primitive{})
+	out := multiplyFn(nil, ENV, []primitive.Primitive{})
 
 	// Will lead to an error
 	e, ok := out.(primitive.Error)
@@ -2550,7 +2550,7 @@ func TestMultiply(t *testing.T) {
 	}
 
 	// Argument which isn't a number
-	out = multiplyFn(ENV, []primitive.Primitive{
+	out = multiplyFn(nil, ENV, []primitive.Primitive{
 		primitive.String("foo"),
 	})
 
@@ -2564,7 +2564,7 @@ func TestMultiply(t *testing.T) {
 	}
 
 	// Argument which isn't a number
-	out = multiplyFn(ENV, []primitive.Primitive{
+	out = multiplyFn(nil, ENV, []primitive.Primitive{
 		primitive.Number(32),
 		primitive.String("foo"),
 	})
@@ -2581,7 +2581,7 @@ func TestMultiply(t *testing.T) {
 	//
 	// Now a real one
 	//
-	out = multiplyFn(ENV, []primitive.Primitive{
+	out = multiplyFn(nil, ENV, []primitive.Primitive{
 		primitive.Number(10),
 		primitive.Number(3),
 	})
@@ -2600,7 +2600,7 @@ func TestMultiply(t *testing.T) {
 func TestNil(t *testing.T) {
 
 	// No arguments
-	out := nilFn(ENV, []primitive.Primitive{})
+	out := nilFn(nil, ENV, []primitive.Primitive{})
 
 	// Will lead to an error
 	e, ok := out.(primitive.Error)
@@ -2612,7 +2612,7 @@ func TestNil(t *testing.T) {
 	}
 
 	// nil is nil
-	out = nilFn(ENV, []primitive.Primitive{
+	out = nilFn(nil, ENV, []primitive.Primitive{
 		primitive.Nil{},
 	})
 
@@ -2626,7 +2626,7 @@ func TestNil(t *testing.T) {
 	}
 
 	// empty list is nil
-	out = nilFn(ENV, []primitive.Primitive{
+	out = nilFn(nil, ENV, []primitive.Primitive{
 		primitive.List{},
 	})
 
@@ -2640,7 +2640,7 @@ func TestNil(t *testing.T) {
 	}
 
 	// Finally a number is not a nil
-	out = nilFn(ENV, []primitive.Primitive{
+	out = nilFn(nil, ENV, []primitive.Primitive{
 		primitive.Number(32),
 	})
 
@@ -2657,7 +2657,7 @@ func TestNil(t *testing.T) {
 func TestNow(t *testing.T) {
 
 	// No arguments
-	out := nowFn(ENV, []primitive.Primitive{})
+	out := nowFn(nil, ENV, []primitive.Primitive{})
 
 	// Will lead to a number
 	e, ok := out.(primitive.Number)
@@ -2677,7 +2677,7 @@ func TestNow(t *testing.T) {
 func TestNth(t *testing.T) {
 
 	// No arguments
-	out := nthFn(ENV, []primitive.Primitive{})
+	out := nthFn(nil, ENV, []primitive.Primitive{})
 
 	// Will lead to an error
 	e, ok := out.(primitive.Error)
@@ -2691,7 +2691,7 @@ func TestNth(t *testing.T) {
 	// we need to have "list" + "number"
 
 	// Not a list
-	out = nthFn(ENV, []primitive.Primitive{
+	out = nthFn(nil, ENV, []primitive.Primitive{
 		primitive.Number(3),
 		primitive.Number(3),
 	})
@@ -2705,7 +2705,7 @@ func TestNth(t *testing.T) {
 	}
 
 	// Not a number
-	out = nthFn(ENV, []primitive.Primitive{
+	out = nthFn(nil, ENV, []primitive.Primitive{
 		primitive.List{},
 		primitive.List{},
 	})
@@ -2724,7 +2724,7 @@ func TestNth(t *testing.T) {
 	l = append(l, primitive.String("two"))
 
 	// negative offset
-	out = nthFn(ENV, []primitive.Primitive{
+	out = nthFn(nil, ENV, []primitive.Primitive{
 		l,
 		primitive.Number(-1),
 	})
@@ -2740,7 +2740,7 @@ func TestNth(t *testing.T) {
 	// out of bounds.
 	// list has two entries: offset 0, then offset 1
 	// offset 2 is buffer overflow
-	out = nthFn(ENV, []primitive.Primitive{
+	out = nthFn(nil, ENV, []primitive.Primitive{
 		l,
 		primitive.Number(2),
 	})
@@ -2754,7 +2754,7 @@ func TestNth(t *testing.T) {
 	}
 
 	// valid access
-	str := nthFn(ENV, []primitive.Primitive{
+	str := nthFn(nil, ENV, []primitive.Primitive{
 		l,
 		primitive.Number(0),
 	})
@@ -2768,7 +2768,7 @@ func TestNth(t *testing.T) {
 	}
 
 	// valid access
-	str = nthFn(ENV, []primitive.Primitive{
+	str = nthFn(nil, ENV, []primitive.Primitive{
 		l,
 		primitive.Number(1),
 	})
@@ -2786,7 +2786,7 @@ func TestNth(t *testing.T) {
 func TestNumber(t *testing.T) {
 
 	// No arguments
-	out := numberFn(ENV, []primitive.Primitive{})
+	out := numberFn(nil, ENV, []primitive.Primitive{})
 
 	// Will lead to an error
 	e, ok := out.(primitive.Error)
@@ -2798,7 +2798,7 @@ func TestNumber(t *testing.T) {
 	}
 
 	// Must be a string.
-	out = numberFn(ENV, []primitive.Primitive{
+	out = numberFn(nil, ENV, []primitive.Primitive{
 		primitive.Number(3),
 	})
 
@@ -2826,7 +2826,7 @@ func TestNumber(t *testing.T) {
 
 	for _, tst := range tests {
 
-		res := numberFn(ENV, []primitive.Primitive{
+		res := numberFn(nil, ENV, []primitive.Primitive{
 			primitive.String(tst.Inp),
 		})
 
@@ -2841,7 +2841,7 @@ func TestNumber(t *testing.T) {
 	}
 
 	// Failure to convert a bogus number
-	out = numberFn(ENV, []primitive.Primitive{
+	out = numberFn(nil, ENV, []primitive.Primitive{
 		primitive.String("3.3.3.3"),
 	})
 
@@ -2858,7 +2858,7 @@ func TestNumber(t *testing.T) {
 func TestOrd(t *testing.T) {
 
 	// no arguments
-	out := ordFn(ENV, []primitive.Primitive{})
+	out := ordFn(nil, ENV, []primitive.Primitive{})
 
 	// Will lead to an error
 	e, ok := out.(primitive.Error)
@@ -2870,7 +2870,7 @@ func TestOrd(t *testing.T) {
 	}
 
 	// First argument must be a string
-	out = ordFn(ENV, []primitive.Primitive{
+	out = ordFn(nil, ENV, []primitive.Primitive{
 		primitive.Number(4),
 	})
 
@@ -2884,7 +2884,7 @@ func TestOrd(t *testing.T) {
 	}
 
 	// Now a valid call: * => 42
-	val := ordFn(ENV, []primitive.Primitive{
+	val := ordFn(nil, ENV, []primitive.Primitive{
 		primitive.String("*"),
 	})
 
@@ -2897,7 +2897,7 @@ func TestOrd(t *testing.T) {
 	}
 
 	// Now a valid call: empty string => 0
-	val = ordFn(ENV, []primitive.Primitive{
+	val = ordFn(nil, ENV, []primitive.Primitive{
 		primitive.String(""),
 	})
 
@@ -2913,7 +2913,7 @@ func TestOrd(t *testing.T) {
 func TestOs(t *testing.T) {
 
 	// No arguments
-	out := osFn(ENV, []primitive.Primitive{})
+	out := osFn(nil, ENV, []primitive.Primitive{})
 
 	// Will lead to a number
 	e, ok := out.(primitive.String)
@@ -2930,7 +2930,7 @@ func TestOs(t *testing.T) {
 func TestPlus(t *testing.T) {
 
 	// No arguments
-	out := plusFn(ENV, []primitive.Primitive{})
+	out := plusFn(nil, ENV, []primitive.Primitive{})
 
 	// Will lead to an error
 	e, ok := out.(primitive.Error)
@@ -2942,7 +2942,7 @@ func TestPlus(t *testing.T) {
 	}
 
 	// Argument which isn't a number
-	out = plusFn(ENV, []primitive.Primitive{
+	out = plusFn(nil, ENV, []primitive.Primitive{
 		primitive.String("foo"),
 	})
 
@@ -2956,7 +2956,7 @@ func TestPlus(t *testing.T) {
 	}
 
 	// Argument which isn't a number
-	out = plusFn(ENV, []primitive.Primitive{
+	out = plusFn(nil, ENV, []primitive.Primitive{
 		primitive.Number(32),
 		primitive.String("foo"),
 	})
@@ -2973,7 +2973,7 @@ func TestPlus(t *testing.T) {
 	//
 	// Now a real one
 	//
-	out = plusFn(ENV, []primitive.Primitive{
+	out = plusFn(nil, ENV, []primitive.Primitive{
 		primitive.Number(10),
 		primitive.Number(3),
 	})
@@ -2991,7 +2991,7 @@ func TestPlus(t *testing.T) {
 func TestPrint(t *testing.T) {
 
 	// No arguments
-	out := printFn(ENV, []primitive.Primitive{})
+	out := printFn(nil, ENV, []primitive.Primitive{})
 
 	// Will lead to an error
 	e, ok := out.(primitive.Error)
@@ -3003,7 +3003,7 @@ func TestPrint(t *testing.T) {
 	}
 
 	// One argument
-	out = printFn(ENV, []primitive.Primitive{
+	out = printFn(nil, ENV, []primitive.Primitive{
 		primitive.String("Hello!"),
 	})
 
@@ -3016,7 +3016,7 @@ func TestPrint(t *testing.T) {
 	}
 
 	// Two argument
-	out = printFn(ENV, []primitive.Primitive{
+	out = printFn(nil, ENV, []primitive.Primitive{
 		primitive.String("Hello %d!"),
 		primitive.Number(3),
 	})
@@ -3030,7 +3030,7 @@ func TestPrint(t *testing.T) {
 	}
 
 	// Two argument with a type that can't be native-converated
-	out = printFn(ENV, []primitive.Primitive{
+	out = printFn(nil, ENV, []primitive.Primitive{
 		primitive.String("Hello %s!"),
 		primitive.List{
 			primitive.Number(3),
@@ -3052,7 +3052,7 @@ func TestPrint(t *testing.T) {
 func TestRandom(t *testing.T) {
 
 	// No arguments
-	out := randomFn(ENV, []primitive.Primitive{})
+	out := randomFn(nil, ENV, []primitive.Primitive{})
 
 	// Will lead to an error
 	e, ok := out.(primitive.Error)
@@ -3064,7 +3064,7 @@ func TestRandom(t *testing.T) {
 	}
 
 	// One argument, of the wrong type
-	out = randomFn(ENV, []primitive.Primitive{
+	out = randomFn(nil, ENV, []primitive.Primitive{
 		primitive.String("Hello!"),
 	})
 
@@ -3077,7 +3077,7 @@ func TestRandom(t *testing.T) {
 	}
 
 	// Now call with a number
-	out = randomFn(ENV, []primitive.Primitive{
+	out = randomFn(nil, ENV, []primitive.Primitive{
 		primitive.Number(1),
 	})
 	_, ok2 := out.(primitive.Number)
@@ -3086,7 +3086,7 @@ func TestRandom(t *testing.T) {
 	}
 
 	// Calling with a number less than zero returns an error
-	out = randomFn(ENV, []primitive.Primitive{
+	out = randomFn(nil, ENV, []primitive.Primitive{
 		primitive.Number(-3),
 	})
 
@@ -3103,7 +3103,7 @@ func TestRandom(t *testing.T) {
 func TestSet(t *testing.T) {
 
 	// no arguments
-	out := setFn(ENV, []primitive.Primitive{})
+	out := setFn(nil, ENV, []primitive.Primitive{})
 
 	// Will lead to an error
 	e, ok := out.(primitive.Error)
@@ -3115,7 +3115,7 @@ func TestSet(t *testing.T) {
 	}
 
 	// First argument must be a hash
-	out = setFn(ENV, []primitive.Primitive{
+	out = setFn(nil, ENV, []primitive.Primitive{
 		primitive.String("foo"),
 		primitive.String("foo"),
 		primitive.String("foo"),
@@ -3133,7 +3133,7 @@ func TestSet(t *testing.T) {
 	// create a hash
 	h := primitive.NewHash()
 
-	out2 := setFn(ENV, []primitive.Primitive{
+	out2 := setFn(nil, ENV, []primitive.Primitive{
 		h,
 		primitive.String("Name"),
 		primitive.String("Steve"),
@@ -3180,7 +3180,7 @@ func TestSetup(t *testing.T) {
 func TestSort(t *testing.T) {
 
 	// No arguments
-	out := sortFn(ENV, []primitive.Primitive{})
+	out := sortFn(nil, ENV, []primitive.Primitive{})
 
 	// Will lead to an error
 	e, ok := out.(primitive.Error)
@@ -3192,7 +3192,7 @@ func TestSort(t *testing.T) {
 	}
 
 	// Not a list
-	out = sortFn(ENV, []primitive.Primitive{
+	out = sortFn(nil, ENV, []primitive.Primitive{
 		primitive.Number(3),
 	})
 
@@ -3207,7 +3207,7 @@ func TestSort(t *testing.T) {
 	//
 	// Now we sort
 	//
-	out = sortFn(ENV, []primitive.Primitive{
+	out = sortFn(nil, ENV, []primitive.Primitive{
 		primitive.List{
 			primitive.Number(30),
 			primitive.Number(3),
@@ -3227,7 +3227,7 @@ func TestSort(t *testing.T) {
 	//
 	// Now we sort a different range of things
 	//
-	out = sortFn(ENV, []primitive.Primitive{
+	out = sortFn(nil, ENV, []primitive.Primitive{
 		primitive.List{
 			primitive.Bool(true),
 			primitive.String("steve"),
@@ -3248,7 +3248,7 @@ func TestSort(t *testing.T) {
 func TestSplit(t *testing.T) {
 
 	// No arguments
-	out := splitFn(ENV, []primitive.Primitive{})
+	out := splitFn(nil, ENV, []primitive.Primitive{})
 
 	// Will lead to an error
 	e, ok := out.(primitive.Error)
@@ -3260,7 +3260,7 @@ func TestSplit(t *testing.T) {
 	}
 
 	// Arguments that aren't strings: 1
-	out = splitFn(ENV, []primitive.Primitive{
+	out = splitFn(nil, ENV, []primitive.Primitive{
 		primitive.String("foo"),
 		primitive.Number(3),
 	})
@@ -3275,7 +3275,7 @@ func TestSplit(t *testing.T) {
 	}
 
 	// Arguments that aren't strings: 2
-	out = splitFn(ENV, []primitive.Primitive{
+	out = splitFn(nil, ENV, []primitive.Primitive{
 		primitive.Number(3),
 		primitive.String("foo"),
 	})
@@ -3292,7 +3292,7 @@ func TestSplit(t *testing.T) {
 	//
 	// Now a proper split
 	//
-	out = splitFn(ENV, []primitive.Primitive{
+	out = splitFn(nil, ENV, []primitive.Primitive{
 		primitive.String("fooπx"),
 		primitive.String(""),
 	})
@@ -3314,7 +3314,7 @@ func TestSplit(t *testing.T) {
 func TestSprintf(t *testing.T) {
 
 	// No arguments
-	out := sprintfFn(ENV, []primitive.Primitive{})
+	out := sprintfFn(nil, ENV, []primitive.Primitive{})
 
 	// Will lead to an error
 	e, ok := out.(primitive.Error)
@@ -3326,7 +3326,7 @@ func TestSprintf(t *testing.T) {
 	}
 
 	// Two arguments
-	out = sprintfFn(ENV, []primitive.Primitive{
+	out = sprintfFn(nil, ENV, []primitive.Primitive{
 		primitive.String("Hello\t\"%s\"\n\r!"),
 		primitive.String("world"),
 	})
@@ -3340,7 +3340,7 @@ func TestSprintf(t *testing.T) {
 	}
 
 	// Two arguments with a native mapping
-	out = sprintfFn(ENV, []primitive.Primitive{
+	out = sprintfFn(nil, ENV, []primitive.Primitive{
 		primitive.String("Hello %d!"),
 		primitive.Number(3),
 	})
@@ -3357,7 +3357,7 @@ func TestSprintf(t *testing.T) {
 func TestStr(t *testing.T) {
 
 	// calling with no arguments will lead to an error
-	fail := strFn(ENV, []primitive.Primitive{})
+	fail := strFn(nil, ENV, []primitive.Primitive{})
 
 	// Will lead to an error
 	_, ok := fail.(primitive.Error)
@@ -3366,7 +3366,7 @@ func TestStr(t *testing.T) {
 	}
 
 	// calling with an arg
-	out := strFn(ENV, []primitive.Primitive{
+	out := strFn(nil, ENV, []primitive.Primitive{
 		primitive.Number(32),
 	})
 
@@ -3384,7 +3384,7 @@ func TestStr(t *testing.T) {
 func TestStringEquals(t *testing.T) {
 
 	// No arguments
-	out := stringEqualsFn(ENV, []primitive.Primitive{})
+	out := stringEqualsFn(nil, ENV, []primitive.Primitive{})
 
 	// Will lead to an error
 	e, ok := out.(primitive.Error)
@@ -3396,7 +3396,7 @@ func TestStringEquals(t *testing.T) {
 	}
 
 	// One bogus argument
-	out = stringEqualsFn(ENV, []primitive.Primitive{
+	out = stringEqualsFn(nil, ENV, []primitive.Primitive{
 		primitive.Number(33),
 		primitive.String("a"),
 	})
@@ -3413,7 +3413,7 @@ func TestStringEquals(t *testing.T) {
 	//
 	// Now a real one: equal
 	//
-	out = stringEqualsFn(ENV, []primitive.Primitive{
+	out = stringEqualsFn(nil, ENV, []primitive.Primitive{
 		primitive.String("foo"),
 		primitive.String("foo"),
 	})
@@ -3430,7 +3430,7 @@ func TestStringEquals(t *testing.T) {
 	//
 	// Now a real one: unequal values
 	//
-	out = stringEqualsFn(ENV, []primitive.Primitive{
+	out = stringEqualsFn(nil, ENV, []primitive.Primitive{
 		primitive.String("a"),
 		primitive.String("b"),
 	})
@@ -3447,7 +3447,7 @@ func TestStringEquals(t *testing.T) {
 	//
 	// Now with wrong types - last one is wrong
 	//
-	out = stringEqualsFn(ENV, []primitive.Primitive{
+	out = stringEqualsFn(nil, ENV, []primitive.Primitive{
 		primitive.String("a"),
 		primitive.Number(32),
 	})
@@ -3465,7 +3465,7 @@ func TestStringEquals(t *testing.T) {
 func TestStringLt(t *testing.T) {
 
 	// No arguments
-	out := stringLtFn(ENV, []primitive.Primitive{})
+	out := stringLtFn(nil, ENV, []primitive.Primitive{})
 
 	// Will lead to an error
 	e, ok := out.(primitive.Error)
@@ -3477,7 +3477,7 @@ func TestStringLt(t *testing.T) {
 	}
 
 	// Argument which isn't a string
-	out = stringLtFn(ENV, []primitive.Primitive{
+	out = stringLtFn(nil, ENV, []primitive.Primitive{
 		primitive.Character("f"),
 		primitive.String("foo"),
 	})
@@ -3492,7 +3492,7 @@ func TestStringLt(t *testing.T) {
 	}
 
 	// Argument which isn't a string
-	out = stringLtFn(ENV, []primitive.Primitive{
+	out = stringLtFn(nil, ENV, []primitive.Primitive{
 		primitive.String("a"),
 		primitive.Number(332),
 	})
@@ -3509,7 +3509,7 @@ func TestStringLt(t *testing.T) {
 	//
 	// Now a real one
 	//
-	out = stringLtFn(ENV, []primitive.Primitive{
+	out = stringLtFn(nil, ENV, []primitive.Primitive{
 		primitive.String("a"),
 		primitive.String("b"),
 	})
@@ -3524,7 +3524,7 @@ func TestStringLt(t *testing.T) {
 	}
 }
 
-func TestTrig(t *testing.T ) {
+func TestTrig(t *testing.T) {
 
 	funs := []primitive.GolangPrimitiveFn{
 		acosFn,
@@ -3538,9 +3538,9 @@ func TestTrig(t *testing.T ) {
 		tanhFn,
 	}
 
-	for _, fn := range(funs) {
+	for _, fn := range funs {
 
-		out := fn(nil, []primitive.Primitive{} )
+		out := fn(nil, nil, []primitive.Primitive{})
 
 		// Will lead to an error
 		e, ok := out.(primitive.Error)
@@ -3552,7 +3552,7 @@ func TestTrig(t *testing.T ) {
 		}
 
 		// Argument must be an umber
-		out = fn(ENV, []primitive.Primitive{
+		out = fn(nil, ENV, []primitive.Primitive{
 			primitive.String("foo"),
 		})
 
@@ -3566,7 +3566,7 @@ func TestTrig(t *testing.T ) {
 		}
 
 		// Now a valid result
-		res := fn(ENV, []primitive.Primitive{
+		res := fn(nil, ENV, []primitive.Primitive{
 			primitive.Number(3),
 		})
 
@@ -3581,7 +3581,7 @@ func TestTrig(t *testing.T ) {
 func TestType(t *testing.T) {
 
 	// No arguments
-	out := typeFn(ENV, []primitive.Primitive{})
+	out := typeFn(nil, ENV, []primitive.Primitive{})
 
 	// Will lead to an error
 	e, ok := out.(primitive.Error)
@@ -3593,7 +3593,7 @@ func TestType(t *testing.T) {
 	}
 
 	// calling with an arg
-	out = typeFn(ENV, []primitive.Primitive{
+	out = typeFn(nil, ENV, []primitive.Primitive{
 		primitive.Number(32),
 	})
 
@@ -3609,7 +3609,7 @@ func TestType(t *testing.T) {
 func TestVals(t *testing.T) {
 
 	// no arguments
-	out := valsFn(ENV, []primitive.Primitive{})
+	out := valsFn(nil, ENV, []primitive.Primitive{})
 
 	// Will lead to an error
 	e, ok := out.(primitive.Error)
@@ -3621,7 +3621,7 @@ func TestVals(t *testing.T) {
 	}
 
 	// First argument must be a hash
-	out = valsFn(ENV, []primitive.Primitive{
+	out = valsFn(nil, ENV, []primitive.Primitive{
 		primitive.String("foo"),
 	})
 
@@ -3642,7 +3642,7 @@ func TestVals(t *testing.T) {
 	h.Set("Location", primitive.String("Helsinki"))
 
 	// Get the values
-	res := valsFn(ENV, []primitive.Primitive{
+	res := valsFn(nil, ENV, []primitive.Primitive{
 		h,
 	})
 

@@ -592,7 +592,7 @@ func TestTimeout(t *testing.T) {
 	ev.Set("sleep",
 		&primitive.Procedure{
 			Help: "sleep delays for two seconds",
-			F: func(e *env.Environment, args []primitive.Primitive) primitive.Primitive {
+			F: func(yal any, e *env.Environment, args []primitive.Primitive) primitive.Primitive {
 				fmt.Printf("Sleeping for two seconds")
 				time.Sleep(2 * time.Second)
 				return primitive.Nil{}

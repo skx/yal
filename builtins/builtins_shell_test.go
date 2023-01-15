@@ -15,7 +15,7 @@ import (
 func TestShell(t *testing.T) {
 
 	// calling with no argument
-	out := shellFn(ENV, []primitive.Primitive{})
+	out := shellFn(nil, ENV, []primitive.Primitive{})
 
 	// Will lead to an error
 	_, ok := out.(primitive.Error)
@@ -24,7 +24,7 @@ func TestShell(t *testing.T) {
 	}
 
 	// One argument, but the wrong type
-	out = shellFn(ENV, []primitive.Primitive{
+	out = shellFn(nil, ENV, []primitive.Primitive{
 		primitive.Number(3),
 	})
 
@@ -44,7 +44,7 @@ func TestShell(t *testing.T) {
 	cmd = append(cmd, primitive.String("bar"))
 
 	// Run the command
-	res := shellFn(ENV, []primitive.Primitive{cmd})
+	res := shellFn(nil, ENV, []primitive.Primitive{cmd})
 
 	// Response should be a list
 	lst, ok2 := res.(primitive.List)
@@ -64,7 +64,7 @@ func TestShell(t *testing.T) {
 	fail = append(fail, primitive.String("/fdsf/fdsf/-path-not/exists"))
 
 	// Run the command
-	out = shellFn(ENV, []primitive.Primitive{fail})
+	out = shellFn(nil, ENV, []primitive.Primitive{fail})
 
 	// Will lead to an error
 	_, ok = out.(primitive.Error)
@@ -79,7 +79,7 @@ func TestShell(t *testing.T) {
 	//
 	old := os.Getenv("FUZZ")
 	os.Setenv("FUZZ", "FUZZ")
-	res = shellFn(ENV, []primitive.Primitive{cmd})
+	res = shellFn(nil, ENV, []primitive.Primitive{cmd})
 	os.Setenv("FUZZ", old)
 
 	// Response should still be a list

@@ -165,7 +165,7 @@ func PopulateEnvironment(env *env.Environment) {
 // Built in functions
 
 // acos implements acos
-func acosFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+func acosFn(yal any, env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 
 	// We only need a single argument
 	if len(args) != 1 {
@@ -182,12 +182,12 @@ func acosFn(env *env.Environment, args []primitive.Primitive) primitive.Primitiv
 }
 
 // archFn implements (os)
-func archFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+func archFn(yal any, env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 	return primitive.String(runtime.GOARCH)
 }
 
 // asin implements asin
-func asinFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+func asinFn(yal any, env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 
 	// We only need a single argument
 	if len(args) != 1 {
@@ -204,7 +204,7 @@ func asinFn(env *env.Environment, args []primitive.Primitive) primitive.Primitiv
 }
 
 // atan implements atan
-func atanFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+func atanFn(yal any, env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 
 	// We only need a single argument
 	if len(args) != 1 {
@@ -221,7 +221,7 @@ func atanFn(env *env.Environment, args []primitive.Primitive) primitive.Primitiv
 }
 
 // baseFn implements (base)
-func baseFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+func baseFn(yal any, env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 	if len(args) != 2 {
 		return primitive.ArityError()
 	}
@@ -245,7 +245,7 @@ func baseFn(env *env.Environment, args []primitive.Primitive) primitive.Primitiv
 }
 
 // carFn implements "car"
-func carFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+func carFn(yal any, env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 
 	if len(args) != 1 {
 		return primitive.ArityError()
@@ -267,7 +267,7 @@ func carFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive
 }
 
 // cdrFn implements "cdr"
-func cdrFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+func cdrFn(yal any, env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 
 	if len(args) != 1 {
 		return primitive.ArityError()
@@ -286,7 +286,7 @@ func cdrFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive
 }
 
 // charEqualsFn implements "char="
-func charEqualsFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+func charEqualsFn(yal any, env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 
 	// We need at least two arguments
 	if len(args) < 2 {
@@ -329,7 +329,7 @@ func charEqualsFn(env *env.Environment, args []primitive.Primitive) primitive.Pr
 }
 
 // charLtFn implements (char<)
-func charLtFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+func charLtFn(yal any, env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 	if len(args) != 2 {
 		return primitive.ArityError()
 	}
@@ -347,7 +347,7 @@ func charLtFn(env *env.Environment, args []primitive.Primitive) primitive.Primit
 }
 
 // chrFn is the implementation of (chr ..)
-func chrFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+func chrFn(yal any, env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 
 	if len(args) != 1 {
 		return primitive.ArityError()
@@ -364,7 +364,7 @@ func chrFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive
 }
 
 // consFn implements (cons).
-func consFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+func consFn(yal any, env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 	if len(args) < 1 {
 		return primitive.ArityError()
 	}
@@ -382,7 +382,7 @@ func consFn(env *env.Environment, args []primitive.Primitive) primitive.Primitiv
 }
 
 // containsFn implements (contains?)
-func containsFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+func containsFn(yal any, env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 
 	// We need a pair of arguments
 	if len(args) != 2 {
@@ -411,7 +411,7 @@ func containsFn(env *env.Environment, args []primitive.Primitive) primitive.Prim
 }
 
 // cosFn implements cos
-func cosFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+func cosFn(yal any, env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 
 	// We only need a single argument
 	if len(args) != 1 {
@@ -428,7 +428,7 @@ func cosFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive
 }
 
 // coshFn implements cosh
-func coshFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+func coshFn(yal any, env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 
 	// We only need a single argument
 	if len(args) != 1 {
@@ -445,7 +445,7 @@ func coshFn(env *env.Environment, args []primitive.Primitive) primitive.Primitiv
 }
 
 // dateFn returns the current (Weekday, DD, MM, YYYY) as a list.
-func dateFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+func dateFn(yal any, env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 	var ret primitive.List
 
 	t := time.Now()
@@ -464,7 +464,7 @@ func dateFn(env *env.Environment, args []primitive.Primitive) primitive.Primitiv
 }
 
 // directoryEntriesFn returns the files beneath given path, recursively.
-func directoryEntriesFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+func directoryEntriesFn(yal any, env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 
 	// We only need a single argument
 	if len(args) != 1 {
@@ -493,7 +493,7 @@ func directoryEntriesFn(env *env.Environment, args []primitive.Primitive) primit
 }
 
 // directoryFn returns whether the given path exists, and is a directory
-func directoryFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+func directoryFn(yal any, env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 
 	// We only need a single argument
 	if len(args) != 1 {
@@ -521,7 +521,7 @@ func directoryFn(env *env.Environment, args []primitive.Primitive) primitive.Pri
 }
 
 // divideFn implements "/"
-func divideFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+func divideFn(yal any, env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 	// ensure we have at least one argument
 	if len(args) < 1 {
 		return primitive.ArityError()
@@ -560,7 +560,7 @@ func divideFn(env *env.Environment, args []primitive.Primitive) primitive.Primit
 }
 
 // envFn returns registered "things" from our environment
-func envFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+func envFn(yal any, env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 	// create a new list
 	var c primitive.List
 
@@ -588,7 +588,7 @@ func envFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive
 }
 
 // eqFn implements "eq"
-func eqFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+func eqFn(yal any, env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 	if len(args) != 2 {
 		return primitive.ArityError()
 	}
@@ -606,7 +606,7 @@ func eqFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive 
 }
 
 // equalsFn implements "="
-func equalsFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+func equalsFn(yal any, env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 
 	// We need at least two arguments
 	if len(args) < 2 {
@@ -649,7 +649,7 @@ func equalsFn(env *env.Environment, args []primitive.Primitive) primitive.Primit
 }
 
 // errorFn implements "error"
-func errorFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+func errorFn(yal any, env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 	if len(args) != 1 {
 		return primitive.ArityError()
 	}
@@ -657,7 +657,7 @@ func errorFn(env *env.Environment, args []primitive.Primitive) primitive.Primiti
 }
 
 // existsFn returns whether the given path exists.
-func existsFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+func existsFn(yal any, env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 
 	// We only need a single argument
 	if len(args) != 1 {
@@ -726,7 +726,7 @@ func expandStr(input string) string {
 }
 
 // explodeFn splits a string into a list of characters
-func explodeFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+func explodeFn(yal any, env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 
 	// We only need a single argument
 	if len(args) != 1 {
@@ -753,7 +753,7 @@ func explodeFn(env *env.Environment, args []primitive.Primitive) primitive.Primi
 }
 
 // expnFn implements "#"
-func expnFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+func expnFn(yal any, env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 	if len(args) != 2 {
 		return primitive.ArityError()
 	}
@@ -768,7 +768,7 @@ func expnFn(env *env.Environment, args []primitive.Primitive) primitive.Primitiv
 }
 
 // fileFn returns whether the given path exists, and is a file (or rather is not a directory).
-func fileFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+func fileFn(yal any, env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 	// We only need a single argument
 	if len(args) != 1 {
 		return primitive.ArityError()
@@ -795,7 +795,7 @@ func fileFn(env *env.Environment, args []primitive.Primitive) primitive.Primitiv
 }
 
 // fileLinesFn implements (file:lines)
-func fileLinesFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+func fileLinesFn(yal any, env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 	// We only need a single argument
 	if len(args) != 1 {
 		return primitive.ArityError()
@@ -828,7 +828,7 @@ func fileLinesFn(env *env.Environment, args []primitive.Primitive) primitive.Pri
 }
 
 // fileReadFn implements (file:read)
-func fileReadFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+func fileReadFn(yal any, env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 	// We only need a single argument
 	if len(args) != 1 {
 		return primitive.ArityError()
@@ -850,7 +850,7 @@ func fileReadFn(env *env.Environment, args []primitive.Primitive) primitive.Prim
 // fileStatFn implements (file:stat)
 //
 // Return value is (NAME SIZE UID GID MODE)
-func fileStatFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+func fileStatFn(yal any, env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 	// We only need a single argument
 	if len(args) != 1 {
 		return primitive.ArityError()
@@ -898,7 +898,7 @@ func fileStatFn(env *env.Environment, args []primitive.Primitive) primitive.Prim
 }
 
 // fileWriteFn implements file:write
-func fileWriteFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+func fileWriteFn(yal any, env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 	// We need two arguments
 	if len(args) != 2 {
 		return primitive.ArityError()
@@ -924,7 +924,7 @@ func fileWriteFn(env *env.Environment, args []primitive.Primitive) primitive.Pri
 }
 
 // gensymFn is the implementation of (gensym ..)
-func gensymFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+func gensymFn(yal any, env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 	// symbol characters
 	var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
 
@@ -942,7 +942,7 @@ func gensymFn(env *env.Environment, args []primitive.Primitive) primitive.Primit
 }
 
 // getFn is the implementation of `(get hash key)`
-func getFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+func getFn(yal any, env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 
 	// We need two arguments
 	if len(args) != 2 {
@@ -959,7 +959,7 @@ func getFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive
 }
 
 // getenvFn is the implementation of `(getenv "PATH")`
-func getenvFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+func getenvFn(yal any, env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 
 	// If we have only a single argument
 	if len(args) != 1 {
@@ -977,7 +977,7 @@ func getenvFn(env *env.Environment, args []primitive.Primitive) primitive.Primit
 }
 
 // globFn is the implementation of `(glob "pattern")`
-func globFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+func globFn(yal any, env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 
 	// If we have only a single argument
 	if len(args) != 1 {
@@ -1007,7 +1007,7 @@ func globFn(env *env.Environment, args []primitive.Primitive) primitive.Primitiv
 }
 
 // helpFn is the implementation of `(help fn)`
-func helpFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+func helpFn(yal any, env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 	// We need a single argument
 	if len(args) != 1 {
 		return primitive.ArityError()
@@ -1037,7 +1037,7 @@ func helpFn(env *env.Environment, args []primitive.Primitive) primitive.Primitiv
 }
 
 // inequalityFn implements /=
-func inequalityFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+func inequalityFn(yal any, env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 
 	// We need at least two arguments
 	if len(args) < 2 {
@@ -1084,7 +1084,7 @@ func inequalityFn(env *env.Environment, args []primitive.Primitive) primitive.Pr
 }
 
 // (join (1 2 3)
-func joinFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+func joinFn(yal any, env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 
 	// We require one argument
 	if len(args) != 1 {
@@ -1106,7 +1106,7 @@ func joinFn(env *env.Environment, args []primitive.Primitive) primitive.Primitiv
 }
 
 // keysFn is the implementation of `(keys hash)`
-func keysFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+func keysFn(yal any, env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 
 	// We need a single argument
 	if len(args) != 1 {
@@ -1144,12 +1144,12 @@ func keysFn(env *env.Environment, args []primitive.Primitive) primitive.Primitiv
 }
 
 // listFn implements "list"
-func listFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+func listFn(yal any, env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 	return primitive.List(args)
 }
 
 // ltFn implements "<"
-func ltFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+func ltFn(yal any, env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 	if len(args) != 2 {
 		return primitive.ArityError()
 	}
@@ -1164,7 +1164,7 @@ func ltFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive 
 }
 
 // matchFn is the implementation of (match ..)
-func matchFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+func matchFn(yal any, env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 
 	// We need two arguments
 	if len(args) != 2 {
@@ -1219,7 +1219,7 @@ func matchFn(env *env.Environment, args []primitive.Primitive) primitive.Primiti
 }
 
 // minusFn implements "-"
-func minusFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+func minusFn(yal any, env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 
 	// ensure we have at least one argument
 	if len(args) < 1 {
@@ -1247,7 +1247,7 @@ func minusFn(env *env.Environment, args []primitive.Primitive) primitive.Primiti
 }
 
 // modFn implements "%"
-func modFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+func modFn(yal any, env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 	if len(args) != 2 {
 		return primitive.ArityError()
 	}
@@ -1267,12 +1267,12 @@ func modFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive
 }
 
 // msFn is the implementation of `(ms)`
-func msFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+func msFn(yal any, env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 	return primitive.Number(time.Now().UnixNano() / int64(time.Millisecond))
 }
 
 // multiplyFn implements "*"
-func multiplyFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+func multiplyFn(yal any, env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 	// ensure we have at least one argument
 	if len(args) < 1 {
 		return primitive.ArityError()
@@ -1299,7 +1299,7 @@ func multiplyFn(env *env.Environment, args []primitive.Primitive) primitive.Prim
 }
 
 // nilFn implements nil?
-func nilFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+func nilFn(yal any, env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 	if len(args) != 1 {
 		return primitive.ArityError()
 	}
@@ -1318,12 +1318,12 @@ func nilFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive
 }
 
 // nowFn is the implementation of `(now)`
-func nowFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+func nowFn(yal any, env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 	return primitive.Number(time.Now().Unix())
 }
 
 // nthFn is the implementation of `(nth..)`
-func nthFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+func nthFn(yal any, env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 
 	// We need two arguments.
 	if len(args) != 2 {
@@ -1353,7 +1353,7 @@ func nthFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive
 }
 
 // numberFn is the implementation of (number ..)
-func numberFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+func numberFn(yal any, env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 	// we only accept a single parameter
 	if len(args) != 1 {
 		return primitive.ArityError()
@@ -1387,7 +1387,7 @@ func numberFn(env *env.Environment, args []primitive.Primitive) primitive.Primit
 }
 
 // ordFn is the implementation of (ord ..)
-func ordFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+func ordFn(yal any, env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 
 	if len(args) != 1 {
 		return primitive.ArityError()
@@ -1415,12 +1415,12 @@ func ordFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive
 }
 
 // osFn implements (os)
-func osFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+func osFn(yal any, env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 	return primitive.String(runtime.GOOS)
 }
 
 // plusFn implements "+"
-func plusFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+func plusFn(yal any, env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 
 	// ensure we have at least one argument
 	if len(args) < 1 {
@@ -1448,7 +1448,7 @@ func plusFn(env *env.Environment, args []primitive.Primitive) primitive.Primitiv
 }
 
 // printFn implements (print).
-func printFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+func printFn(yal any, env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 	// no args
 	if len(args) < 1 {
 		return primitive.ArityError()
@@ -1486,7 +1486,7 @@ func printFn(env *env.Environment, args []primitive.Primitive) primitive.Primiti
 }
 
 // randomFn implements (random).
-func randomFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+func randomFn(yal any, env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 	if len(args) != 1 {
 		return primitive.ArityError()
 	}
@@ -1507,7 +1507,7 @@ func randomFn(env *env.Environment, args []primitive.Primitive) primitive.Primit
 }
 
 // setFn is the implementation of `(set hash key val)`
-func setFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+func setFn(yal any, env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 
 	// We need three arguments
 	if len(args) != 3 {
@@ -1525,7 +1525,7 @@ func setFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive
 }
 
 // shellFn runs a command via the shell
-func shellFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+func shellFn(yal any, env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 
 	// We need one argument
 	if len(args) != 1 {
@@ -1568,7 +1568,7 @@ func shellFn(env *env.Environment, args []primitive.Primitive) primitive.Primiti
 }
 
 // sinFn implements sin
-func sinFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+func sinFn(yal any, env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 
 	// We only need a single argument
 	if len(args) != 1 {
@@ -1585,7 +1585,7 @@ func sinFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive
 }
 
 // sinhFn implements sinh
-func sinhFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+func sinhFn(yal any, env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 
 	// We only need a single argument
 	if len(args) != 1 {
@@ -1602,7 +1602,7 @@ func sinhFn(env *env.Environment, args []primitive.Primitive) primitive.Primitiv
 }
 
 // sortFn implements (sort)
-func sortFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+func sortFn(yal any, env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 	// If we have only a single argument
 	if len(args) != 1 {
 		return primitive.ArityError()
@@ -1645,7 +1645,7 @@ func sortFn(env *env.Environment, args []primitive.Primitive) primitive.Primitiv
 }
 
 // (split "str" "by")
-func splitFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+func splitFn(yal any, env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 
 	// We require two arguments
 	if len(args) != 2 {
@@ -1673,7 +1673,7 @@ func splitFn(env *env.Environment, args []primitive.Primitive) primitive.Primiti
 }
 
 // (sprintf "fmt" "arg1" ... "argN")
-func sprintfFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+func sprintfFn(yal any, env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 
 	// we need 2+ arguments
 	if len(args) < 2 {
@@ -1701,7 +1701,7 @@ func sprintfFn(env *env.Environment, args []primitive.Primitive) primitive.Primi
 }
 
 // strFn implements "str"
-func strFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+func strFn(yal any, env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 	if len(args) != 1 {
 		return primitive.ArityError()
 	}
@@ -1709,7 +1709,7 @@ func strFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive
 }
 
 // stringEqualsFn implements "string="
-func stringEqualsFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+func stringEqualsFn(yal any, env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 	if len(args) != 2 {
 		return primitive.ArityError()
 	}
@@ -1727,7 +1727,7 @@ func stringEqualsFn(env *env.Environment, args []primitive.Primitive) primitive.
 }
 
 // stringLtFn implements "string<"
-func stringLtFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+func stringLtFn(yal any, env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 	if len(args) != 2 {
 		return primitive.ArityError()
 	}
@@ -1745,7 +1745,7 @@ func stringLtFn(env *env.Environment, args []primitive.Primitive) primitive.Prim
 }
 
 // tanFn implements tan
-func tanFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+func tanFn(yal any, env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 
 	// We only need a single argument
 	if len(args) != 1 {
@@ -1762,7 +1762,7 @@ func tanFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive
 }
 
 // tanhFn implements tanh
-func tanhFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+func tanhFn(yal any, env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 
 	// We only need a single argument
 	if len(args) != 1 {
@@ -1779,7 +1779,7 @@ func tanhFn(env *env.Environment, args []primitive.Primitive) primitive.Primitiv
 }
 
 // timeFn returns the current (HH, MM, SS) as a list.
-func timeFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+func timeFn(yal any, env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 	var ret primitive.List
 
 	t := time.Now()
@@ -1796,7 +1796,7 @@ func timeFn(env *env.Environment, args []primitive.Primitive) primitive.Primitiv
 }
 
 // typeFn implements "type"
-func typeFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+func typeFn(yal any, env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 	if len(args) != 1 {
 		return primitive.ArityError()
 	}
@@ -1804,7 +1804,7 @@ func typeFn(env *env.Environment, args []primitive.Primitive) primitive.Primitiv
 }
 
 // valsFn is the implementation of `(vals hash)`
-func valsFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+func valsFn(yal any, env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 
 	// We need a single argument
 	if len(args) != 1 {

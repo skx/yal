@@ -563,7 +563,7 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 		if proc.F != nil {
 
 			// Then call it.
-			return proc.F(e, args)
+			return proc.F(ev, e, args)
 		}
 
 		//

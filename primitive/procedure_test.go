@@ -10,7 +10,7 @@ func TestProcedure(t *testing.T) {
 
 	// built-in
 	b := Procedure{
-		F: func(e *env.Environment, args []Primitive) Primitive {
+		F: func(yal any, e *env.Environment, args []Primitive) Primitive {
 			return Nil{}
 		},
 	}

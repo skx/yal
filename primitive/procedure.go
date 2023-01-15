@@ -1,10 +1,12 @@
 package primitive
 
-import "github.com/skx/yal/env"
+import (
+	"github.com/skx/yal/env"
+)
 
 // GolangPrimitiveFn is the type which represents a function signature for
 // a lisp-usable function implemented in golang.
-type GolangPrimitiveFn func(e *env.Environment, args []Primitive) Primitive
+type GolangPrimitiveFn func(yal any, e *env.Environment, args []Primitive) Primitive
 
 // Procedure holds a user-defined function.
 //
