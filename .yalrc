@@ -43,4 +43,5 @@
 ;;
 ;; OK now we're done, show a banner and launch the REPL
 ;;
+(print "YAL version %s" (version))
 (print "This is ~/.yalrc on %s - %s %s" (trim (hostname)) (os) (arch) )
