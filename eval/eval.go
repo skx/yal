@@ -6,12 +6,10 @@
 package eval
 
 import (
-	"bufio"
 	"context"
 	"errors"
 	"flag"
 	"fmt"
-	"os"
 	"regexp"
 	"strconv"
 	"strings"
@@ -59,14 +57,6 @@ type Eval struct {
 	// The key is the name of the fake method, the value the name of
 	// the field to get/set
 	accessors map[string]string
-
-	// STDIN is an input-reader used for the (read) function, when
-	// called with no arguments.
-	STDIN *bufio.Reader
-
-	// STDOUT is the writer which we should use for "(print)", but we
-	// currently don't.
-	STDOUT *bufio.Writer
 }
 
 // New constructs a new lisp interpreter.
@@ -92,10 +82,6 @@ func New(src string) *Eval {
 		// functions for field access within structs
 		accessors: make(map[string]string),
 	}
-
-	// Setup default input/output streams
-	e.STDIN = bufio.NewReader(os.Stdin)
-	e.STDOUT = bufio.NewWriter(os.Stdout)
 
 	// Setup the default symbol-table (interned) entries.
 

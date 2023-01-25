@@ -18,7 +18,6 @@ func getGID(info os.FileInfo) (int, error) {
 	return int(stat.Gid), nil
 }
 
-
 // getUID returns the owner of the file, from the extended information
 // available after a stat - that is not portable to Windows though.
 //

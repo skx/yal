@@ -1,6 +1,7 @@
 package builtins
 
 import (
+	"bytes"
 	"math"
 	"os"
 	"path/filepath"
@@ -9,6 +10,7 @@ import (
 	"testing"
 	"time"
 
+	"github.com/skx/yal/config"
 	"github.com/skx/yal/env"
 	"github.com/skx/yal/eval"
 	"github.com/skx/yal/primitive"
@@ -21,6 +23,10 @@ var ENV *env.Environment
 // init ensures our environment pointer is up to date.
 func init() {
 	ENV = env.New()
+
+	// Environment will have a config
+	ENV.SetIOConfig(config.DefaultIO())
+
 }
 
 func TestArch(t *testing.T) {
@@ -3046,6 +3052,31 @@ func TestPrint(t *testing.T) {
 		t.Fatalf("got string, but wrong one %v", e2)
 	}
 
+	// Preserve the current config
+	orig := ENV.GetIOConfig()
+
+	// Setup a new STDOUT handle, pointing to a buffer
+	cfg := config.New()
+	tmp := new(bytes.Buffer)
+	cfg.STDOUT = tmp
+	ENV.SetIOConfig(cfg)
+
+	// Print something
+	printFn(ENV, []primitive.Primitive{
+		primitive.String("Hello %s!"),
+		primitive.List{
+			primitive.String("world"),
+			primitive.Number(42),
+		},
+	})
+
+	// Restore our handles
+	ENV.SetIOConfig(orig)
+
+	// Our buffer should be good
+	if tmp.String() != "Hello (world 42)!\n" {
+		t.Fatalf("(print 'hello (list)!') failed, got '%s'", tmp.String())
+	}
 }
 
 // TestRandom tests (random)
@@ -3524,7 +3555,7 @@ func TestStringLt(t *testing.T) {
 	}
 }
 
-func TestTrig(t *testing.T ) {
+func TestTrig(t *testing.T) {
 
 	funs := []primitive.GolangPrimitiveFn{
 		acosFn,
@@ -3538,9 +3569,9 @@ func TestTrig(t *testing.T ) {
 		tanhFn,
 	}
 
-	for _, fn := range(funs) {
+	for _, fn := range funs {
 
-		out := fn(nil, []primitive.Primitive{} )
+		out := fn(nil, []primitive.Primitive{})
 
 		// Will lead to an error
 		e, ok := out.(primitive.Error)

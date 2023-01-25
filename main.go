@@ -18,6 +18,7 @@ import (
 	"time"
 
 	"github.com/skx/yal/builtins"
+	"github.com/skx/yal/config"
 	"github.com/skx/yal/env"
 	"github.com/skx/yal/eval"
 	"github.com/skx/yal/primitive"
@@ -42,6 +43,9 @@ func create() {
 
 	// Create a new environment
 	ENV = env.New()
+
+	// Setup the I/O
+	ENV.SetIOConfig(config.DefaultIO())
 
 	// Populate the default primitives
 	builtins.PopulateEnvironment(ENV)
