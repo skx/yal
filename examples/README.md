@@ -12,7 +12,7 @@ This directory contains some simple lisp examples, which can be executed via `ya
 * [hash.lisp](hash.lisp)
   * Demonstrate working with hashes.
 * [lisp-tests.lisp](lisp-tests.lisp)
-  * A simple lisp-based testing framework for our primitives.
+  * A simple testing framework for our primitives.
 * [mtest.lisp](mtest.lisp)
   * Simple tests of our macro system.
 * [readme.lisp](readme.lisp)

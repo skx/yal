@@ -20,7 +20,7 @@
                      (let* (
                             text (file:lines file)
                             line  (nth text 0)
-                            info (match "^([^-]*)-+[ ]+(.*)$" line))
+                            info (match "^(.*)-+[ ]+(.*)$" line))
                        (when (list? info)
                          (print "* [%s](%s)" file file)
                          (print "  * %s" (nth info 2))))))
