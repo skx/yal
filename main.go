@@ -36,6 +36,11 @@ var (
 	LISP *eval.Eval
 )
 
+// versionFn is the implementation of the (version) primitive.
+func versionFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+	return primitive.String(version)
+}
+
 // create handles the setup of our global interpreter and environment.
 //
 // The standard-library will be loaded, and os.args will be populated.
@@ -49,6 +54,13 @@ func create() {
 
 	// Populate the default primitives
 	builtins.PopulateEnvironment(ENV)
+
+	// Add the (version) function
+	ENV.Set("version",
+		&primitive.Procedure{
+			F:    versionFn,
+			Help: "Return the version of the interpreter.\n\nSee-also: arch, os",
+			Args: []primitive.Symbol{}})
 
 	// Build up a list of the command-line arguments
 	args := primitive.List{}
@@ -264,7 +276,6 @@ func main() {
 	//
 	// No arguments mean this is our REPL
 	//
-	fmt.Printf("YAL version %s\n", version)
 	reader := bufio.NewReader(os.Stdin)
 
 	//
