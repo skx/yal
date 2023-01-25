@@ -1462,8 +1462,9 @@ func printFn(env *env.Environment, args []primitive.Primitive) primitive.Primiti
 		str := expandStr(args[0].ToString())
 
 		// Write via our configuration object
-		ioHelper.STDOUT.Write([]byte(str))
-		ioHelper.STDOUT.Write([]byte("\n"))
+		// Linter complains about ignored return values here..
+		_, _ = ioHelper.STDOUT.Write([]byte(str))
+		_, _ = ioHelper.STDOUT.Write([]byte("\n"))
 
 		return primitive.String(str)
 	}
@@ -1487,8 +1488,9 @@ func printFn(env *env.Environment, args []primitive.Primitive) primitive.Primiti
 	out := fmt.Sprintf(frmt, parm...)
 
 	// Write via our configuration object
-	ioHelper.STDOUT.Write([]byte(out))
-	ioHelper.STDOUT.Write([]byte("\n"))
+	// Linter complains about ignored return values here..
+	_, _ = ioHelper.STDOUT.Write([]byte(out))
+	_, _ = ioHelper.STDOUT.Write([]byte("\n"))
 
 	return primitive.String(out)
 }

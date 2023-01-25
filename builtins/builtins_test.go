@@ -3062,7 +3062,7 @@ func TestPrint(t *testing.T) {
 	ENV.SetIOConfig(cfg)
 
 	// Print something
-	out = printFn(ENV, []primitive.Primitive{
+	printFn(ENV, []primitive.Primitive{
 		primitive.String("Hello %s!"),
 		primitive.List{
 			primitive.String("world"),
