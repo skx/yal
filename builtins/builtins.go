@@ -1454,13 +1454,17 @@ func printFn(env *env.Environment, args []primitive.Primitive) primitive.Primiti
 		return primitive.ArityError()
 	}
 
+	ioHelper := env.GetIOConfig()
+
 	// one arg
 	if len(args) == 1 {
 		// expand
 		str := expandStr(args[0].ToString())
 
-		// show & return
-		fmt.Println(str)
+		// Write via our configuration object
+		ioHelper.STDOUT.Write([]byte(str))
+		ioHelper.STDOUT.Write([]byte("\n"))
+
 		return primitive.String(str)
 	}
 
@@ -1481,7 +1485,11 @@ func printFn(env *env.Environment, args []primitive.Primitive) primitive.Primiti
 	}
 
 	out := fmt.Sprintf(frmt, parm...)
-	fmt.Println(out)
+
+	// Write via our configuration object
+	ioHelper.STDOUT.Write([]byte(out))
+	ioHelper.STDOUT.Write([]byte("\n"))
+
 	return primitive.String(out)
 }
 

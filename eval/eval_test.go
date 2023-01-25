@@ -8,6 +8,7 @@ import (
 	"time"
 
 	"github.com/skx/yal/builtins"
+	"github.com/skx/yal/config"
 	"github.com/skx/yal/env"
 	"github.com/skx/yal/primitive"
 	"github.com/skx/yal/stdlib"
@@ -25,6 +26,9 @@ func TestAliased(t *testing.T) {
 
 	// With a new environment
 	env := env.New()
+
+	// Environment will have a config
+	env.SetIOConfig(config.DefaultIO())
 
 	// Populate the default primitives
 	builtins.PopulateEnvironment(env)
@@ -415,6 +419,9 @@ a
 
 			// With a new environment
 			env := env.New()
+
+			// Environment will have a config
+			env.SetIOConfig(config.DefaultIO())
 
 			// Populate the default primitives
 			builtins.PopulateEnvironment(env)

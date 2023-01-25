@@ -9,6 +9,10 @@
 // or call-frames, you can create a nested environment via NewEnvironment.
 package env
 
+import (
+	"github.com/skx/yal/config"
+)
+
 // Environment holds our state
 type Environment struct {
 
@@ -17,6 +21,10 @@ type Environment struct {
 
 	// values holds the actual values
 	values map[string]any
+
+	// ioconfig holds the interface to the outside world,
+	// which is used for I/O
+	ioconfig *config.Config
 }
 
 // Get retrieves a value from the environment.
@@ -59,7 +67,8 @@ func (env *Environment) Items() map[string]any {
 // New creates a new environment, with no parent.
 func New() *Environment {
 	return &Environment{
-		values: map[string]any{},
+		values:   map[string]any{},
+		ioconfig: config.New(),
 	}
 }
 
@@ -67,8 +76,9 @@ func New() *Environment {
 // parent environment for values in a higher level.
 func NewEnvironment(parent *Environment) *Environment {
 	return &Environment{
-		parent: parent,
-		values: map[string]any{},
+		parent:   parent,
+		values:   map[string]any{},
+		ioconfig: parent.ioconfig,
 	}
 }
 
@@ -86,4 +96,16 @@ func (env *Environment) SetOuter(key string, value any) {
 	if env.parent != nil {
 		env.parent.SetOuter(key, value)
 	}
+}
+
+// SetIOConfig updates the configuration object which is stored
+// in our environment
+func (env *Environment) SetIOConfig(cfg *config.Config) {
+	env.ioconfig = cfg
+}
+
+// GetIOConfig returns the configuration object which is stored in
+// our environment.
+func (env *Environment) GetIOConfig() *config.Config {
+	return env.ioconfig
 }

@@ -3,6 +3,7 @@
 package eval
 
 import (
+	"bufio"
 	"fmt"
 	"strings"
 
@@ -286,7 +287,10 @@ func (ev *Eval) evalSpecialForm(name string, args []primitive.Primitive, e *env.
 
 		// zero arguments: read from STDIN
 		if len(args) == 0 {
-			input, err := ev.STDIN.ReadString('\n')
+
+			ioHelper := e.GetIOConfig()
+			r := bufio.NewReader(ioHelper.STDIN)
+			input, err := r.ReadString('\n')
 			if err != nil {
 				return primitive.Error(
 					fmt.Sprintf("failed to read from STDIN %s", err)), true
