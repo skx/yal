@@ -205,6 +205,8 @@ func main() {
 	hlp := flag.Bool("h", false, "Show help information and exit.")
 	lsp := flag.Bool("lsp", false, "Launch the LSP mode")
 	ver := flag.Bool("v", false, "Show our version and exit.")
+	deb := flag.Bool("debug", false, "Show debug output during execution (to STDERR).")
+
 	flag.Parse()
 
 	// Showing the version?
@@ -227,6 +229,23 @@ func main() {
 	//     that present too.
 	//
 	create()
+
+
+	//
+	// By default we have no STDERR handler wired up, but if we set the
+	// debug flag we'll send that to the actual console's STDERR stream
+	if *deb {
+
+		// Get config
+		iohelper := ENV.GetIOConfig()
+
+		// Setup a destination for STDERR
+		iohelper.STDERR =os.Stderr
+
+		// Update
+		ENV.SetIOConfig(iohelper)
+	}
+
 
 	// LSP?
 	if *lsp {
