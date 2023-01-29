@@ -13,7 +13,6 @@ package config
 
 import (
 	"io"
-	"io/ioutil"
 	"os"
 )
 
@@ -55,7 +54,7 @@ func DefaultIO() *Config {
 	// STDERR is only used when debugging.
 	//
 	// So we can discard output here by default.
-	e.STDERR = ioutil.Discard
+	e.STDERR = io.Discard
 
 	return e
 }
