@@ -506,6 +506,9 @@ func TestStandardLibrary(t *testing.T) {
 			// Populate the default primitives
 			builtins.PopulateEnvironment(env)
 
+			// Environment will have a config
+			env.SetIOConfig(config.DefaultIO())
+
 			// Run it
 			out := l.Evaluate(env)
 
@@ -543,6 +546,9 @@ func TestStdlibHelp(t *testing.T) {
 
 	// Populate the default primitives
 	builtins.PopulateEnvironment(env)
+
+	// Environment will have a config
+	env.SetIOConfig(config.DefaultIO())
 
 	// Run it
 	_ = l.Evaluate(env)
@@ -594,6 +600,9 @@ func TestTimeout(t *testing.T) {
 
 	// With a new environment
 	ev := env.New()
+
+	// Environment will have a config
+	ev.SetIOConfig(config.DefaultIO())
 
 	// Add a new function
 	ev.Set("sleep",

@@ -697,12 +697,34 @@ func (ev *Eval) isMacro(exp primitive.Primitive, e *env.Environment) bool {
 	return proc.Macro
 }
 
-// macroExpand expands the given macro, recursively.
+// macroExpand expands the given macro.
+//
+// This is not done recursively.
 func (ev *Eval) macroExpand(exp primitive.Primitive, e *env.Environment) primitive.Primitive {
 
 	// is this a macro?
 	for ev.isMacro(exp, e) {
+
+		// Save the before, so we can see if there was a change.
+		before := exp
+
+		// Rewrite it
 		exp = ev.eval(exp, e, false)
+
+		// If things changed (why wouldn't they?)
+		if exp.ToString() != before.ToString() {
+
+			// If it was a macro it was a list, so this is safe.
+			lst := before.(primitive.List)
+
+			// Log the expansion
+			ioHelper := e.GetIOConfig()
+			log := fmt.Sprintf("Expanded macro %s -> %s\n", lst[0].ToString(), exp.ToString())
+
+			// Write via our configuration object
+			// Linter complains about ignored return values here..
+			_, _ = ioHelper.STDERR.Write([]byte(log))
+		}
 	}
 	return exp
 }
