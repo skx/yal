@@ -350,7 +350,7 @@ func main() {
 
 			// If the result wasn't nil then show it
 			if _, ok := out.(primitive.Nil); !ok {
-				fmt.Printf("%v\n", out)
+				fmt.Printf("%v\n", out.ToString())
 			}
 			src = ""
 		}
