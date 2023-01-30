@@ -13,11 +13,16 @@ func (n Number) IsSimpleType() bool {
 	return true
 }
 
+// IsInt returns true if this number is an integer
+func (n Number) IsInt() bool {
+	return float64(n) == float64(int(n))
+}
+
 // ToInterface converts this object to a golang value
 func (n Number) ToInterface() any {
 
 	// int?
-	if float64(n) == float64(int(n)) {
+	if n.IsInt() {
 		return int(n)
 	}
 
@@ -29,7 +34,7 @@ func (n Number) ToInterface() any {
 func (n Number) ToString() string {
 
 	// Is this really an integer?
-	if float64(n) == float64(int(n)) {
+	if n.IsInt() {
 		return fmt.Sprintf("%d", int(n))
 	}
 

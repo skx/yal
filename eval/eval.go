@@ -240,8 +240,7 @@ func (ev *Eval) atom(token string) primitive.Primitive {
 
 		// If this is an integer then save it in our
 		// interned table, for the future.
-		if f == float64(int(f)) {
-
+		if n.IsInt() {
 			ev.symbols[token] = n
 		}
 
