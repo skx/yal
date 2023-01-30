@@ -67,6 +67,8 @@ Once installed there are three ways to execute code:
   * If present the file `~/.yalrc` is loaded before the REPL starts.
   * Here is a sample [.yalrc](.yalrc) file which shows the kind of thing you might wish to do.
 
+When running with the `-debug` flag any output from the `(error)` primitive will be shown to STDERR, along with some internal logging.
+
 Finally if you've downloaded a binary release from [our release page](https://github.com/skx/yal/releases) the `-v` flag will show you what version you're running:
 
 ```sh

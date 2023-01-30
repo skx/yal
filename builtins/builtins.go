@@ -653,7 +653,18 @@ func errorFn(env *env.Environment, args []primitive.Primitive) primitive.Primiti
 	if len(args) != 1 {
 		return primitive.ArityError()
 	}
-	return primitive.Error(args[0].ToString())
+
+	str := args[0].ToString()
+
+	// Show any errors to STDERR, which will be swallowed unless
+	// running with `-debug`.
+
+	ioHelper := env.GetIOConfig()
+
+	_, _ = ioHelper.STDERR.Write([]byte("(error \"" + str + "\")"))
+	_, _ = ioHelper.STDERR.Write([]byte("\n"))
+
+	return primitive.Error(str)
 }
 
 // existsFn returns whether the given path exists.
