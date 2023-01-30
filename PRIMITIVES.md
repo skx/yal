@@ -508,7 +508,7 @@ If multiple types are permitted then just keep appending things, for example:
 
 There is a simple set of tests written in Lisp, using a macro to define them easily, which can be viewed:
 
-* [lisp-tests.lisp](lisp-tests.lisp)
+* [examples/lisp-tests.lisp](examples/lisp-tests.lisp)
 
 Adding new tests is easy enough that this file should be updated over time with new test-cases.
 
