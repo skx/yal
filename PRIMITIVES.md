@@ -192,6 +192,8 @@ Things you'll find here include:
   * Create a new list.
 * `match`
   * Perform a regular expression test.
+* `md5`
+  * Return the MD5 digest of the given string.
 * `ms`
   * Return the time, in milliseconds.
 * `nil?`
@@ -215,6 +217,10 @@ Things you'll find here include:
   * Output the specified string, or format string + values.
 * `set`
   * Update the value of the specified hash-key.
+* `sha1`
+  * Return the SHA1 digest of the given string.
+* `sha256`
+  * Return the SHA256 digest of the given string.
 * `shell`
   * Run a command via the shell, and return STDOUT and STDERR it generated.
 * `sin`

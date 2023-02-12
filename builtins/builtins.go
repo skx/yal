@@ -8,6 +8,9 @@ package builtins
 import (
 	"bufio"
 	"bytes"
+	"crypto/md5"
+	"crypto/sha1"
+	"crypto/sha256"
 	"fmt"
 	"math"
 	"math/rand"
@@ -135,6 +138,7 @@ func PopulateEnvironment(env *env.Environment) {
 	env.Set("keys", &primitive.Procedure{F: keysFn, Help: helpMap["keys"], Args: []primitive.Symbol{primitive.Symbol("hash")}})
 	env.Set("list", &primitive.Procedure{F: listFn, Help: helpMap["list"], Args: []primitive.Symbol{primitive.Symbol("arg1"), primitive.Symbol("arg...")}})
 	env.Set("match", &primitive.Procedure{F: matchFn, Help: helpMap["match"], Args: []primitive.Symbol{primitive.Symbol("regexp"), primitive.Symbol("str")}})
+	env.Set("md5", &primitive.Procedure{F: md5Fn, Help: helpMap["md5"], Args: []primitive.Symbol{primitive.Symbol("string")}})
 	env.Set("ms", &primitive.Procedure{F: msFn, Help: helpMap["ms"]})
 	env.Set("nil?", &primitive.Procedure{F: nilFn, Help: helpMap["nil?"], Args: []primitive.Symbol{primitive.Symbol("object")}})
 	env.Set("now", &primitive.Procedure{F: nowFn, Help: helpMap["now"]})
@@ -145,6 +149,8 @@ func PopulateEnvironment(env *env.Environment) {
 	env.Set("print", &primitive.Procedure{F: printFn, Help: helpMap["print"], Args: []primitive.Symbol{primitive.Symbol("arg1..argN")}})
 	env.Set("random", &primitive.Procedure{F: randomFn, Help: helpMap["random"], Args: []primitive.Symbol{primitive.Symbol("max")}})
 	env.Set("set", &primitive.Procedure{F: setFn, Help: helpMap["set"], Args: []primitive.Symbol{primitive.Symbol("hash"), primitive.Symbol("key"), primitive.Symbol("val")}})
+	env.Set("sha1", &primitive.Procedure{F: sha1Fn, Help: helpMap["sha1"], Args: []primitive.Symbol{primitive.Symbol("string")}})
+	env.Set("sha256", &primitive.Procedure{F: sha256Fn, Help: helpMap["sha256"], Args: []primitive.Symbol{primitive.Symbol("string")}})
 	env.Set("shell", &primitive.Procedure{F: shellFn, Help: helpMap["shell"], Args: []primitive.Symbol{primitive.Symbol("list")}})
 	env.Set("sin", &primitive.Procedure{F: sinFn, Help: helpMap["sin"], Args: []primitive.Symbol{primitive.Symbol("n")}})
 	env.Set("sinh", &primitive.Procedure{F: sinhFn, Help: helpMap["sinh"], Args: []primitive.Symbol{primitive.Symbol("n")}})
@@ -1277,6 +1283,20 @@ func modFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive
 	return primitive.Number(a % b)
 }
 
+// md5Fn is the implementation of `(md5)`
+func md5Fn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+	// We need one argument
+	if len(args) != 1 {
+		return primitive.ArityError()
+	}
+
+	// The argument must be a string
+	str := args[0].ToString()
+
+	// Get the output
+	return primitive.String(fmt.Sprintf("%X", md5.Sum([]byte(str))))
+}
+
 // msFn is the implementation of `(ms)`
 func msFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 	return primitive.Number(time.Now().UnixNano() / int64(time.Millisecond))
@@ -1543,6 +1563,34 @@ func setFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive
 	tmp := args[0].(primitive.Hash)
 	tmp.Set(args[1].ToString(), args[2])
 	return args[2]
+}
+
+// sha1Fn runs a SHA1 hash
+func sha1Fn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+	// We need one argument
+	if len(args) != 1 {
+		return primitive.ArityError()
+	}
+
+	// The argument must be a string
+	str := args[0].ToString()
+
+	// Get the output
+	return primitive.String(fmt.Sprintf("%X", sha1.Sum([]byte(str))))
+}
+
+// sha256Fn runs a SHA256 hash
+func sha256Fn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+	// We need one argument
+	if len(args) != 1 {
+		return primitive.ArityError()
+	}
+
+	// The argument must be a string
+	str := args[0].ToString()
+
+	// Get the output
+	return primitive.String(fmt.Sprintf("%X", sha256.Sum256([]byte(str))))
 }
 
 // shellFn runs a command via the shell

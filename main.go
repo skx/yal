@@ -9,13 +9,11 @@ import (
 	"bufio"
 	"flag"
 	"fmt"
-	"math/rand"
 	"os"
 	"path"
 	"regexp"
 	"sort"
 	"strings"
-	"time"
 
 	"github.com/skx/yal/builtins"
 	"github.com/skx/yal/config"
@@ -197,9 +195,6 @@ func help(show []string) {
 
 func main() {
 
-	// (gensym) needs a decent random seed, as does (random).
-	rand.Seed(time.Now().UnixNano())
-
 	// Parse our command-line flags
 	exp := flag.String("e", "", "A string to evaluate.")
 	hlp := flag.Bool("h", false, "Show help information and exit.")
@@ -230,7 +225,6 @@ func main() {
 	//
 	create()
 
-
 	//
 	// By default we have no STDERR handler wired up, but if we set the
 	// debug flag we'll send that to the actual console's STDERR stream
@@ -240,12 +234,11 @@ func main() {
 		iohelper := ENV.GetIOConfig()
 
 		// Setup a destination for STDERR
-		iohelper.STDERR =os.Stderr
+		iohelper.STDERR = os.Stderr
 
 		// Update
 		ENV.SetIOConfig(iohelper)
 	}
-
 
 	// LSP?
 	if *lsp {
