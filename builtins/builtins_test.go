@@ -1907,6 +1907,47 @@ func TestGlob(t *testing.T) {
 
 }
 
+// TestHash tests our hash functions
+func TestHash(t *testing.T) {
+
+	funs := []primitive.GolangPrimitiveFn{
+		md5Fn,
+		sha1Fn,
+		sha256Fn,
+	}
+
+	for _, fn := range funs {
+
+		// No eargs
+		out := fn(nil, []primitive.Primitive{})
+
+		// Will lead to an error
+		e, ok := out.(primitive.Error)
+		if !ok {
+			t.Fatalf("expected error, got %v", out)
+		}
+		if e != primitive.ArityError() {
+			t.Fatalf("got error, but wrong one")
+
+		}
+
+		// Hash a string
+		out = fn(ENV, []primitive.Primitive{
+			primitive.String("foo"),
+		})
+
+		// Will lead to an error
+		r, ok2 := out.(primitive.String)
+		if !ok2 {
+			t.Fatalf("expected string, got %v", r)
+		}
+
+		if len(r) < 15 {
+			t.Fatalf("result '%s' was the wrong length", r)
+		}
+	}
+}
+
 // TestHelp tests help
 func TestHelp(t *testing.T) {
 	// no arguments

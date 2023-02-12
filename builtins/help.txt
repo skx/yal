@@ -250,6 +250,14 @@ Any matches found will be returned as a list, with nil being returned on no matc
 
 Example: (print (match "c.ke$" "cake"))
 %%
+md5
+
+md5 returns the calculated MD5 digest of the provived string
+
+See also: sha1, sha256
+
+Example: (print (md5 "steve"))
+%%
 ms
 
 ms returns the current time as a number of milliseconds, it is useful for benchmarking.
@@ -330,6 +338,22 @@ See also: get
 
 Example: (set! person {:name "Steve"})
          (set person :name "Bobby")
+%%
+sha1
+
+sha1 returns the calculated SHA1 digest of the provived string
+
+See also: md5sum, sha256
+
+Example: (print (sha1 "steve"))
+%%
+sha256
+
+sha256 returns the calculated SHA256 digest of the provived string
+
+See also: md5sum, sha1
+
+Example: (print (sha256 "steve"))
 %%
 shell
 
