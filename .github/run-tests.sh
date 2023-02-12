@@ -37,6 +37,8 @@ echo "Launching shadowed-variable check .."
 go vet -vettool=$(which shadow) ./...
 echo "Completed shadowed-variable check .."
 
+go env -w GOFLAGS="-buildvcs=false"
+
 # Run golang tests
 go test ./...
 
