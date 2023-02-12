@@ -1,5 +1,7 @@
 package primitive
 
+import "sort"
+
 // Hash holds a collection of other types, indexed by string
 type Hash struct {
 
@@ -51,12 +53,32 @@ func (h *Hash) SetStruct(name string) {
 }
 
 // ToString converts this object to a string.
+//
+// Note that we sort the keys before returning the stringified object,
+// which allows us to use the "eq" test on hashes with identical key/values,
+// regardless of their ordering.
 func (h Hash) ToString() string {
 
+	// Output prefix.
 	out := "{\n"
-	for k, v := range h.Entries {
-		out += "\t" + k + " => " + v.ToString() + "\n"
+
+	// Get the keys in our hash.
+	keys := []string{}
+
+	for x := range h.Entries {
+		keys = append(keys, x)
 	}
+
+	// Sort the list of keys
+	sort.Strings(keys)
+
+	// Now we can get a consistent ordering for our
+	// hash keys/value pairs.
+	for _, key := range keys {
+		out += "\t" + key + " => " + h.Entries[key].ToString() + "\n"
+	}
+
+	// Terminate the string representation and return.
 	out += "}"
 	return out
 }

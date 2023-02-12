@@ -278,6 +278,12 @@ a
 		{"(* 4 -1)", "-4"},
 		{"(# 3 2)", "9"},
 
+		// hash equality
+		{`(eq { :name "Ale" :age 3}
+                      { :age 3 :name "Ale"})`, "#t"},
+		{`(eq { :name "ale" :age 3}
+                      { :age 3 :name "Ale"})`, "#f"},
+
 		// since we're variadic we start with the first
 		// number, and apply the operation to any subsequent
 		// ones.
