@@ -5,6 +5,9 @@ BASE="yal"
 
 D=$(pwd)
 
+# I don't even ..
+go env -w GOFLAGS="-buildvcs=false"
+
 #
 # We build on multiple platforms/archs
 #
