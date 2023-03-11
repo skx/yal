@@ -27,6 +27,8 @@ func init() {
 	// Environment will have a config
 	ENV.SetIOConfig(config.DefaultIO())
 
+	// And will have our builtin-functions present
+	PopulateEnvironment(ENV)
 }
 
 func TestArch(t *testing.T) {
@@ -122,6 +124,25 @@ func TestBase(t *testing.T) {
 		if !strings.Contains(string(r), "invalid base") {
 			t.Fatalf("got error, but wrong one %v", r)
 		}
+	}
+}
+
+
+// Test (builtins
+func TestBuiltins(t *testing.T) {
+
+	// No arguments
+	out := builtinsFn(ENV, []primitive.Primitive{})
+
+	// Will lead to a list
+	e, ok := out.(primitive.List)
+	if !ok {
+		t.Fatalf("expected list, got %v", out)
+	}
+
+	// List will have 20+ entries
+	if len(e) < 20 {
+		t.Fatalf("expected (builtins) to return at least 20 entries, got %d", len(e))
 	}
 }
 
@@ -3315,6 +3336,23 @@ func TestSort(t *testing.T) {
 		t.Fatalf("got wrong result %v", s)
 	}
 
+}
+
+func TestSpecials(t *testing.T) {
+
+	// No arguments
+	out := specialsFn(ENV, []primitive.Primitive{})
+
+	// Will lead to a list
+	e, ok := out.(primitive.List)
+	if !ok {
+		t.Fatalf("expected list, got %v", out)
+	}
+
+	// List will have 10+ entries
+	if len(e) < 10 {
+		t.Fatalf("expected (specials) to return at least 10 entries, got %d", len(e))
+	}
 }
 
 func TestSplit(t *testing.T) {
