@@ -64,6 +64,13 @@ See also: number, sprintf, str
 Example: (print (base 255 2))  ; base two is binary
 Example: (print (base 255 16)) ; base 16 is hexadecimal
 %%
+builtins
+
+Return a list of all functions builtin to our golang interpreter.  This
+includes only the functions implemented in golang, excluding the specials.
+
+See also: specials
+%%
 car
 car returns the first item from the specified list.
 %%
@@ -385,6 +392,13 @@ will be converted to a string and sorted that way.  If you want more flexibility
 see also sort-by.
 
 Example: (print (sort 3 43  1 "Steve" "Adam"))
+%%
+specials
+
+Return a list of all functions which are implemented within our golang
+interpreter, as special forms, in golang.
+
+See-also: builtins
 %%
 split
 

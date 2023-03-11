@@ -45,7 +45,9 @@ Characters are specified via the `#\X` syntax, for escaped characters you just n
 
 ## Special Forms
 
-Special forms are things that are built into the core interpreter, and include:
+Special forms are things that are built into the core interpreter, and handled specially.
+
+You can receive a full-list of special forms via `(specials)`, this list will include:
 
 * `alias`
   * Define function aliases, this is used whenever we rename/change things in the standard-library to avoid breaking user scripts.
@@ -88,7 +90,7 @@ Special forms are things that are built into the core interpreter, and include:
 
 Core primitives are those that can be overridden, and are implemented in golang, in the [builtins/builtins.go](builtins/builtins.go) file.
 
-Things you'll find here include:
+You can receive a full-list of these via `(builtins)`, this list will include:
 
 * `#`
   * Exponent function.
@@ -120,6 +122,8 @@ Things you'll find here include:
   * Trig. function.
 * `base`
   * Convert the specified integer to a string, in the given base.
+* `builtins`
+  * Return the list of built-in functions, implemented in golang.
 * `car`
   * Return the first item of a list.
 * `cdr`
@@ -229,6 +233,8 @@ Things you'll find here include:
   * Trig. function.
 * `sort`
   * Sort the given list.
+* `specials`
+  * Return the list of built-in special-forms, implemented in golang.
 * `split`
   * Split the given string, by the specified character.
 * `sprintf`

@@ -47,6 +47,9 @@ var regCache map[string]*regexp.Regexp
 // function.
 var symCount int
 
+// builtins contains all our built-in functions
+var builtins []string
+
 // init ensures that our regexp cache is populated, and that we build
 // up a list of help-texts, keyed on function name.
 func init() {
@@ -87,84 +90,97 @@ func init() {
 	// All done, our help text should be available at run-time now.
 }
 
+// registerBuiltin registers a built-in, at the same time storing
+// the name in the "builtins" global.
+func registerBuiltin(env *env.Environment, key string, value any) {
+	builtins = append(builtins, key)
+
+	// Sort the list
+	sort.Strings(builtins)
+
+	env.Set(key, value)
+}
+
 // PopulateEnvironment registers our default primitives
 func PopulateEnvironment(env *env.Environment) {
 
 	//
 	// bind the functions - sorted order
 	//
-	env.Set("#", &primitive.Procedure{F: expnFn, Help: helpMap["#"], Args: []primitive.Symbol{primitive.Symbol("N"), primitive.Symbol("b")}})
-	env.Set("%", &primitive.Procedure{F: modFn, Help: helpMap["%"], Args: []primitive.Symbol{primitive.Symbol("a"), primitive.Symbol("b")}})
-	env.Set("*", &primitive.Procedure{F: multiplyFn, Help: helpMap["*"], Args: []primitive.Symbol{primitive.Symbol("N"), primitive.Symbol("arg1..argN")}})
-	env.Set("+", &primitive.Procedure{F: plusFn, Help: helpMap["+"], Args: []primitive.Symbol{primitive.Symbol("N"), primitive.Symbol("arg1..argN")}})
-	env.Set("-", &primitive.Procedure{F: minusFn, Help: helpMap["-"], Args: []primitive.Symbol{primitive.Symbol("N"), primitive.Symbol("arg1..argN")}})
-	env.Set("/", &primitive.Procedure{F: divideFn, Help: helpMap["/"], Args: []primitive.Symbol{primitive.Symbol("N"), primitive.Symbol("arg1..argN")}})
-	env.Set("/=", &primitive.Procedure{F: inequalityFn, Help: helpMap["/="], Args: []primitive.Symbol{primitive.Symbol("N"), primitive.Symbol("arg1..argN")}})
-	env.Set("<", &primitive.Procedure{F: ltFn, Help: helpMap["<"], Args: []primitive.Symbol{primitive.Symbol("a"), primitive.Symbol("b")}})
-	env.Set("=", &primitive.Procedure{F: equalsFn, Help: helpMap["="], Args: []primitive.Symbol{primitive.Symbol("arg1"), primitive.Symbol("arg2 .. argN")}})
-	env.Set("acos", &primitive.Procedure{F: acosFn, Help: helpMap["acos"], Args: []primitive.Symbol{primitive.Symbol("n")}})
-	env.Set("arch", &primitive.Procedure{F: archFn, Help: helpMap["arch"]})
-	env.Set("asin", &primitive.Procedure{F: asinFn, Help: helpMap["asin"], Args: []primitive.Symbol{primitive.Symbol("n")}})
-	env.Set("atan", &primitive.Procedure{F: atanFn, Help: helpMap["atan"], Args: []primitive.Symbol{primitive.Symbol("n")}})
-	env.Set("base", &primitive.Procedure{F: baseFn, Help: helpMap["base"], Args: []primitive.Symbol{primitive.Symbol("number"), primitive.Symbol("base")}})
-	env.Set("car", &primitive.Procedure{F: carFn, Help: helpMap["car"], Args: []primitive.Symbol{primitive.Symbol("list")}})
-	env.Set("cdr", &primitive.Procedure{F: cdrFn, Help: helpMap["cdr"], Args: []primitive.Symbol{primitive.Symbol("list")}})
-	env.Set("char<", &primitive.Procedure{F: charLtFn, Help: helpMap["char<"], Args: []primitive.Symbol{primitive.Symbol("a"), primitive.Symbol("b")}})
-	env.Set("char=", &primitive.Procedure{F: charEqualsFn, Help: helpMap["char="], Args: []primitive.Symbol{primitive.Symbol("a"), primitive.Symbol("b")}})
-	env.Set("chr", &primitive.Procedure{F: chrFn, Help: helpMap["chr"], Args: []primitive.Symbol{primitive.Symbol("num")}})
-	env.Set("cons", &primitive.Procedure{F: consFn, Help: helpMap["cons"], Args: []primitive.Symbol{primitive.Symbol("a"), primitive.Symbol("b")}})
-	env.Set("contains?", &primitive.Procedure{F: containsFn, Help: helpMap["contains?"], Args: []primitive.Symbol{primitive.Symbol("hash"), primitive.Symbol("key")}})
-	env.Set("cos", &primitive.Procedure{F: cosFn, Help: helpMap["cos"], Args: []primitive.Symbol{primitive.Symbol("n")}})
-	env.Set("cosh", &primitive.Procedure{F: coshFn, Help: helpMap["cosh"], Args: []primitive.Symbol{primitive.Symbol("n")}})
-	env.Set("date", &primitive.Procedure{F: dateFn, Help: helpMap["date"]})
-	env.Set("directory:entries", &primitive.Procedure{F: directoryEntriesFn, Help: helpMap["directory:entries"]})
-	env.Set("directory?", &primitive.Procedure{F: directoryFn, Help: helpMap["directory?"], Args: []primitive.Symbol{primitive.Symbol("path")}})
-	env.Set("env", &primitive.Procedure{F: envFn, Help: helpMap["env"], Args: []primitive.Symbol{}})
-	env.Set("eq", &primitive.Procedure{F: eqFn, Help: helpMap["eq"], Args: []primitive.Symbol{primitive.Symbol("a"), primitive.Symbol("b")}})
-	env.Set("error", &primitive.Procedure{F: errorFn, Help: helpMap["error"], Args: []primitive.Symbol{primitive.Symbol("message")}})
-	env.Set("exists?", &primitive.Procedure{F: existsFn, Help: helpMap["exists?"], Args: []primitive.Symbol{primitive.Symbol("path")}})
-	env.Set("explode", &primitive.Procedure{F: explodeFn, Help: helpMap["explode"], Args: []primitive.Symbol{primitive.Symbol("string")}})
-	env.Set("file:lines", &primitive.Procedure{F: fileLinesFn, Help: helpMap["file:lines"], Args: []primitive.Symbol{primitive.Symbol("path")}})
-	env.Set("file:read", &primitive.Procedure{F: fileReadFn, Help: helpMap["file:read"], Args: []primitive.Symbol{primitive.Symbol("path")}})
-	env.Set("file:stat", &primitive.Procedure{F: fileStatFn, Help: helpMap["file:stat"], Args: []primitive.Symbol{primitive.Symbol("path")}})
-	env.Set("file:write", &primitive.Procedure{F: fileWriteFn, Help: helpMap["file:write"], Args: []primitive.Symbol{primitive.Symbol("path"), primitive.Symbol("content")}})
-	env.Set("file?", &primitive.Procedure{F: fileFn, Help: helpMap["file?"], Args: []primitive.Symbol{primitive.Symbol("path")}})
-	env.Set("gensym", &primitive.Procedure{F: gensymFn, Help: helpMap["gensym"]})
-	env.Set("get", &primitive.Procedure{F: getFn, Help: helpMap["get"], Args: []primitive.Symbol{primitive.Symbol("hash"), primitive.Symbol("key")}})
-	env.Set("getenv", &primitive.Procedure{F: getenvFn, Help: helpMap["getenv"], Args: []primitive.Symbol{primitive.Symbol("key")}})
-	env.Set("glob", &primitive.Procedure{F: globFn, Help: helpMap["glob"], Args: []primitive.Symbol{primitive.Symbol("pattern")}})
-	env.Set("help", &primitive.Procedure{F: helpFn, Help: helpMap["help"], Args: []primitive.Symbol{primitive.Symbol("function")}})
-	env.Set("join", &primitive.Procedure{F: joinFn, Help: helpMap["join"], Args: []primitive.Symbol{primitive.Symbol("list")}})
-	env.Set("keys", &primitive.Procedure{F: keysFn, Help: helpMap["keys"], Args: []primitive.Symbol{primitive.Symbol("hash")}})
-	env.Set("list", &primitive.Procedure{F: listFn, Help: helpMap["list"], Args: []primitive.Symbol{primitive.Symbol("arg1"), primitive.Symbol("arg...")}})
-	env.Set("match", &primitive.Procedure{F: matchFn, Help: helpMap["match"], Args: []primitive.Symbol{primitive.Symbol("regexp"), primitive.Symbol("str")}})
-	env.Set("md5", &primitive.Procedure{F: md5Fn, Help: helpMap["md5"], Args: []primitive.Symbol{primitive.Symbol("string")}})
-	env.Set("ms", &primitive.Procedure{F: msFn, Help: helpMap["ms"]})
-	env.Set("nil?", &primitive.Procedure{F: nilFn, Help: helpMap["nil?"], Args: []primitive.Symbol{primitive.Symbol("object")}})
-	env.Set("now", &primitive.Procedure{F: nowFn, Help: helpMap["now"]})
-	env.Set("nth", &primitive.Procedure{F: nthFn, Help: helpMap["nth"], Args: []primitive.Symbol{primitive.Symbol("list"), primitive.Symbol("offset")}})
-	env.Set("number", &primitive.Procedure{F: numberFn, Help: helpMap["number"], Args: []primitive.Symbol{primitive.Symbol("str")}})
-	env.Set("ord", &primitive.Procedure{F: ordFn, Help: helpMap["ord"], Args: []primitive.Symbol{primitive.Symbol("char")}})
-	env.Set("os", &primitive.Procedure{F: osFn, Help: helpMap["os"]})
-	env.Set("print", &primitive.Procedure{F: printFn, Help: helpMap["print"], Args: []primitive.Symbol{primitive.Symbol("arg1..argN")}})
-	env.Set("random", &primitive.Procedure{F: randomFn, Help: helpMap["random"], Args: []primitive.Symbol{primitive.Symbol("max")}})
-	env.Set("set", &primitive.Procedure{F: setFn, Help: helpMap["set"], Args: []primitive.Symbol{primitive.Symbol("hash"), primitive.Symbol("key"), primitive.Symbol("val")}})
-	env.Set("sha1", &primitive.Procedure{F: sha1Fn, Help: helpMap["sha1"], Args: []primitive.Symbol{primitive.Symbol("string")}})
-	env.Set("sha256", &primitive.Procedure{F: sha256Fn, Help: helpMap["sha256"], Args: []primitive.Symbol{primitive.Symbol("string")}})
-	env.Set("shell", &primitive.Procedure{F: shellFn, Help: helpMap["shell"], Args: []primitive.Symbol{primitive.Symbol("list")}})
-	env.Set("sin", &primitive.Procedure{F: sinFn, Help: helpMap["sin"], Args: []primitive.Symbol{primitive.Symbol("n")}})
-	env.Set("sinh", &primitive.Procedure{F: sinhFn, Help: helpMap["sinh"], Args: []primitive.Symbol{primitive.Symbol("n")}})
-	env.Set("sort", &primitive.Procedure{F: sortFn, Help: helpMap["sort"], Args: []primitive.Symbol{primitive.Symbol("list")}})
-	env.Set("split", &primitive.Procedure{F: splitFn, Help: helpMap["split"], Args: []primitive.Symbol{primitive.Symbol("str"), primitive.Symbol("by")}})
-	env.Set("sprintf", &primitive.Procedure{F: sprintfFn, Help: helpMap["sprintf"], Args: []primitive.Symbol{primitive.Symbol("arg1..argN")}})
-	env.Set("str", &primitive.Procedure{F: strFn, Help: helpMap["str"], Args: []primitive.Symbol{primitive.Symbol("object")}})
-	env.Set("string<", &primitive.Procedure{F: stringLtFn, Help: helpMap["string<"], Args: []primitive.Symbol{primitive.Symbol("a"), primitive.Symbol("b")}})
-	env.Set("string=", &primitive.Procedure{F: stringEqualsFn, Help: helpMap["string="], Args: []primitive.Symbol{primitive.Symbol("a"), primitive.Symbol("b")}})
-	env.Set("tan", &primitive.Procedure{F: tanFn, Help: helpMap["tan"], Args: []primitive.Symbol{primitive.Symbol("n")}})
-	env.Set("tanh", &primitive.Procedure{F: tanhFn, Help: helpMap["tanh"], Args: []primitive.Symbol{primitive.Symbol("n")}})
-	env.Set("time", &primitive.Procedure{F: timeFn, Help: helpMap["time"]})
-	env.Set("type", &primitive.Procedure{F: typeFn, Help: helpMap["type"], Args: []primitive.Symbol{primitive.Symbol("object")}})
-	env.Set("vals", &primitive.Procedure{F: valsFn, Help: helpMap["vals"], Args: []primitive.Symbol{primitive.Symbol("hash")}})
+	registerBuiltin(env, "#", &primitive.Procedure{F: expnFn, Help: helpMap["#"], Args: []primitive.Symbol{primitive.Symbol("N"), primitive.Symbol("b")}})
+	registerBuiltin(env, "%", &primitive.Procedure{F: modFn, Help: helpMap["%"], Args: []primitive.Symbol{primitive.Symbol("a"), primitive.Symbol("b")}})
+	registerBuiltin(env, "*", &primitive.Procedure{F: multiplyFn, Help: helpMap["*"], Args: []primitive.Symbol{primitive.Symbol("N"), primitive.Symbol("arg1..argN")}})
+	registerBuiltin(env, "+", &primitive.Procedure{F: plusFn, Help: helpMap["+"], Args: []primitive.Symbol{primitive.Symbol("N"), primitive.Symbol("arg1..argN")}})
+	registerBuiltin(env, "-", &primitive.Procedure{F: minusFn, Help: helpMap["-"], Args: []primitive.Symbol{primitive.Symbol("N"), primitive.Symbol("arg1..argN")}})
+	registerBuiltin(env, "/", &primitive.Procedure{F: divideFn, Help: helpMap["/"], Args: []primitive.Symbol{primitive.Symbol("N"), primitive.Symbol("arg1..argN")}})
+	registerBuiltin(env, "/=", &primitive.Procedure{F: inequalityFn, Help: helpMap["/="], Args: []primitive.Symbol{primitive.Symbol("N"), primitive.Symbol("arg1..argN")}})
+	registerBuiltin(env, "<", &primitive.Procedure{F: ltFn, Help: helpMap["<"], Args: []primitive.Symbol{primitive.Symbol("a"), primitive.Symbol("b")}})
+	registerBuiltin(env, "=", &primitive.Procedure{F: equalsFn, Help: helpMap["="], Args: []primitive.Symbol{primitive.Symbol("arg1"), primitive.Symbol("arg2 .. argN")}})
+	registerBuiltin(env, "acos", &primitive.Procedure{F: acosFn, Help: helpMap["acos"], Args: []primitive.Symbol{primitive.Symbol("n")}})
+	registerBuiltin(env, "arch", &primitive.Procedure{F: archFn, Help: helpMap["arch"]})
+	registerBuiltin(env, "asin", &primitive.Procedure{F: asinFn, Help: helpMap["asin"], Args: []primitive.Symbol{primitive.Symbol("n")}})
+	registerBuiltin(env, "atan", &primitive.Procedure{F: atanFn, Help: helpMap["atan"], Args: []primitive.Symbol{primitive.Symbol("n")}})
+	registerBuiltin(env, "base", &primitive.Procedure{F: baseFn, Help: helpMap["base"], Args: []primitive.Symbol{primitive.Symbol("number"), primitive.Symbol("base")}})
+	registerBuiltin(env, "builtins", &primitive.Procedure{F: builtinsFn, Help: helpMap["builtins"], Args: []primitive.Symbol{}})
+	registerBuiltin(env, "car", &primitive.Procedure{F: carFn, Help: helpMap["car"], Args: []primitive.Symbol{primitive.Symbol("list")}})
+	registerBuiltin(env, "cdr", &primitive.Procedure{F: cdrFn, Help: helpMap["cdr"], Args: []primitive.Symbol{primitive.Symbol("list")}})
+	registerBuiltin(env, "char<", &primitive.Procedure{F: charLtFn, Help: helpMap["char<"], Args: []primitive.Symbol{primitive.Symbol("a"), primitive.Symbol("b")}})
+	registerBuiltin(env, "char=", &primitive.Procedure{F: charEqualsFn, Help: helpMap["char="], Args: []primitive.Symbol{primitive.Symbol("a"), primitive.Symbol("b")}})
+	registerBuiltin(env, "chr", &primitive.Procedure{F: chrFn, Help: helpMap["chr"], Args: []primitive.Symbol{primitive.Symbol("num")}})
+	registerBuiltin(env, "cons", &primitive.Procedure{F: consFn, Help: helpMap["cons"], Args: []primitive.Symbol{primitive.Symbol("a"), primitive.Symbol("b")}})
+	registerBuiltin(env, "contains?", &primitive.Procedure{F: containsFn, Help: helpMap["contains?"], Args: []primitive.Symbol{primitive.Symbol("hash"), primitive.Symbol("key")}})
+	registerBuiltin(env, "cos", &primitive.Procedure{F: cosFn, Help: helpMap["cos"], Args: []primitive.Symbol{primitive.Symbol("n")}})
+	registerBuiltin(env, "cosh", &primitive.Procedure{F: coshFn, Help: helpMap["cosh"], Args: []primitive.Symbol{primitive.Symbol("n")}})
+	registerBuiltin(env, "date", &primitive.Procedure{F: dateFn, Help: helpMap["date"]})
+	registerBuiltin(env, "directory:entries", &primitive.Procedure{F: directoryEntriesFn, Help: helpMap["directory:entries"]})
+	registerBuiltin(env, "directory?", &primitive.Procedure{F: directoryFn, Help: helpMap["directory?"], Args: []primitive.Symbol{primitive.Symbol("path")}})
+	registerBuiltin(env, "env", &primitive.Procedure{F: envFn, Help: helpMap["env"], Args: []primitive.Symbol{}})
+	registerBuiltin(env, "eq", &primitive.Procedure{F: eqFn, Help: helpMap["eq"], Args: []primitive.Symbol{primitive.Symbol("a"), primitive.Symbol("b")}})
+	registerBuiltin(env, "error", &primitive.Procedure{F: errorFn, Help: helpMap["error"], Args: []primitive.Symbol{primitive.Symbol("message")}})
+	registerBuiltin(env, "exists?", &primitive.Procedure{F: existsFn, Help: helpMap["exists?"], Args: []primitive.Symbol{primitive.Symbol("path")}})
+	registerBuiltin(env, "explode", &primitive.Procedure{F: explodeFn, Help: helpMap["explode"], Args: []primitive.Symbol{primitive.Symbol("string")}})
+	registerBuiltin(env, "file:lines", &primitive.Procedure{F: fileLinesFn, Help: helpMap["file:lines"], Args: []primitive.Symbol{primitive.Symbol("path")}})
+	registerBuiltin(env, "file:read", &primitive.Procedure{F: fileReadFn, Help: helpMap["file:read"], Args: []primitive.Symbol{primitive.Symbol("path")}})
+	registerBuiltin(env, "file:stat", &primitive.Procedure{F: fileStatFn, Help: helpMap["file:stat"], Args: []primitive.Symbol{primitive.Symbol("path")}})
+	registerBuiltin(env, "file:write", &primitive.Procedure{F: fileWriteFn, Help: helpMap["file:write"], Args: []primitive.Symbol{primitive.Symbol("path"), primitive.Symbol("content")}})
+	registerBuiltin(env, "file?", &primitive.Procedure{F: fileFn, Help: helpMap["file?"], Args: []primitive.Symbol{primitive.Symbol("path")}})
+	registerBuiltin(env, "gensym", &primitive.Procedure{F: gensymFn, Help: helpMap["gensym"]})
+	registerBuiltin(env, "get", &primitive.Procedure{F: getFn, Help: helpMap["get"], Args: []primitive.Symbol{primitive.Symbol("hash"), primitive.Symbol("key")}})
+	registerBuiltin(env, "getenv", &primitive.Procedure{F: getenvFn, Help: helpMap["getenv"], Args: []primitive.Symbol{primitive.Symbol("key")}})
+	registerBuiltin(env, "glob", &primitive.Procedure{F: globFn, Help: helpMap["glob"], Args: []primitive.Symbol{primitive.Symbol("pattern")}})
+	registerBuiltin(env, "help", &primitive.Procedure{F: helpFn, Help: helpMap["help"], Args: []primitive.Symbol{primitive.Symbol("function")}})
+	registerBuiltin(env, "join", &primitive.Procedure{F: joinFn, Help: helpMap["join"], Args: []primitive.Symbol{primitive.Symbol("list")}})
+	registerBuiltin(env, "keys", &primitive.Procedure{F: keysFn, Help: helpMap["keys"], Args: []primitive.Symbol{primitive.Symbol("hash")}})
+	registerBuiltin(env, "list", &primitive.Procedure{F: listFn, Help: helpMap["list"], Args: []primitive.Symbol{primitive.Symbol("arg1"), primitive.Symbol("arg...")}})
+	registerBuiltin(env, "match", &primitive.Procedure{F: matchFn, Help: helpMap["match"], Args: []primitive.Symbol{primitive.Symbol("regexp"), primitive.Symbol("str")}})
+	registerBuiltin(env, "md5", &primitive.Procedure{F: md5Fn, Help: helpMap["md5"], Args: []primitive.Symbol{primitive.Symbol("string")}})
+	registerBuiltin(env, "ms", &primitive.Procedure{F: msFn, Help: helpMap["ms"]})
+	registerBuiltin(env, "nil?", &primitive.Procedure{F: nilFn, Help: helpMap["nil?"], Args: []primitive.Symbol{primitive.Symbol("object")}})
+	registerBuiltin(env, "now", &primitive.Procedure{F: nowFn, Help: helpMap["now"]})
+	registerBuiltin(env, "nth", &primitive.Procedure{F: nthFn, Help: helpMap["nth"], Args: []primitive.Symbol{primitive.Symbol("list"), primitive.Symbol("offset")}})
+	registerBuiltin(env, "number", &primitive.Procedure{F: numberFn, Help: helpMap["number"], Args: []primitive.Symbol{primitive.Symbol("str")}})
+	registerBuiltin(env, "ord", &primitive.Procedure{F: ordFn, Help: helpMap["ord"], Args: []primitive.Symbol{primitive.Symbol("char")}})
+	registerBuiltin(env, "os", &primitive.Procedure{F: osFn, Help: helpMap["os"]})
+	registerBuiltin(env, "print", &primitive.Procedure{F: printFn, Help: helpMap["print"], Args: []primitive.Symbol{primitive.Symbol("arg1..argN")}})
+	registerBuiltin(env, "random", &primitive.Procedure{F: randomFn, Help: helpMap["random"], Args: []primitive.Symbol{primitive.Symbol("max")}})
+	registerBuiltin(env, "set", &primitive.Procedure{F: setFn, Help: helpMap["set"], Args: []primitive.Symbol{primitive.Symbol("hash"), primitive.Symbol("key"), primitive.Symbol("val")}})
+	registerBuiltin(env, "sha1", &primitive.Procedure{F: sha1Fn, Help: helpMap["sha1"], Args: []primitive.Symbol{primitive.Symbol("string")}})
+	registerBuiltin(env, "sha256", &primitive.Procedure{F: sha256Fn, Help: helpMap["sha256"], Args: []primitive.Symbol{primitive.Symbol("string")}})
+	registerBuiltin(env, "shell", &primitive.Procedure{F: shellFn, Help: helpMap["shell"], Args: []primitive.Symbol{primitive.Symbol("list")}})
+	registerBuiltin(env, "sin", &primitive.Procedure{F: sinFn, Help: helpMap["sin"], Args: []primitive.Symbol{primitive.Symbol("n")}})
+	registerBuiltin(env, "sinh", &primitive.Procedure{F: sinhFn, Help: helpMap["sinh"], Args: []primitive.Symbol{primitive.Symbol("n")}})
+	registerBuiltin(env, "sort", &primitive.Procedure{F: sortFn, Help: helpMap["sort"], Args: []primitive.Symbol{primitive.Symbol("list")}})
+	registerBuiltin(env, "specials", &primitive.Procedure{F: specialsFn, Help: helpMap["specials"], Args: []primitive.Symbol{}})
+	registerBuiltin(env, "split", &primitive.Procedure{F: splitFn, Help: helpMap["split"], Args: []primitive.Symbol{primitive.Symbol("str"), primitive.Symbol("by")}})
+	registerBuiltin(env, "sprintf", &primitive.Procedure{F: sprintfFn, Help: helpMap["sprintf"], Args: []primitive.Symbol{primitive.Symbol("arg1..argN")}})
+	registerBuiltin(env, "str", &primitive.Procedure{F: strFn, Help: helpMap["str"], Args: []primitive.Symbol{primitive.Symbol("object")}})
+	registerBuiltin(env, "string<", &primitive.Procedure{F: stringLtFn, Help: helpMap["string<"], Args: []primitive.Symbol{primitive.Symbol("a"), primitive.Symbol("b")}})
+	registerBuiltin(env, "string=", &primitive.Procedure{F: stringEqualsFn, Help: helpMap["string="], Args: []primitive.Symbol{primitive.Symbol("a"), primitive.Symbol("b")}})
+	registerBuiltin(env, "tan", &primitive.Procedure{F: tanFn, Help: helpMap["tan"], Args: []primitive.Symbol{primitive.Symbol("n")}})
+	registerBuiltin(env, "tanh", &primitive.Procedure{F: tanhFn, Help: helpMap["tanh"], Args: []primitive.Symbol{primitive.Symbol("n")}})
+	registerBuiltin(env, "time", &primitive.Procedure{F: timeFn, Help: helpMap["time"]})
+	registerBuiltin(env, "type", &primitive.Procedure{F: typeFn, Help: helpMap["type"], Args: []primitive.Symbol{primitive.Symbol("object")}})
+	registerBuiltin(env, "vals", &primitive.Procedure{F: valsFn, Help: helpMap["vals"], Args: []primitive.Symbol{primitive.Symbol("hash")}})
 
 }
 
@@ -248,6 +264,16 @@ func baseFn(env *env.Environment, args []primitive.Primitive) primitive.Primitiv
 		return primitive.Error("invalid base - must be >=2 and <=36")
 	}
 	return primitive.String(strconv.FormatInt(int64(n), int(base)))
+}
+
+// builtinsFn implements (builtins)
+func builtinsFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+
+	var ret primitive.List
+	for _, entry := range builtins {
+		ret = append(ret, primitive.String(entry))
+	}
+	return ret
 }
 
 // carFn implements "car"
@@ -1710,6 +1736,36 @@ func sortFn(env *env.Environment, args []primitive.Primitive) primitive.Primitiv
 	})
 
 	return c
+
+}
+
+// (specials
+func specialsFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+
+	specials := []string{"alias",
+		"define",
+		"def!",
+		"defmacro!",
+		"do",
+		"eval",
+		"if",
+		"lambda",
+		"fn*",
+		"let*",
+		"macroexpand",
+		"quasiquote",
+		"quote",
+		"read",
+		"set!",
+		"struct",
+		"symbol",
+		"try",
+	}
+	var ret primitive.List
+	for _, entry := range specials {
+		ret = append(ret, primitive.String(entry))
+	}
+	return ret
 
 }
 
