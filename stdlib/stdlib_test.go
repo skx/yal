@@ -1,6 +1,7 @@
 package stdlib
 
 import (
+	"fmt"
 	"os"
 	"strings"
 	"testing"
@@ -20,6 +21,7 @@ func TestStdlibExcludeAll(t *testing.T) {
 	os.Setenv("YAL_STDLIB_EXCLUDE_ALL", "yes")
 
 	x = Contents()
+	fmt.Printf("%s\n", x)
 	if len(x) != 0 {
 		t.Fatalf("We expected no content, but got something, despite $YAL_STDLIB_EXCLUDE_ALL")
 	}

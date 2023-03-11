@@ -26,14 +26,15 @@ var stdlib embed.FS
 // We embed "*.lisp" when we build our binary
 func Contents() []byte {
 
+	// We can allow disabling the stdlib - if that is the case
+	// we return nothing.
+	if os.Getenv("YAL_STDLIB_EXCLUDE_ALL") != "" {
+		return []byte{}
+	}
+
 	// Result we'll return, start by ensuring we're loading
 	// our standard library
-	result := []byte( "(stdlib-start)\n" )
-
-	// We can allow disabling the stdlib.
-	if os.Getenv("YAL_STDLIB_EXCLUDE_ALL") != "" {
-		return result
-	}
+	result := []byte("(stdlib-start)\n" )
 
 	// We might exclude only one/two files
 	exclude := []string{}
