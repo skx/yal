@@ -26,8 +26,9 @@ var stdlib embed.FS
 // We embed "*.lisp" when we build our binary
 func Contents() []byte {
 
-	// Result
-	result := []byte{}
+	// Result we'll return, start by ensuring we're loading
+	// our standard library
+	result := []byte( "(stdlib-start)\n" )
 
 	// We can allow disabling the stdlib.
 	if os.Getenv("YAL_STDLIB_EXCLUDE_ALL") != "" {
@@ -69,6 +70,10 @@ func Contents() []byte {
 		// Append to our result
 		result = append(result, data...)
 	}
+
+	// Ensure we're finished with our standard library now.
+	suffix := "\n(stdlib-end)\n"
+	result = append(result, suffix...)
 
 	return result
 }

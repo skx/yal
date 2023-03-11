@@ -1758,6 +1758,9 @@ func specialsFn(env *env.Environment, args []primitive.Primitive) primitive.Prim
 		"read",
 		"set!",
 		"struct",
+		"stdlib-start",
+		"stdlib-end",
+		"stdlib",
 		"symbol",
 		"try",
 	}

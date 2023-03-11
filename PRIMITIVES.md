@@ -78,6 +78,13 @@ You can receive a full-list of special forms via `(specials)`, this list will in
   * Read a form from the specified string.
 * `set!`
   * Set the value of a variable.
+* `stdlib`
+  * Return the names of functions/macros defined in the standard-library.
+  * This is any function defined between a call to `stdlib-start` and `stdlib-end`.
+* `stdlib-end` (internal)
+  * Mark ourselves as no longer loading the standard library.
+* `stdlib-start` (internal)
+  * Mark ourselves as loading the standard library, such that new functions/macros will be appended to the `stdlib` list.
 * `struct`
   * Define a structure.
 * `symbol`

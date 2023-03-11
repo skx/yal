@@ -6,6 +6,7 @@ import (
 	"bufio"
 	"fmt"
 	"strings"
+	"sort"
 
 	"github.com/skx/yal/env"
 	"github.com/skx/yal/primitive"
@@ -70,6 +71,14 @@ func (ev *Eval) evalSpecialForm(name string, args []primitive.Primitive, e *env.
 		symb, ok := args[0].(primitive.Symbol)
 		if !ok {
 			return primitive.Error(fmt.Sprintf("Expected a symbol, got %v", args[0])), true
+		}
+
+		// If we're loading our standard library save the function
+		if ev.loadingStdlib {
+
+			// save the name
+			ev.stdlib = append(ev.stdlib, symb.ToString())
+			sort.Strings(ev.stdlib)
 		}
 
 		// macro body
@@ -267,6 +276,14 @@ func (ev *Eval) evalSpecialForm(name string, args []primitive.Primitive, e *env.
 		}
 		return ev.macroExpand(args[0], e), true
 
+	case "stdlib-end":
+		ev.loadingStdlib = false
+		return primitive.Nil{}, true
+
+	case "stdlib-start":
+		ev.loadingStdlib = true
+		return primitive.Nil{}, true
+
 	case "quasiquote":
 		if len(args) != 1 {
 			return primitive.ArityError(), true
@@ -333,6 +350,18 @@ func (ev *Eval) evalSpecialForm(name string, args []primitive.Primitive, e *env.
 		// Get the value.
 		val := ev.eval(args[1], e, expandMacro)
 
+		// If we're loading our standard library save the function
+		if ev.loadingStdlib {
+
+			// Is the value we're setting a function?
+			_, ok2 := val.(*primitive.Procedure)
+			if ok2 {
+				// Then save the name
+				ev.stdlib = append(ev.stdlib, sym.ToString())
+				sort.Strings(ev.stdlib)
+			}
+		}
+
 		// Now set, either locally or in the parent scope.
 		if len(args) == 3 {
 			e.SetOuter(string(sym), val)
@@ -340,6 +369,13 @@ func (ev *Eval) evalSpecialForm(name string, args []primitive.Primitive, e *env.
 			e.Set(string(sym), val)
 		}
 		return primitive.Nil{}, true
+
+	case "stdlib":
+		var ret primitive.List
+		for _, entry := range ev.stdlib {
+			ret = append(ret, primitive.String(entry))
+		}
+		return ret,true
 
 	case "struct":
 		if len(args) <= 1 {

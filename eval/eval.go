@@ -57,6 +57,14 @@ type Eval struct {
 	// The key is the name of the fake method, the value the name of
 	// the field to get/set
 	accessors map[string]string
+
+	// stdlib contains the names of the functions in the standard
+	// library
+	stdlib []string
+
+	// loadingStdlib controls whether we're loading the standard library
+	// if we are we write definitions to stdlib, otherwise we don't
+	loadingStdlib bool
 }
 
 // New constructs a new lisp interpreter.
