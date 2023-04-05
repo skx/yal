@@ -2184,6 +2184,27 @@ func TestJoin(t *testing.T) {
 	if s != "34" {
 		t.Fatalf("got wrong result %v", s)
 	}
+
+
+	// Now a list and a separator
+	out = joinFn(ENV, []primitive.Primitive{
+		primitive.List{
+			primitive.Number(1),
+			primitive.Number(2),
+			primitive.Number(3),
+			primitive.Number(4),
+		},
+		primitive.String("."),
+	})
+
+	s, ok2 = out.(primitive.String)
+	if !ok2 {
+		t.Fatalf("expected string, got %v", s)
+	}
+	if s != "1.2.3.4" {
+		t.Fatalf("got wrong result %v", s)
+	}
+
 }
 
 // TestKeys tests keys

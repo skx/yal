@@ -233,7 +233,11 @@ Example: (print (help print))
 %%
 join
 
-join returns a string formed by converting every element of the supplied list into a string and concatenating the results.
+join returns a string formed by converting every element of the supplied
+list into a string and concatenating the results.  An optional second
+parameter will be inserted between the list entries.
+
+Example: (print (join (list 192 168 1 1) ".")) ; "192.168.1.1"
 
 See also: explode, split
 %%

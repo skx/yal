@@ -1129,20 +1129,36 @@ func inequalityFn(env *env.Environment, args []primitive.Primitive) primitive.Pr
 // (join (1 2 3)
 func joinFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 
-	// We require one argument
-	if len(args) != 1 {
+	// We require one or two arguments
+	if len(args) != 1 && len(args) != 2 {
 		return primitive.ArityError()
 	}
 
 	// The argument must be a list
-	if _, ok := args[0].(primitive.List); !ok {
+	lst, ok := args[0].(primitive.List)
+	if !ok {
 		return primitive.Error("argument not a list")
 	}
 
-	tmp := ""
+	ln := len(lst)
 
-	for _, t := range args[0].(primitive.List) {
+	tmp := ""
+	sep := ""
+
+	// If we got a separator then save it away
+	if len(args) == 2 {
+		sep = args[1].ToString()
+	}
+
+	for i, t := range lst {
+
+		// Add the entry
 		tmp += t.ToString()
+
+		// Add the separator, unless it's the last entry
+		if i != (ln-1) {
+			tmp += sep
+		}
 	}
 
 	return primitive.String(tmp)
