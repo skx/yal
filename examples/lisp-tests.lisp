@@ -436,6 +436,17 @@ If the name of the test is not unique then that will cause an error to be printe
 (deftest mean:1 (list (mean (list 3 3 3)) 3))
 (deftest mean:2 (list (mean (list 10 6)) 8))
 
+;; counting matches in a list
+(deftest occur:1 (list (occurrences 3 '(1 2 3)) 1))
+(deftest occur:2 (list (occurrences 3 '(3 3 3)) 3))
+(deftest occur:3 (list (occurrences 3 '())      0))
+(deftest occur:4 (list (occurrences "me" '("me" "you" 3 "me")) 2))
+
+;; finding values in a list
+(deftest find:1 (list (find 3 '(1 2)) nil))
+(deftest find:2 (list (find 3 '(1 2 3)) '(2)))
+(deftest find:3 (list (find 3 '(1 2 3 3 2 1 )) '(2 3 )))
+(deftest find:4 (list (find 3 '()) nil))
 
 ;; Define two helpers for sorting, by one/other field.
 (set! people-surname-sort (fn* (a b) (string< (person.surname a) (person.surname b))))
