@@ -380,6 +380,8 @@ Functions here include:
   * Write the specified content to the given path.
 * `filter`
   * Remove every element from the given list, unless the function returns true.
+* `find`
+  * Return the offset(s) at which the given item occurs in the list, if at all.
 * `first`
   * Return the first element of the given list.
   * This is the same as `car`.
@@ -425,6 +427,8 @@ Functions here include:
   * Return the Nth element of the list.
 * `number?`
   * Is the given thing a number?
+* `occurrences`
+  * Count how many times the given item appears in the specified list.
 * `odd?`
   * Is the given number odd?
 * `one?`
