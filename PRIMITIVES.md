@@ -52,7 +52,7 @@ You can receive a full-list of special forms via `(specials)`, this list will in
 * `alias`
   * Define function aliases, this is used whenever we rename/change things in the standard-library to avoid breaking user scripts.
 * `catch`.
-  * Demonstrated in [try.lisp](try.lisp).
+  * Demonstrated in [examples/try.lisp](examples/try.lisp).
 * `def!`
   * `define` is an alias.
 * `defmacro!`
