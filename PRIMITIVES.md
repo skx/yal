@@ -56,12 +56,12 @@ You can receive a full-list of special forms via `(specials)`, this list will in
 * `def!`
   * `define` is an alias.
 * `defmacro!`
-  * Demonstrated in [mtest.lisp](mtest.lisp).
+  * Demonstrated in [examples/mtest.lisp](examples/mtest.lisp).
 * `do`
   * Execute each statement in the list.
 * `env`
   * Env allows introspection of the current environment.
-  * Demonstrated in [dynamic.lisp](dynamic.lisp)
+  * Demonstrated in [examples/dynamic.lisp](examples/dynamic.lisp)
 * `eval`
   * Execute the given expression.
 * `fn*`
@@ -90,7 +90,7 @@ You can receive a full-list of special forms via `(specials)`, this list will in
 * `symbol`
   * Create a new symbol from the given string.
 * `try`
-  * Error-catching warpper, demonstrated in [try.lisp](try.lisp).
+  * Error-catching warpper, demonstrated in [examples/try.lisp](examples/try.lisp).
 
 
 ## Core Primitives
@@ -157,7 +157,7 @@ You can receive a full-list of these via `(builtins)`, this list will include:
   * Trig. function.
 * `date`
   * Return details of today's date, as a list.
-  * Demonstrated in [time.lisp](time.lisp).
+  * Demonstrated in [examples/time.lisp](examples/time.lisp).
 * `dec2bin`
   * Convert the specified integer to a binary string.
 * `dec2hex`
@@ -270,7 +270,7 @@ You can receive a full-list of these via `(builtins)`, this list will include:
   * Trig. function.
 * `time`
   * Return values relating to the current time, as a list.
-  * Demonstrated in [time.lisp](time.lisp).
+  * Demonstrated in [examples/time.lisp](examples/time.lisp).
 * `type`
   * Return the type of the given object.
 * `vals`
