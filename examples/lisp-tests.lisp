@@ -448,6 +448,16 @@ If the name of the test is not unique then that will cause an error to be printe
 (deftest find:3 (list (find 3 '(1 2 3 3 2 1 )) '(2 3 )))
 (deftest find:4 (list (find 3 '()) nil))
 
+
+;; defaults
+(set! addy (fn* ( (a 10) (b 11) ) (+ a b) ))
+
+(deftest defaults:1 (list (addy)       21))
+(deftest defaults:2 (list (addy 1)     12))
+(deftest defaults:3 (list (addy 1 2)    3))
+(deftest defaults:4 (list (addy 1 2 3)  3))
+
+
 ;; Define two helpers for sorting, by one/other field.
 (set! people-surname-sort (fn* (a b) (string< (person.surname a) (person.surname b))))
 (set! people-forename-sort (fn* (a b) (string< (person.forename a) (person.forename b))))
