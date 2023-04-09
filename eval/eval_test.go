@@ -130,6 +130,13 @@ func TestEvaluate(t *testing.T) {
 		{"#\\a", "a"},
 		{"#\\AB", "ERROR{invalid character literal: AB}"},
 
+		// defaults
+		{"(set! def1 (fn* ( (a 3)   ) a )) (def1)", "3"},
+		{"(set! def2 (fn* ( (a 3)   ) a )) (def2 33)", "33"},
+		{"(fn* ( (3 3)   ) a )", "ERROR{expected a symbol for an argument, got 3}"},
+		{"(fn* ( (a 3 c) ) a )", "ERROR{only two list items allowed for a default-value, got 3}"},
+
+
 		// literals
 		{":foo", ":foo"},
 
@@ -315,9 +322,10 @@ a
 		{"(= -1 -1)", "#t"},
 
 		// we have a LOT of built ins, but not 200
-		{"(> (length (env))  10)", "#t"},
-		{"(> (length (env))  50)", "#t"},
-		{"(< (length (env)) 200)", "#t"},
+		{"(> (length (env))     10)", "#t"},
+		{"(> (length (env))     50)", "#t"},
+		{"(< (length (env))    200)", "#t"},
+		{"(< (length (stdlib)) 200)", "#t"},
 
 		// errors
 		{"(symbol)", primitive.ArityError().ToString()},
@@ -440,6 +448,47 @@ a
 			}
 		})
 	}
+}
+
+// This function tests (read)
+func TestRead(t *testing.T ) {
+
+	tst := `(read)`
+
+	// Load our standard library
+	st := stdlib.Contents()
+	std := string(st)
+
+	// Create a new interpreter
+	l := New(std + "\n" + tst)
+
+	// With a new environment
+	ev := env.New()
+
+	// Ensure we read from a fake input
+	c := config.DefaultIO()
+	c.STDIN = strings.NewReader( "hello, world\n")
+
+	// Environment will have a config
+	ev.SetIOConfig(c)
+
+	// Populate the default primitives
+	builtins.PopulateEnvironment(ev)
+
+	// Run it
+	out := l.Evaluate(ev)
+
+	if out.ToString() != "hello, world" {
+		t.Fatalf("read '%s' from (read)", out )
+	}
+
+	// Run it again - this time reading will fail
+	out = l.Evaluate(ev)
+
+	if !strings.Contains(out.ToString(), "failed to read from STDIN" ) {
+		t.Fatalf("(read) didn't give expected error, got '%s'", out )
+	}
+
 }
 
 // This function tests our standard library.
