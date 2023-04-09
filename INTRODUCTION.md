@@ -115,6 +115,23 @@ Help information can be retrieved at runtime, for usage:
 
     (print (help print))
 
+As shown in the examples above parameters are named, rather than specifying
+them as distinct symbols it is also possible to specify a default value by
+expressing the parameters as a list (of two items only):
+
+    (set! greet (fn* ( (name "World") )
+      "Greet the supplied name, use the default if a name is not supplied."
+      (print "Hello, %s" name)))
+
+That would operate like so:
+
+    (greet "Steve") ; "Hello, Steve"
+    (greet)         ; "Hello, World"
+
+
+
+
+## Macros
 To define a macro use `defmacro!`:
 
     (defmacro! debug (fn* (x) `(print "Variable '%s' has value %s" '~x ~x)))
