@@ -162,6 +162,14 @@ func help(show []string) {
 
 			for _, arg := range prc.Args {
 				args += " " + arg.ToString()
+
+				// Default value for this argument?
+				def, ok := prc.Defaults[arg]
+				if ok {
+					args += "[default:"
+					args += def.ToString()
+					args += "]"
+				}
 			}
 			args = strings.TrimSpace(args)
 			args = " (" + args + ")"

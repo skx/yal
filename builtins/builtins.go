@@ -1071,6 +1071,15 @@ func helpFn(env *env.Environment, args []primitive.Primitive) primitive.Primitiv
 			str = "Arguments"
 		}
 		str += " " + arg.ToString()
+
+		// Default value for this argument?
+		def, ok2 := proc.Defaults[arg]
+		if ok2 {
+			str += "[default:"
+			str += def.ToString()
+			str += "]"
+		}
+
 	}
 	if len(str) > 0 {
 		str += "\n"
