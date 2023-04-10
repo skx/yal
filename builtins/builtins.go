@@ -171,6 +171,7 @@ func PopulateEnvironment(env *env.Environment) {
 	registerBuiltin(env, "sin", &primitive.Procedure{F: sinFn, Help: helpMap["sin"], Args: []primitive.Symbol{primitive.Symbol("n")}})
 	registerBuiltin(env, "sinh", &primitive.Procedure{F: sinhFn, Help: helpMap["sinh"], Args: []primitive.Symbol{primitive.Symbol("n")}})
 	registerBuiltin(env, "sort", &primitive.Procedure{F: sortFn, Help: helpMap["sort"], Args: []primitive.Symbol{primitive.Symbol("list")}})
+	registerBuiltin(env, "source", &primitive.Procedure{F: sourceFn, Help: helpMap["source"], Args: []primitive.Symbol{primitive.Symbol("symbol")}})
 	registerBuiltin(env, "specials", &primitive.Procedure{F: specialsFn, Help: helpMap["specials"], Args: []primitive.Symbol{}})
 	registerBuiltin(env, "split", &primitive.Procedure{F: splitFn, Help: helpMap["split"], Args: []primitive.Symbol{primitive.Symbol("str"), primitive.Symbol("by")}})
 	registerBuiltin(env, "sprintf", &primitive.Procedure{F: sprintfFn, Help: helpMap["sprintf"], Args: []primitive.Symbol{primitive.Symbol("arg1..argN")}})
@@ -1785,6 +1786,28 @@ func sortFn(env *env.Environment, args []primitive.Primitive) primitive.Primitiv
 
 	return c
 
+}
+
+// sourceFn implements (source)
+func sourceFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+	// We need a single argument
+	if len(args) != 1 {
+		return primitive.ArityError()
+	}
+
+	// Which is a function
+	proc, ok := args[0].(*primitive.Procedure)
+
+	if !ok {
+		return primitive.Error("argument not a procedure")
+	}
+
+	if proc.F != nil {
+		return primitive.Error("procedure is implemented in golang")
+	}
+
+	// Return value
+	return primitive.String( proc.ToString())
 }
 
 // (specials
