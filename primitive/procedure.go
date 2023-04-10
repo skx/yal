@@ -15,6 +15,9 @@ type Procedure struct {
 	// Arguments to this procedure.
 	Args []Symbol
 
+	// Defaults supplied when the procedure was defined
+	Defaults map[Symbol]Primitive
+
 	// Body is the body to execute, in the case where F is nil.
 	Body Primitive
 

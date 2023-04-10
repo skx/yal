@@ -605,13 +605,18 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 		// Variadic arguments would add _extra_ arguments, so this check
 		// is still safe for those.
 		//
-		if len(args) < min {
+		if (len(args) + len(proc.Defaults)) < min {
 			return primitive.ArityError()
 		}
 
 		// Create a new environment/scope to set the
 		// parameter values within.
 		e = env.NewEnvironment(proc.Env)
+
+		// For each default argument set it
+		for k, v := range proc.Defaults {
+			e.Set(k.ToString(),v)
+		}
 
 		// For each of the arguments that have been supplied
 		for i, x := range args {

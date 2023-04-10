@@ -1,6 +1,6 @@
 ;;; lists.lisp - Some list-utility functions
 
-;; These were adapted from Rob Pike's lisp
+;; Some of these functions were adapted from Rob Pike's lisp
 ;;
 ;;    https://github.com/robpike/lisp
 ;;

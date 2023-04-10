@@ -185,15 +185,39 @@ func (ev *Eval) evalSpecialForm(name string, args []primitive.Primitive, e *env.
 			return primitive.Error(fmt.Sprintf("expected a list for arguments, got %v", args[0])), true
 		}
 
+		proc := &primitive.Procedure{
+			Defaults: make(map[primitive.Symbol]primitive.Primitive),
+		}
+
 		// Collect arguments
 		arguments := []primitive.Symbol{}
 		for _, x := range argMarkers {
 
-			xs, ok := x.(primitive.Symbol)
-			if !ok {
-				return primitive.Error(fmt.Sprintf("expected a symbol for an argument, got %v", x)), true
+			lst, ok1 := x.(primitive.List)
+			if ok1 {
+				// First term is the name
+				// Second term is the default
+				// TODO: More flexible
+				if len(lst) != 2 {
+					return primitive.Error(fmt.Sprintf("only two list items allowed for a default-value, got %d", len(lst))), true
+				}
+				arg := lst[0]
+				val := lst[1]
+
+				xs, ok2 := arg.(primitive.Symbol)
+				if !ok2 {
+					return primitive.Error(fmt.Sprintf("expected a symbol for an argument, got %v", arg)), true
+
+				}
+				arguments = append(arguments, xs)
+				proc.Defaults[xs] = val
+			} else {
+				xs, ok2 := x.(primitive.Symbol)
+				if !ok2 {
+					return primitive.Error(fmt.Sprintf("expected a symbol for an argument, got %v", x)), true
+				}
+				arguments = append(arguments, xs)
 			}
-			arguments = append(arguments, xs)
 		}
 
 		body := args[1]
@@ -210,13 +234,13 @@ func (ev *Eval) evalSpecialForm(name string, args []primitive.Primitive, e *env.
 		//
 		// To make it a macro it should be set with
 		// "(defmacro!..)"
-		return &primitive.Procedure{
-			Args:  arguments,
-			Body:  body,
-			Env:   e,
-			Help:  help,
-			Macro: false,
-		}, true
+		proc.Args = arguments
+		proc.Body = body
+		proc.Env = e
+		proc.Help= help
+		proc.Macro = false
+
+		return proc,true
 
 	case "let*":
 		// We need to have at least one argument.

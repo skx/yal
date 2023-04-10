@@ -2003,7 +2003,7 @@ func TestHelp(t *testing.T) {
 	env := env.New()
 	PopulateEnvironment(env)
 
-	for _, name := range []string{"print", "sprintf", "length"} {
+	for _, name := range []string{"print", "sprintf", "length", "inc", "dec"} {
 
 		// Load our standard library
 		st := stdlib.Contents()
