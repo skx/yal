@@ -128,6 +128,83 @@ func TestBase(t *testing.T) {
 }
 
 
+// TestBody tests (body)
+func TestBody(t *testing.T) {
+	// no arguments
+	out := bodyFn(ENV, []primitive.Primitive{})
+
+	// Will lead to an error
+	e, ok := out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if !strings.Contains(string(e), "argument") {
+		t.Fatalf("got error, but wrong one")
+	}
+
+	// First argument must be a procedure
+	out = bodyFn(ENV, []primitive.Primitive{
+		primitive.String("foo"),
+	})
+
+	// Will lead to an error
+	e, ok = out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if !strings.Contains(string(e), "not a procedure") {
+		t.Fatalf("got error, but wrong one %v", out)
+	}
+
+	//
+	// create a new environment, and populate it
+	//
+	env := env.New()
+	PopulateEnvironment(env)
+
+	for _, name := range []string{"inc", "dec"} {
+
+		// Load our standard library
+		st := stdlib.Contents()
+		std := string(st)
+
+		// Create a new interpreter
+		l := eval.New(std + "\n")
+
+		l.Evaluate(env)
+
+		fn, ok := env.Get(name)
+		if !ok {
+			t.Fatalf("failed to lookup function %s in environment", name)
+		}
+
+		result := bodyFn(ENV, []primitive.Primitive{fn.(*primitive.Procedure)})
+
+		txt, ok2 := result.(primitive.String)
+		if !ok2 {
+			t.Fatalf("expected a string, got %v", result)
+		}
+		if !strings.Contains(txt.ToString(), "(") {
+			t.Fatalf("got body text, but didn't find reasonable content: %v", result)
+		}
+	}
+
+	// Finally we get an error if we try to get the body of a golang
+	// primitive
+	fn, ok := env.Get("print")
+	if !ok {
+		t.Fatalf("failed to lookup function 'print' in environment")
+	}
+
+
+	result := bodyFn(ENV, []primitive.Primitive{fn.(*primitive.Procedure)})
+
+	_, ok2 := result.(primitive.Error)
+	if !ok2 {
+		t.Fatalf("expected an error, got %v", result)
+	}
+}
+
 // Test (builtins
 func TestBuiltins(t *testing.T) {
 

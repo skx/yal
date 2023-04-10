@@ -64,6 +64,14 @@ See also: number, sprintf, str
 Example: (print (base 255 2))  ; base two is binary
 Example: (print (base 255 16)) ; base 16 is hexadecimal
 %%
+body
+
+Return the body of a function implemented in lisp.
+
+See also: help
+
+Example: (print (body inc))
+%%
 builtins
 
 Return a list of all functions builtin to our golang interpreter.  This
@@ -229,6 +237,7 @@ help
 
 help returns any help associated with the item specified as the single argument.
 
+See also: body
 Example: (print (help print))
 %%
 join

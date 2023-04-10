@@ -121,6 +121,7 @@ func PopulateEnvironment(env *env.Environment) {
 	registerBuiltin(env, "asin", &primitive.Procedure{F: asinFn, Help: helpMap["asin"], Args: []primitive.Symbol{primitive.Symbol("n")}})
 	registerBuiltin(env, "atan", &primitive.Procedure{F: atanFn, Help: helpMap["atan"], Args: []primitive.Symbol{primitive.Symbol("n")}})
 	registerBuiltin(env, "base", &primitive.Procedure{F: baseFn, Help: helpMap["base"], Args: []primitive.Symbol{primitive.Symbol("number"), primitive.Symbol("base")}})
+	registerBuiltin(env, "body", &primitive.Procedure{F: bodyFn, Help: helpMap["body"], Args: []primitive.Symbol{primitive.Symbol("function")}})
 	registerBuiltin(env, "builtins", &primitive.Procedure{F: builtinsFn, Help: helpMap["builtins"], Args: []primitive.Symbol{}})
 	registerBuiltin(env, "car", &primitive.Procedure{F: carFn, Help: helpMap["car"], Args: []primitive.Symbol{primitive.Symbol("list")}})
 	registerBuiltin(env, "cdr", &primitive.Procedure{F: cdrFn, Help: helpMap["cdr"], Args: []primitive.Symbol{primitive.Symbol("list")}})
@@ -264,6 +265,28 @@ func baseFn(env *env.Environment, args []primitive.Primitive) primitive.Primitiv
 		return primitive.Error("invalid base - must be >=2 and <=36")
 	}
 	return primitive.String(strconv.FormatInt(int64(n), int(base)))
+}
+
+// bodyFn implements (body)
+func bodyFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+	// We need a single argument
+	if len(args) != 1 {
+		return primitive.ArityError()
+	}
+
+	// Which is a function
+	proc, ok := args[0].(*primitive.Procedure)
+
+	if !ok {
+		return primitive.Error("argument not a procedure")
+	}
+
+	if proc.F != nil {
+		return primitive.Error("procedure is implemented in golang")
+	}
+
+	// Return value
+	return primitive.String( proc.Body.ToString())
 }
 
 // builtinsFn implements (builtins)
