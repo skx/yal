@@ -28,7 +28,7 @@ It is similar to an if-statement, however there is no provision for an 'else' cl
 ;; NOTE: This recurses, so it will eventually explode the stack.
 ;;
 (defmacro! while (fn* (condition &body)
-                      "while is a macro which repeatedly runs the specified body, while the condition returns a true-result"
+                      "while is a macro which repeatedly runs the specified body, while the condition returns a true-result."
                       (let* (inner-sym (gensym))
                         `(let* (~inner-sym (fn* ()
                                                 (if ~condition

@@ -1,13 +1,17 @@
 ;;; maths.lisp - Some simple maths-related primitives
 
 ;; inc/dec are useful primitives to have
-(set! inc (fn* (n:number)
-               "inc will add one to the supplied value, and return the result."
-               (+ n 1)))
+(set! inc (fn* (n:number (by 1))
+               "inc will add one to the supplied value, and return the result.
 
-(set! dec (fn* (n:number)
-               "dec will subtract one from the supplied value, and return the result."
-               (- n 1)))
+If the optional second value is supplied it will be used instead of one."
+               (+ n by)))
+
+(set! dec (fn* (n:number (by 1))
+               "dec will subtract one from the supplied value, and return the result.
+
+If the optional second value is supplied it will be used instead of one."
+               (- n by)))
 
 ;; PI
 (set! pi (fn* ()
