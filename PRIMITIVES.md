@@ -129,6 +129,8 @@ You can receive a full-list of these via `(builtins)`, this list will include:
   * Trig. function.
 * `base`
   * Convert the specified integer to a string, in the given base.
+* `body`
+  * Return the body of a lisp-function.
 * `builtins`
   * Return the list of built-in functions, implemented in golang.
 * `car`
@@ -240,6 +242,8 @@ You can receive a full-list of these via `(builtins)`, this list will include:
   * Trig. function.
 * `sort`
   * Sort the given list.
+* `source`
+  * Return the source of a lisp-function.
 * `specials`
   * Return the list of built-in special-forms, implemented in golang.
 * `split`
