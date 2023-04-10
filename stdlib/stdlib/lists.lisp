@@ -22,6 +22,15 @@ See-also: intersection, member, occurrences, union."
                         (if (= 0 (length res)) nil res ))))
 
 
+(set! flatten (fn* (L)
+                   "Converts a list of nested lists to a single list, flattening it."
+                   (if (nil? L)
+                       nil
+                     (if (! (list? (first L)))
+                         (cons (first L) (flatten (rest L)))
+                       (append (flatten (first L)) (flatten (rest L)))))))
+
+
 (set! intersection (fn* (x y)
                         "Return the values common to the two specified lists.
 

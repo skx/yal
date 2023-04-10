@@ -17,6 +17,8 @@ This directory contains some simple lisp examples, which can be executed via `ya
   * Simple tests of our macro system.
 * [readme.lisp](readme.lisp)
   * Generate a README.md file, based on directory contents.
+* [sentences.lisp](sentences.lisp)
+  * Generate random sentences.
 * [sorting.lisp](sorting.lisp)
   * Demonstrate generating random lists, and sorting them.
 * [test.lisp](test.lisp)
