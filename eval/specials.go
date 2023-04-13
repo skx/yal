@@ -175,9 +175,6 @@ func (ev *Eval) evalSpecialForm(name string, args []primitive.Primitive, e *env.
 			}
 		}
 
-		// not reached
-		return nil, true
-
 	case "if":
 		if len(args) < 2 {
 			return primitive.ArityError(), true
