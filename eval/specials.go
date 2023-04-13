@@ -167,7 +167,7 @@ func (ev *Eval) evalSpecialForm(name string, args []primitive.Primitive, e *env.
 	case "forever":
 
 		// We run the body forever.
-		for true {
+		for {
 
 			// Process all the expressions
 			for _, x := range args {
