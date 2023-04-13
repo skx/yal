@@ -615,7 +615,7 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 
 		// For each default argument set it
 		for k, v := range proc.Defaults {
-			e.Set(k.ToString(),v)
+			e.Set(k.ToString(), v)
 		}
 
 		// For each of the arguments that have been supplied

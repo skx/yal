@@ -5,11 +5,11 @@ package eval
 import (
 	"bufio"
 	"fmt"
-	"strings"
-	"sort"
-
 	"github.com/skx/yal/env"
 	"github.com/skx/yal/primitive"
+	"os"
+	"sort"
+	"strings"
 )
 
 // evalSpecialForm is invoked to execute one of our special forms.
@@ -148,6 +148,33 @@ func (ev *Eval) evalSpecialForm(name string, args []primitive.Primitive, e *env.
 			return primitive.Error(fmt.Sprintf("unexpected type for eval %V.", args[0])), true
 		}
 
+	case "exit":
+		ret := 0
+
+		if len(args) == 1 {
+
+			n, ok := args[0].(primitive.Number)
+			if ok {
+				ret = int(n)
+			}
+		}
+
+		os.Exit(ret)
+
+		// not reached
+		return nil, true
+
+	case "forever":
+
+		// We run the body forever.
+		for {
+
+			// Process all the expressions
+			for _, x := range args {
+				_ = ev.eval(x, e, expandMacro)
+			}
+		}
+
 	case "if":
 		if len(args) < 2 {
 			return primitive.ArityError(), true
@@ -237,10 +264,10 @@ func (ev *Eval) evalSpecialForm(name string, args []primitive.Primitive, e *env.
 		proc.Args = arguments
 		proc.Body = body
 		proc.Env = e
-		proc.Help= help
+		proc.Help = help
 		proc.Macro = false
 
-		return proc,true
+		return proc, true
 
 	case "let*":
 		// We need to have at least one argument.
@@ -399,7 +426,7 @@ func (ev *Eval) evalSpecialForm(name string, args []primitive.Primitive, e *env.
 		for _, entry := range ev.stdlib {
 			ret = append(ret, primitive.String(entry))
 		}
-		return ret,true
+		return ret, true
 
 	case "struct":
 		if len(args) <= 1 {

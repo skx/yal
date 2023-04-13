@@ -136,7 +136,6 @@ func TestEvaluate(t *testing.T) {
 		{"(fn* ( (3 3)   ) a )", "ERROR{expected a symbol for an argument, got 3}"},
 		{"(fn* ( (a 3 c) ) a )", "ERROR{only two list items allowed for a default-value, got 3}"},
 
-
 		// literals
 		{":foo", ":foo"},
 
@@ -451,7 +450,7 @@ a
 }
 
 // This function tests (read)
-func TestRead(t *testing.T ) {
+func TestRead(t *testing.T) {
 
 	tst := `(read)`
 
@@ -467,7 +466,7 @@ func TestRead(t *testing.T ) {
 
 	// Ensure we read from a fake input
 	c := config.DefaultIO()
-	c.STDIN = strings.NewReader( "hello, world\n")
+	c.STDIN = strings.NewReader("hello, world\n")
 
 	// Environment will have a config
 	ev.SetIOConfig(c)
@@ -479,14 +478,14 @@ func TestRead(t *testing.T ) {
 	out := l.Evaluate(ev)
 
 	if out.ToString() != "hello, world" {
-		t.Fatalf("read '%s' from (read)", out )
+		t.Fatalf("read '%s' from (read)", out)
 	}
 
 	// Run it again - this time reading will fail
 	out = l.Evaluate(ev)
 
-	if !strings.Contains(out.ToString(), "failed to read from STDIN" ) {
-		t.Fatalf("(read) didn't give expected error, got '%s'", out )
+	if !strings.Contains(out.ToString(), "failed to read from STDIN") {
+		t.Fatalf("(read) didn't give expected error, got '%s'", out)
 	}
 
 }
