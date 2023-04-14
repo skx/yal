@@ -287,7 +287,7 @@ func bodyFn(env *env.Environment, args []primitive.Primitive) primitive.Primitiv
 	}
 
 	// Return value
-	return primitive.String( proc.Body.ToString())
+	return primitive.String(proc.Body.ToString())
 }
 
 // builtinsFn implements (builtins)
@@ -1189,7 +1189,7 @@ func joinFn(env *env.Environment, args []primitive.Primitive) primitive.Primitiv
 		tmp += t.ToString()
 
 		// Add the separator, unless it's the last entry
-		if i != (ln-1) {
+		if i != (ln - 1) {
 			tmp += sep
 		}
 	}
@@ -1807,18 +1807,22 @@ func sourceFn(env *env.Environment, args []primitive.Primitive) primitive.Primit
 	}
 
 	// Return value
-	return primitive.String( proc.ToString())
+	return primitive.String(proc.ToString())
 }
 
 // (specials
 func specialsFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 
-	specials := []string{"alias",
+	specials := []string{
+		"$",
+		"alias",
 		"define",
 		"def!",
 		"defmacro!",
 		"do",
 		"eval",
+		"exit",
+		"forever",
 		"if",
 		"lambda",
 		"fn*",

@@ -127,7 +127,6 @@ func TestBase(t *testing.T) {
 	}
 }
 
-
 // TestBody tests (body)
 func TestBody(t *testing.T) {
 	// no arguments
@@ -195,7 +194,6 @@ func TestBody(t *testing.T) {
 	if !ok {
 		t.Fatalf("failed to lookup function 'print' in environment")
 	}
-
 
 	result := bodyFn(ENV, []primitive.Primitive{fn.(*primitive.Procedure)})
 
@@ -2261,7 +2259,6 @@ func TestJoin(t *testing.T) {
 	if s != "34" {
 		t.Fatalf("got wrong result %v", s)
 	}
-
 
 	// Now a list and a separator
 	out = joinFn(ENV, []primitive.Primitive{
