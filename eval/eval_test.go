@@ -284,6 +284,14 @@ a
 		{"(* 4 -1)", "-4"},
 		{"(# 3 2)", "9"},
 
+		// $
+		{`($ "ls" "foo")`, "ERROR{($ ..) accepts only a symbol for the type-argument, got foo}"},
+		{`(type ($ "ls" :string))`, "string"},
+		{`($ "ls" :bogus)`, "ERROR{($...) can produce output in :string, or :list, got :bogus}"},
+		{`(type ($ "ls" :list))`, "list"},
+		{`($)`, primitive.ArityError().ToString()},
+		{`($ (list "ls" ))`, "ERROR{($ ..) accepts only a string argument, got [list ls]}"},
+
 		// hash equality
 		{`(eq { :name "Ale" :age 3}
                       { :age 3 :name "Ale"})`, "#t"},

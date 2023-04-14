@@ -5,11 +5,13 @@ package eval
 import (
 	"bufio"
 	"fmt"
-	"github.com/skx/yal/env"
-	"github.com/skx/yal/primitive"
 	"os"
+	"os/exec"
 	"sort"
 	"strings"
+
+	"github.com/skx/yal/env"
+	"github.com/skx/yal/primitive"
 )
 
 // evalSpecialForm is invoked to execute one of our special forms.
@@ -24,6 +26,67 @@ import (
 func (ev *Eval) evalSpecialForm(name string, args []primitive.Primitive, e *env.Environment, expandMacro bool) (primitive.Primitive, bool) {
 
 	switch name {
+
+	case "$":
+		// We need at least one argument (optionally two)
+		if len(args) < 1 {
+			return primitive.ArityError(), true
+		}
+
+		// The command to execute must be a string - because otherwise we get parsing/escaping issues.
+		str, ok := args[0].(primitive.String)
+		if !ok {
+			return primitive.Error(fmt.Sprintf("($ ..) accepts only a string argument, got %v", args[0])), true
+		}
+
+		// Output is either "string" or "list".
+		output := "string"
+
+		// Did the user specify an output type?
+		if len(args) == 2 {
+
+			// If so it must be a symbol.
+			sym, ok := args[1].(primitive.Symbol)
+			if !ok {
+				return primitive.Error(fmt.Sprintf("($ ..) accepts only a symbol for the type-argument, got %v", args[1])), true
+			}
+
+			switch sym {
+			case ":string":
+				output = "string"
+			case ":list":
+				output = "list"
+			default:
+				return primitive.Error(fmt.Sprintf("($...) can produce output in :string, or :list, got %v", sym)), true
+			}
+		}
+
+		// The command
+		cmd := []string{"-c", str.ToString()}
+
+		// The shell might be changed.
+		sh := os.Getenv("SHELL")
+		if sh == "" {
+			sh = "/bin/sh"
+		}
+
+		// Run the command
+		out, err := exec.Command(sh, cmd...).Output()
+		if err != nil {
+			return primitive.Error(fmt.Sprintf("($ %v) failed to execute %s", cmd, err)), true
+		}
+
+		// string output is easy.
+		if output == "string" {
+			return primitive.String(out), true
+		}
+
+		// list output will split on newlines.
+		ret := primitive.List{}
+		for _, x := range strings.Split(string(out), "\n") {
+			ret = append(ret, primitive.String(x))
+		}
+		return ret, true
 
 	case "alias":
 		// We need at least one pair.
