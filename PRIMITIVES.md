@@ -49,6 +49,8 @@ Special forms are things that are built into the core interpreter, and handled s
 
 You can receive a full-list of special forms via `(specials)`, this list will include:
 
+* `$`
+  * Allow running a shell-command, including pipelines, and return the output as either a string or a list of strings.
 * `alias`
   * Define function aliases, this is used whenever we rename/change things in the standard-library to avoid breaking user scripts.
 * `catch`.
@@ -64,8 +66,12 @@ You can receive a full-list of special forms via `(specials)`, this list will in
   * Demonstrated in [examples/dynamic.lisp](examples/dynamic.lisp)
 * `eval`
   * Execute the given expression.
+* `exit`
+  * Terminate the interpreter, optionally with a given numeric status-code.
 * `fn*`
   * `lambda` is an alias.
+* `forever`
+  * Run the supplied list of statements forever, never terminating, without recursion.
 * `if`
   * Our conditional operation.
 * `let*`
