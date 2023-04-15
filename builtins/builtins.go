@@ -1682,6 +1682,11 @@ func shellFn(env *env.Environment, args []primitive.Primitive) primitive.Primiti
 		return primitive.Error("argument not a list")
 	}
 
+	// An empty list is no good
+	if len(lst) < 1  {
+		return primitive.Error("the list must be non-empty")
+	}
+
 	// Command to  run, and arguments
 	cArgs := []string{}
 
