@@ -9,6 +9,8 @@ This directory contains some simple lisp examples, which can be executed via `ya
   * Calculate the first 25 fibonacci numbers.
 * [fizzbuzz.lisp](fizzbuzz.lisp)
   * Show the fizzbuzz up to 50.
+* [fuzz.lisp](fuzz.lisp)
+  * Generate random expressions and evaluate them, forever.
 * [hash.lisp](hash.lisp)
   * Demonstrate working with hashes.
 * [lisp-tests.lisp](lisp-tests.lisp)
