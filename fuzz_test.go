@@ -119,6 +119,12 @@ func FuzzYAL(f *testing.F) {
 
 	// Load each example as a fuzz-source
 	for _, file := range files {
+
+		// skip fuzz.lisp, which would never return.
+		if strings.Contains(file.Name(), "fuzz") {
+			continue
+		}
+
 		path := path.Join("examples", file.Name())
 
 		data, err := os.ReadFile(path)
