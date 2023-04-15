@@ -61,9 +61,11 @@ See-also: apply, apply-pairs"
 ;; Create ranges of numbers in a list
 (set! range (fn* (start:number end:number step:number)
                  "Create a list of numbers between the start and end bounds, inclusive, incrementing by the given offset each time."
-                 (if (<= start end)
-                     (cons start (range (+ start step) end step))
-                   ())))
+                 (if (zero? step)
+                     (error "step must be non-zero")
+                   (if (<= start end)
+                       (cons start (range (+ start step) end step))
+                     ()))))
 
 ;; Create sequences from 0/1 to N
 (set! seq (fn* (n:number)
