@@ -1683,7 +1683,7 @@ func shellFn(env *env.Environment, args []primitive.Primitive) primitive.Primiti
 	}
 
 	// An empty list is no good
-	if len(lst) < 1  {
+	if len(lst) < 1 {
 		return primitive.Error("the list must be non-empty")
 	}
 

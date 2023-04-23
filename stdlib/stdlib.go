@@ -34,7 +34,7 @@ func Contents() []byte {
 
 	// Result we'll return, start by ensuring we're loading
 	// our standard library
-	result := []byte("(stdlib-start)\n" )
+	result := []byte("(stdlib-start)\n")
 
 	// We might exclude only one/two files
 	exclude := []string{}
