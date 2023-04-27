@@ -2089,15 +2089,15 @@ func TestHelp(t *testing.T) {
 
 		l.Evaluate(env)
 
-		fn, ok := env.Get(name)
-		if !ok {
+		fn, ok2 := env.Get(name)
+		if !ok2 {
 			t.Fatalf("failed to lookup function %s in environment", name)
 		}
 
 		result := helpFn(ENV, []primitive.Primitive{fn.(*primitive.Procedure)})
 
-		txt, ok2 := result.(primitive.String)
-		if !ok2 {
+		txt, ok3 := result.(primitive.String)
+		if !ok3 {
 			t.Fatalf("expected a string, got %v", result)
 		}
 		if !strings.Contains(txt.ToString(), name) {
