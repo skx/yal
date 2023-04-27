@@ -6,7 +6,6 @@
 package main
 
 import (
-	"bufio"
 	"flag"
 	"fmt"
 	"os"
@@ -14,6 +13,8 @@ import (
 	"regexp"
 	"sort"
 	"strings"
+
+	"github.com/chzyer/readline"
 
 	"github.com/skx/yal/builtins"
 	"github.com/skx/yal/config"
@@ -203,13 +204,14 @@ func help(show []string) {
 
 func main() {
 
-	// Parse our command-line flags
+	// define our command-line flags
 	exp := flag.String("e", "", "A string to evaluate.")
 	hlp := flag.Bool("h", false, "Show help information and exit.")
 	lsp := flag.Bool("lsp", false, "Launch the LSP mode")
 	ver := flag.Bool("v", false, "Show our version and exit.")
 	deb := flag.Bool("debug", false, "Show debug output during execution (to STDERR).")
 
+	// Parse our command-line flags
 	flag.Parse()
 
 	// Showing the version?
@@ -294,14 +296,43 @@ func main() {
 	}
 
 	//
+	// We'll read a config file from HOME, if it exists, and also persist history there.
+	//
+	home := os.Getenv("HOME")
+
+	//
+	// History file will be set if HOME wasn't empty.
+	//
+	hist := ""
+	if home != "" {
+		hist = path.Join(home, ".yal.history")
+	}
+
+	//
 	// No arguments mean this is our REPL
 	//
-	reader := bufio.NewReader(os.Stdin)
+	// Create a readline-helper for reading the input from the user.
+	//
+	rl, err := readline.NewEx(&readline.Config{
+		Prompt:                 "> ",
+		HistoryFile:            hist,
+		HistorySearchFold:      true,
+		DisableAutoSaveHistory: false,
+	})
+
+	//
+	// There should be no error creating our readline-helper,
+	// but if there is then it is fatal.
+	//
+	if err != nil {
+		fmt.Printf("Failed to initialize readlin: %s\n", err)
+		os.Exit(1)
+	}
+	defer rl.Close()
 
 	//
 	// Get the home directory, and load ~/.yalrc if present
 	//
-	home := os.Getenv("HOME")
 	if home != "" {
 
 		// Build the path
@@ -319,24 +350,48 @@ func main() {
 		}
 	}
 
+	//
+	// We allow multi-line input, and build up the thing to execute
+	// into this temporary string if that is the case.
+	//
 	src := ""
-	for {
-		if src == "" {
-			fmt.Printf("\n> ")
-		} else {
-			fmt.Printf("    ")
 
+	for {
+
+		//
+		// Different prompt for first-line and additional lines
+		//
+		if src == "" {
+			rl.SetPrompt("> ")
+		} else {
+			rl.SetPrompt(">>> ")
 		}
 
-		line, _ := reader.ReadString('\n')
+		//
+		// Read input
+		//
+		line, err := rl.Readline()
+		if err != nil {
+			break
+		}
+
+		//
+		// Save it to anything we might have previously read
+		//
 		src += line
 		src = strings.TrimSpace(src)
 
 		// Allow the user to exit
 		if src == "exit" || src == "quit" {
-			os.Exit(0)
+			break
 		}
 
+		//
+		// Attempt to guess if the line is complete.
+		//
+		// A line is complete if there are matching numbers
+		// of opening and closing brackets.
+		///
 		open := strings.Count(src, "(")
 		close := strings.Count(src, ")")
 
@@ -353,7 +408,10 @@ func main() {
 			if _, ok := out.(primitive.Nil); !ok {
 				fmt.Printf("%v\n", out.ToString())
 			}
+
 			src = ""
 		}
 	}
+
+	// All done.
 }
