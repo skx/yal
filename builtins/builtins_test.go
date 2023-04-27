@@ -2058,9 +2058,9 @@ func TestHelp(t *testing.T) {
 		t.Fatalf("got error, but wrong one")
 	}
 
-	// First argument must be a procedure
+	// First argument must be a procedure or string
 	out = helpFn(ENV, []primitive.Primitive{
-		primitive.String("foo"),
+		primitive.Number(3),
 	})
 
 	// Will lead to an error
@@ -2089,20 +2089,70 @@ func TestHelp(t *testing.T) {
 
 		l.Evaluate(env)
 
-		fn, ok := env.Get(name)
-		if !ok {
+		fn, ok2 := env.Get(name)
+		if !ok2 {
 			t.Fatalf("failed to lookup function %s in environment", name)
 		}
 
 		result := helpFn(ENV, []primitive.Primitive{fn.(*primitive.Procedure)})
 
-		txt, ok2 := result.(primitive.String)
-		if !ok2 {
+		txt, ok3 := result.(primitive.String)
+		if !ok3 {
 			t.Fatalf("expected a string, got %v", result)
 		}
 		if !strings.Contains(txt.ToString(), name) {
 			t.Fatalf("got help text, but didn't find expected content: %v", result)
 		}
+	}
+
+	// Two argument form of help is acceptible - if both args are string
+	out = helpFn(ENV, []primitive.Primitive{
+		primitive.String("OK"),
+		primitive.Number(3),
+	})
+	// Will lead to an error
+	e, ok = out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if !strings.Contains(string(e), "must be a string") {
+		t.Fatalf("got error, but wrong one")
+	}
+
+	// Two argument form of help is acceptible - if both args are string
+	out = helpFn(ENV, []primitive.Primitive{
+		primitive.Number(3),
+		primitive.String("OK"),
+	})
+	// Will lead to an error
+	e, ok = out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if !strings.Contains(string(e), "must be a string") {
+		t.Fatalf("got error, but wrong one")
+	}
+
+	// Retrieve it
+	out = helpFn(ENV, []primitive.Primitive{
+		primitive.String("Foo"),
+	})
+	if out.ToString() != "nil" {
+		t.Fatalf("failed to confirm missing hlep string")
+	}
+
+	// Setup a help string
+	helpFn(ENV, []primitive.Primitive{
+		primitive.String("Foo"),
+		primitive.String("Bar"),
+	})
+
+	// Retrieve it
+	out = helpFn(ENV, []primitive.Primitive{
+		primitive.String("Foo"),
+	})
+	if out.ToString() != "Bar" {
+		t.Fatalf("failed to setup a custom help-string")
 	}
 }
 

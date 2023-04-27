@@ -37,6 +37,19 @@ func TestShell(t *testing.T) {
 		t.Fatalf("got error, but wrong one %v", out)
 	}
 
+	// One argument, but an empty list, not a valid one.
+	out = shellFn(ENV, []primitive.Primitive{
+		primitive.List{},
+	})
+
+	e, ok = out.(primitive.Error)
+	if !ok {
+		t.Fatalf("expected error, got %v", out)
+	}
+	if !strings.Contains(e.ToString(), "must be non-empty") {
+		t.Fatalf("got error, but wrong one %v", out)
+	}
+
 	// Echo command to execute.
 	cmd := primitive.List{}
 	cmd = append(cmd, primitive.String("echo"))
