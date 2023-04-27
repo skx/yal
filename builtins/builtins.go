@@ -1075,9 +1075,38 @@ func globFn(env *env.Environment, args []primitive.Primitive) primitive.Primitiv
 
 // helpFn is the implementation of `(help fn)`
 func helpFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
+
+	// Two arguments?
+	if len(args) == 2 {
+
+		name, ok1 := args[0].(primitive.String)
+		help, ok2 := args[1].(primitive.String)
+
+		if !ok1 {
+			return primitive.Error("when setting help the key must be a string")
+		}
+		if !ok2 {
+			return primitive.Error("when setting help the value must be a string")
+		}
+
+		helpMap[name.ToString()] = help.ToString()
+		return primitive.Nil{}
+	}
+
 	// We need a single argument
 	if len(args) != 1 {
 		return primitive.ArityError()
+	}
+
+	// Lookup by string?
+	name, ok1 := args[0].(primitive.String)
+	if ok1 {
+		// Stored at runtime?
+		out, ok := helpMap[name.ToString()]
+		if ok {
+			return primitive.String(out)
+		}
+		return primitive.Nil{}
 	}
 
 	// Which is a function
