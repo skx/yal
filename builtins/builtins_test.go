@@ -2142,7 +2142,7 @@ func TestHelp(t *testing.T) {
 	}
 
 	// Setup a help string
-	out = helpFn(ENV, []primitive.Primitive{
+	helpFn(ENV, []primitive.Primitive{
 		primitive.String("Foo"),
 		primitive.String("Bar"),
 	})
