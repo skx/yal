@@ -4,7 +4,6 @@
 package eval
 
 import (
-	"errors"
 	"fmt"
 	"math"
 	"math/rand"
@@ -17,7 +16,7 @@ import (
 	"github.com/skx/yal/primitive"
 )
 
-// Holder for mappings between native and lisp
+// Reflected is the holder for mappings between native and lisp
 var Reflected map[string]interface{}
 
 // init sets up the bindings between golang functions we've made
@@ -61,7 +60,7 @@ func Call(funcName string, params interface{}) (result interface{}, err error) {
 
 	// TODO: Cope with varargs, etc.
 	if len(p) != f.Type().NumIn() {
-		err = errors.New(fmt.Sprintf("Function %s expects %d arguments %d supplied", funcName, f.Type().NumIn(), len(p)))
+		err = fmt.Errorf("function %s expects %d arguments %d supplied", funcName, f.Type().NumIn(), len(p))
 		return
 	}
 
@@ -74,7 +73,7 @@ func Call(funcName string, params interface{}) (result interface{}, err error) {
 		ty := f.Type().In(i)
 
 		// This is also horribly wrong
-		switch fmt.Sprintf("%s", ty) {
+		switch ty.String() {
 
 		case "string":
 			s := string(p[i].(primitive.String))
@@ -135,120 +134,120 @@ func Call(funcName string, params interface{}) (result interface{}, err error) {
 // types, or structures.
 func goToLisp(result any) primitive.Primitive {
 
-	switch result.(type) {
+	switch  res := result.(type) {
 
 	// number / array of numbers
 	case int:
-		return primitive.Number(result.(int))
+		return primitive.Number(res)
 
 	case int16:
-		return primitive.Number(result.(int16))
+		return primitive.Number(res)
 
 	case int32:
-		return primitive.Number(result.(int32))
+		return primitive.Number(res)
 
 	case int64:
-		return primitive.Number(result.(int64))
+		return primitive.Number(res)
 
 	case uint8:
-		return primitive.Number(result.(uint8))
+		return primitive.Number(res)
 
 	case uint16:
-		return primitive.Number(result.(uint16))
+		return primitive.Number(res)
 
 	case uint32:
-		return primitive.Number(result.(uint32))
+		return primitive.Number(res)
 
 	case uint64:
-		return primitive.Number(result.(uint64))
+		return primitive.Number(res)
 
 	case []uint8:
 		r := primitive.List{}
-		for _, x := range result.([]uint8) {
+		for _, x := range res {
 			r = append(r, primitive.Number(x))
 		}
 		return r
 
 	case []uint16:
 		r := primitive.List{}
-		for _, x := range result.([]uint16) {
+		for _, x := range res {
 			r = append(r, primitive.Number(x))
 		}
 		return r
 
 	case []uint32:
 		r := primitive.List{}
-		for _, x := range result.([]uint32) {
+		for _, x := range res {
 			r = append(r, primitive.Number(x))
 		}
 		return r
 
 	case []uint64:
 		r := primitive.List{}
-		for _, x := range result.([]uint64) {
+		for _, x := range res {
 			r = append(r, primitive.Number(x))
 		}
 		return r
 
 	case []int:
 		r := primitive.List{}
-		for _, x := range result.([]int) {
+		for _, x := range res {
 			r = append(r, primitive.Number(x))
 		}
 		return r
 
 	case  []int32:
 		r := primitive.List{}
-		for _, x := range result.([]int32) {
+		for _, x := range res {
 			r = append(r, primitive.Number(x))
 		}
 		return r
 
 	case []int64:
 		r := primitive.List{}
-		for _, x := range result.([]int64) {
+		for _, x := range res {
 			r = append(r, primitive.Number(x))
 		}
 		return r
 
 	// float / array of floats
 	case float32:
-		return primitive.Number(result.(float32))
+		return primitive.Number(res)
 
 	case float64:
-		return primitive.Number(result.(float64))
+		return primitive.Number(res)
 
 	case []float32:
 		r := primitive.List{}
-		for _, x := range result.([]float32) {
+		for _, x := range res {
 			r = append(r, primitive.Number(x))
 		}
 		return r
 
 	case []float64:
 		r := primitive.List{}
-		for _, x := range result.([]float64) {
+		for _, x := range res {
 			r = append(r, primitive.Number(x))
 		}
 		return r
 
 	// string / array of strings
 	case string:
-		return primitive.String(result.(string))
+		return primitive.String(res)
 
 	case []string:
 		r := primitive.List{}
-		for _, x := range result.([]string) {
+		for _, x := range res {
 			r = append(r, primitive.String(x))
 		}
 		return r
 
 	// misc
 	case bool:
-		return primitive.Bool(result.(bool))
+		return primitive.Bool(res)
 
 	case error:
-		return primitive.Error(result.(error).Error())
+		return primitive.Error(res.Error())
 
 	case nil:
 		return primitive.Nil{}
