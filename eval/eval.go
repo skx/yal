@@ -380,7 +380,16 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 		if isSymbol {
 
 			//
-			// If that was handled then return the result.
+			// Cope with aliases: This covers the case of
+			// reflection being used to invoke a function.
+			//
+			aliased,rewrite := ev.aliases[sym.ToString()]
+			if rewrite {
+				sym = primitive.Symbol(aliased)
+			}
+
+			//
+			// If this is handled as a "special" then return the result.
 			//
 			// Otherwise we'll keep going and we'll treat this
 			// as a usual function-call.

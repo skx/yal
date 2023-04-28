@@ -25,6 +25,43 @@ import (
 // This is required because special forms take precedence over other calls.
 func (ev *Eval) evalSpecialForm(name string, args []primitive.Primitive, e *env.Environment, expandMacro bool) (primitive.Primitive, bool) {
 
+	//
+	// Is this function a wrapper around a golang function, which is
+	// handled via magical reflection?
+	//
+	_, ok := Reflected[name]
+	if ok {
+
+		// Evaluate each argument
+		var evaled []primitive.Primitive
+
+		// For each argument
+		for _, arg := range (args ) {
+
+			// evaluate it
+			out := ev.eval(arg, e, expandMacro)
+
+			// was it an error?
+			_, er := out.(primitive.Error)
+			if er {
+				// then return it
+				return out, true
+			}
+
+			// otherwise save it away
+			evaled = append(evaled, out)
+		}
+
+		// Call the native-function with the evaluated arguments
+		resA, err := Call(name, evaled)
+		if err != nil {
+			return primitive.Error(err.Error()), true
+		}
+
+		// The return value is a primitive, assuming a non-error.
+		return resA.(primitive.Primitive), true
+	}
+
 	switch name {
 
 	case "$":
@@ -108,8 +145,8 @@ func (ev *Eval) evalSpecialForm(name string, args []primitive.Primitive, e *env.
 			if ok {
 				e.Set(new.ToString(), old)
 
-				ev.aliases[new.ToString()] = orig.ToString()
 			}
+			ev.aliases[new.ToString()] = orig.ToString()
 		}
 		return primitive.Nil{}, true
 
