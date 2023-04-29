@@ -7,9 +7,7 @@ import (
 	"fmt"
 	"math"
 	"os"
-	"path/filepath"
 	"reflect"
-	"strings"
 	"time"
 
 	"github.com/skx/yal/primitive"
@@ -23,33 +21,20 @@ var Reflected map[string]interface{}
 func init() {
 	Reflected = make(map[string]interface{})
 
+	// trig.lisp
 	Reflected["math.Acos"] = math.Acos
 	Reflected["math.Asin"] = math.Asin
 	Reflected["math.Atan"] = math.Atan
-
 	Reflected["math.Cos"] = math.Cos
 	Reflected["math.Cosh"] = math.Cosh
-
 	Reflected["math.Sin"] = math.Sin
 	Reflected["math.Sinh"] = math.Sinh
-
 	Reflected["math.Tan"] = math.Tan
 	Reflected["math.Tanh"] = math.Tanh
 
-
+	// golang.lisp
 	Reflected["os.Getenv"] = os.Getenv
-	Reflected["os.Stat"] = os.Stat
-
-	Reflected["time.Now"] = time.Now
-
-	Reflected["path.Base"] = filepath.Base
-	Reflected["path.Glob"] = filepath.Glob
-
-	Reflected["strings.Contains"] = strings.Contains
-	Reflected["strings.Cut"] = strings.Cut
-	Reflected["strings.Split"] = strings.Split
-	Reflected["strings.ToLower"] = strings.ToLower
-	Reflected["strings.ToUpper"] = strings.ToUpper
+	Reflected["os.Setenv"] = os.Setenv
 }
 
 

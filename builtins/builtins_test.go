@@ -1885,48 +1885,6 @@ func TestGet(t *testing.T) {
 	}
 }
 
-// TestGetenv tests getenv
-func TestGetenv(t *testing.T) {
-
-	// No arguments
-	out := getenvFn(ENV, []primitive.Primitive{})
-
-	// Will lead to an error
-	e, ok := out.(primitive.Error)
-	if !ok {
-		t.Fatalf("expected error, got %v", out)
-	}
-	if e != primitive.ArityError() {
-		t.Fatalf("got error, but wrong one %v", out)
-	}
-
-	// Argument that isn't a string
-	out = getenvFn(ENV, []primitive.Primitive{
-		primitive.Number(3),
-	})
-
-	// Will lead to an error
-	e, ok = out.(primitive.Error)
-	if !ok {
-		t.Fatalf("expected error, got %v", out)
-	}
-	if !strings.Contains(string(e), "not a string") {
-		t.Fatalf("got error, but wrong one %v", out)
-	}
-
-	// Valid result
-	x := os.Getenv("USER")
-	y := getenvFn(ENV, []primitive.Primitive{
-		primitive.String("USER"),
-	})
-
-	yStr := string(y.(primitive.String))
-
-	if yStr != x {
-		t.Fatalf("getenv USER mismatch")
-	}
-
-}
 
 // TestGlob tests glob
 func TestGlob(t *testing.T) {

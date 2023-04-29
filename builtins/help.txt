@@ -202,12 +202,6 @@ get returns the specified field from the specified hash.
 See also: set
 Example: (get {:name "steve" :location "Europe" } ":name")
 %%
-getenv
-
-getenv returns the contents of the environmental-variable which was specified as the first argument.
-
-Example: (print (getenv "HOME"))
-%%
 glob
 
 glob returns files matching the given pattern, as a list.

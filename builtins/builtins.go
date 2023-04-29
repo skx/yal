@@ -142,7 +142,6 @@ func PopulateEnvironment(env *env.Environment) {
 	registerBuiltin(env, "file?", &primitive.Procedure{F: fileFn, Help: helpMap["file?"], Args: []primitive.Symbol{primitive.Symbol("path")}})
 	registerBuiltin(env, "gensym", &primitive.Procedure{F: gensymFn, Help: helpMap["gensym"]})
 	registerBuiltin(env, "get", &primitive.Procedure{F: getFn, Help: helpMap["get"], Args: []primitive.Symbol{primitive.Symbol("hash"), primitive.Symbol("key")}})
-	registerBuiltin(env, "getenv", &primitive.Procedure{F: getenvFn, Help: helpMap["getenv"], Args: []primitive.Symbol{primitive.Symbol("key")}})
 	registerBuiltin(env, "glob", &primitive.Procedure{F: globFn, Help: helpMap["glob"], Args: []primitive.Symbol{primitive.Symbol("pattern")}})
 	registerBuiltin(env, "help", &primitive.Procedure{F: helpFn, Help: helpMap["help"], Args: []primitive.Symbol{primitive.Symbol("function")}})
 	registerBuiltin(env, "join", &primitive.Procedure{F: joinFn, Help: helpMap["join"], Args: []primitive.Symbol{primitive.Symbol("list")}})
@@ -929,24 +928,6 @@ func getFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive
 
 	tmp := args[0].(primitive.Hash)
 	return tmp.Get(args[1].ToString())
-}
-
-// getenvFn is the implementation of `(getenv "PATH")`
-func getenvFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
-
-	// If we have only a single argument
-	if len(args) != 1 {
-		return primitive.ArityError()
-	}
-
-	// Which is a string
-	if _, ok := args[0].(primitive.String); !ok {
-		return primitive.Error("argument not a string")
-	}
-
-	// Return the value
-	str := args[0].(primitive.String)
-	return primitive.String(os.Getenv(string(str)))
 }
 
 // globFn is the implementation of `(glob "pattern")`
