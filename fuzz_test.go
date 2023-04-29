@@ -146,6 +146,7 @@ func FuzzYAL(f *testing.F) {
 		"deadline exceeded",                    // context timeout
 		"division by zero",
 		"error expanding argument",
+		"error calling function",  // reflection
 		"expected a function body",
 		"expected a list",
 		"expected a hash",

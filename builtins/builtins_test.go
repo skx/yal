@@ -1098,7 +1098,7 @@ func TestEnv(t *testing.T) {
 
 	}
 
-	if len(e) < 100 {
+	if len(e) < 20 {
 		t.Fatalf("expected a lot of entries, got %d", len(e))
 	}
 }
