@@ -3244,57 +3244,6 @@ func TestPrint(t *testing.T) {
 	}
 }
 
-// TestRandom tests (random)
-func TestRandom(t *testing.T) {
-
-	// No arguments
-	out := randomFn(ENV, []primitive.Primitive{})
-
-	// Will lead to an error
-	e, ok := out.(primitive.Error)
-	if !ok {
-		t.Fatalf("expected error, got %v", out)
-	}
-	if e != primitive.ArityError() {
-		t.Fatalf("got error, but wrong one %v", out)
-	}
-
-	// One argument, of the wrong type
-	out = randomFn(ENV, []primitive.Primitive{
-		primitive.String("Hello!"),
-	})
-
-	e, ok = out.(primitive.Error)
-	if !ok {
-		t.Fatalf("expected error, got %v", out)
-	}
-	if !strings.Contains(string(e), "not a number") {
-		t.Fatalf("got error, but wrong one %v", out)
-	}
-
-	// Now call with a number
-	out = randomFn(ENV, []primitive.Primitive{
-		primitive.Number(1),
-	})
-	_, ok2 := out.(primitive.Number)
-	if !ok2 {
-		t.Fatalf("expected string, got %v", out)
-	}
-
-	// Calling with a number less than zero returns an error
-	out = randomFn(ENV, []primitive.Primitive{
-		primitive.Number(-3),
-	})
-
-	e, ok = out.(primitive.Error)
-	if !ok {
-		t.Fatalf("expected error, got %v", out)
-	}
-	if !strings.Contains(string(e), "greater than zero") {
-		t.Fatalf("got error, but wrong one %v", out)
-	}
-}
-
 // TestSet tests set
 func TestSet(t *testing.T) {
 

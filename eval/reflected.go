@@ -6,6 +6,7 @@ package eval
 import (
 	"fmt"
 	"math"
+	"math/rand"
 	"os"
 	"reflect"
 	"time"
@@ -35,6 +36,7 @@ func init() {
 	// golang.lisp
 	Reflected["os.Getenv"] = os.Getenv
 	Reflected["os.Setenv"] = os.Setenv
+	Reflected["rand.Intn"] = rand.Intn
 }
 
 
@@ -47,6 +49,18 @@ func init() {
 // Arrays are not handled in the general case, though string arrays
 // will work.
 func Call(funcName string, params interface{}) (result interface{}, err error) {
+
+	// We might get a panic() from code we call, so we
+	// handle it here.
+	//
+	// A simple trigger is "(random -3)".
+	//
+	defer func() {
+		if er := recover(); er != nil {
+			result = er
+			err = fmt.Errorf("error calling function %s: %s", funcName, er)
+		}
+	}()
 
 	f := reflect.ValueOf(Reflected[funcName])
 
@@ -97,6 +111,7 @@ func Call(funcName string, params interface{}) (result interface{}, err error) {
 			return primitive.Error(fmt.Sprintf("unknown param-type %s", ty)), nil
 		}
 	}
+
 
 	// Call the function, and get the result
 	res := f.Call(in)

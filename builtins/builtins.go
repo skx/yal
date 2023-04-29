@@ -157,7 +157,6 @@ func PopulateEnvironment(env *env.Environment) {
 	registerBuiltin(env, "ord", &primitive.Procedure{F: ordFn, Help: helpMap["ord"], Args: []primitive.Symbol{primitive.Symbol("char")}})
 	registerBuiltin(env, "os", &primitive.Procedure{F: osFn, Help: helpMap["os"]})
 	registerBuiltin(env, "print", &primitive.Procedure{F: printFn, Help: helpMap["print"], Args: []primitive.Symbol{primitive.Symbol("arg1..argN")}})
-	registerBuiltin(env, "random", &primitive.Procedure{F: randomFn, Help: helpMap["random"], Args: []primitive.Symbol{primitive.Symbol("max")}})
 	registerBuiltin(env, "set", &primitive.Procedure{F: setFn, Help: helpMap["set"], Args: []primitive.Symbol{primitive.Symbol("hash"), primitive.Symbol("key"), primitive.Symbol("val")}})
 	registerBuiltin(env, "sha1", &primitive.Procedure{F: sha1Fn, Help: helpMap["sha1"], Args: []primitive.Symbol{primitive.Symbol("string")}})
 	registerBuiltin(env, "sha256", &primitive.Procedure{F: sha256Fn, Help: helpMap["sha256"], Args: []primitive.Symbol{primitive.Symbol("string")}})
@@ -1515,27 +1514,6 @@ func printFn(env *env.Environment, args []primitive.Primitive) primitive.Primiti
 	_, _ = ioHelper.STDOUT.Write([]byte("\n"))
 
 	return primitive.String(out)
-}
-
-// randomFn implements (random).
-func randomFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
-	if len(args) != 1 {
-		return primitive.ArityError()
-	}
-
-	// ensure we received a number
-	num, ok := args[0].(primitive.Number)
-
-	if !ok {
-		return primitive.Error("argument not a number")
-	}
-
-	if int(num) <= 0 {
-		return primitive.Error("argument must be greater than zero")
-	}
-
-	return primitive.Number(rand.Intn(int(num)))
-
 }
 
 // setFn is the implementation of `(set hash key val)`
