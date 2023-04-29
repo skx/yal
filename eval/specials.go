@@ -427,6 +427,52 @@ func (ev *Eval) evalSpecialForm(name string, args []primitive.Primitive, e *env.
 		}
 		return ev.macroExpand(args[0], e), true
 
+	case "specials":
+
+		// Functions defined in this function
+		specials := []string{
+			"$",
+			"alias",
+			"define",
+			"def!",
+			"defmacro!",
+			"do",
+			"eval",
+			"exit",
+			"forever",
+			"if",
+			"lambda",
+			"fn*",
+			"let*",
+			"macroexpand",
+			"quasiquote",
+			"quote",
+			"read",
+			"set!",
+			"specials",
+			"struct",
+			"stdlib-start",
+			"stdlib-end",
+			"stdlib",
+			"symbol",
+			"try",
+		}
+
+		// Return as a list
+		var ret primitive.List
+
+		// The specials defined above
+		for _, entry := range specials {
+			ret = append(ret, primitive.String(entry))
+		}
+
+		// And those installed via reflection.
+		for name := range Reflected {
+			ret = append(ret, primitive.String(name))
+		}
+		return ret, true
+
+
 	case "stdlib-end":
 		ev.loadingStdlib = false
 		return primitive.Nil{}, true

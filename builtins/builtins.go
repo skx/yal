@@ -172,7 +172,6 @@ func PopulateEnvironment(env *env.Environment) {
 	registerBuiltin(env, "sinh", &primitive.Procedure{F: sinhFn, Help: helpMap["sinh"], Args: []primitive.Symbol{primitive.Symbol("n")}})
 	registerBuiltin(env, "sort", &primitive.Procedure{F: sortFn, Help: helpMap["sort"], Args: []primitive.Symbol{primitive.Symbol("list")}})
 	registerBuiltin(env, "source", &primitive.Procedure{F: sourceFn, Help: helpMap["source"], Args: []primitive.Symbol{primitive.Symbol("symbol")}})
-	registerBuiltin(env, "specials", &primitive.Procedure{F: specialsFn, Help: helpMap["specials"], Args: []primitive.Symbol{}})
 	registerBuiltin(env, "split", &primitive.Procedure{F: splitFn, Help: helpMap["split"], Args: []primitive.Symbol{primitive.Symbol("str"), primitive.Symbol("by")}})
 	registerBuiltin(env, "sprintf", &primitive.Procedure{F: sprintfFn, Help: helpMap["sprintf"], Args: []primitive.Symbol{primitive.Symbol("arg1..argN")}})
 	registerBuiltin(env, "str", &primitive.Procedure{F: strFn, Help: helpMap["str"], Args: []primitive.Symbol{primitive.Symbol("object")}})
@@ -1844,42 +1843,6 @@ func sourceFn(env *env.Environment, args []primitive.Primitive) primitive.Primit
 	return primitive.String(proc.ToString())
 }
 
-// (specials
-func specialsFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
-
-	specials := []string{
-		"$",
-		"alias",
-		"define",
-		"def!",
-		"defmacro!",
-		"do",
-		"eval",
-		"exit",
-		"forever",
-		"if",
-		"lambda",
-		"fn*",
-		"let*",
-		"macroexpand",
-		"quasiquote",
-		"quote",
-		"read",
-		"set!",
-		"struct",
-		"stdlib-start",
-		"stdlib-end",
-		"stdlib",
-		"symbol",
-		"try",
-	}
-	var ret primitive.List
-	for _, entry := range specials {
-		ret = append(ret, primitive.String(entry))
-	}
-	return ret
-
-}
 
 // (split "str" "by")
 func splitFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {

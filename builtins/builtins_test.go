@@ -3559,23 +3559,6 @@ func TestSource(t *testing.T) {
 	}
 }
 
-func TestSpecials(t *testing.T) {
-
-	// No arguments
-	out := specialsFn(ENV, []primitive.Primitive{})
-
-	// Will lead to a list
-	e, ok := out.(primitive.List)
-	if !ok {
-		t.Fatalf("expected list, got %v", out)
-	}
-
-	// List will have 10+ entries
-	if len(e) < 10 {
-		t.Fatalf("expected (specials) to return at least 10 entries, got %d", len(e))
-	}
-}
-
 func TestSplit(t *testing.T) {
 
 	// No arguments
