@@ -11,3 +11,9 @@
 
 See also: random:char random:item
 Example: (random 100) ; A number between 0 and 99")
+
+(alias lower strings.ToLower)
+(help "lower" "Convert the given string to lower-case.")
+
+(alias upper strings.ToUpper)
+(help "upper" "Convert the given string to upper-case.")

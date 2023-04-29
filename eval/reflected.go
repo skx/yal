@@ -9,6 +9,7 @@ import (
 	"math/rand"
 	"os"
 	"reflect"
+	"strings"
 	"time"
 
 	"github.com/skx/yal/primitive"
@@ -37,6 +38,9 @@ func init() {
 	Reflected["os.Getenv"] = os.Getenv
 	Reflected["os.Setenv"] = os.Setenv
 	Reflected["rand.Intn"] = rand.Intn
+	Reflected["strings.Split"] = strings.Split
+	Reflected["strings.ToLower"] = strings.ToLower
+	Reflected["strings.ToUpper"] = strings.ToUpper
 }
 
 
