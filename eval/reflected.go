@@ -6,7 +6,6 @@ package eval
 import (
 	"fmt"
 	"math"
-	"math/rand"
 	"os"
 	"path/filepath"
 	"reflect"
@@ -24,9 +23,19 @@ var Reflected map[string]interface{}
 func init() {
 	Reflected = make(map[string]interface{})
 
-	Reflected["math.Abs"] = math.Abs
-	Reflected["math.Intn"] = rand.Intn
+	Reflected["math.Acos"] = math.Acos
+	Reflected["math.Asin"] = math.Asin
+	Reflected["math.Atan"] = math.Atan
+
+	Reflected["math.Cos"] = math.Cos
+	Reflected["math.Cosh"] = math.Cosh
+
 	Reflected["math.Sin"] = math.Sin
+	Reflected["math.Sinh"] = math.Sinh
+
+	Reflected["math.Tan"] = math.Tan
+	Reflected["math.Tanh"] = math.Tanh
+
 
 	Reflected["os.Getenv"] = os.Getenv
 	Reflected["os.Stat"] = os.Stat

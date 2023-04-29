@@ -36,18 +36,8 @@ Example : (print (= 3 a b))
 %%
 abs
 Return the absolute value of the supplied number.
-%%
-acos
-
-Acos returns the arccosine, in radians, of n.
-%%
 asin
 
-Asin returns the arcsine, in radians, of n.
-%%
-atan
-
-Atan returns the arctangent, in radians, of n.
 %%
 arch
 arch returns a simple string describing the architecture the current host is running upon.
@@ -110,14 +100,6 @@ cons adds a to the start of the list b, which might be empty.
 contains?
 
 contains? returns true if the hash specified as the first argument contains the key specified as the second argument.
-%%
-cos
-
-Cos returns the cosine of the radian argument.
-%%
-cosh
-
-Cosh returns the hyperbolic cosine of n.
 %%
 date
 
@@ -384,14 +366,6 @@ The return value is a list of two entries - the first is STDOUT, the second is S
 Example: (print (car (shell '("ls" "-l" "-a")))
 Example: (print (cdr (shell '("ls" "/this /path /does - not EXIST!"))))
 %%
-sin
-
-Sin returns the sine of the radian argument.
-%%
-sinh
-
-Sinh returns the hyperbolic sine of n.
-%%
 slurp
 
 slurp returns the contents of the specified file.
@@ -463,14 +437,6 @@ string<
 string< returns true if the supplied parameters were both strings, and the first is less than the second.
 
 See also: < char< string=
-%%
-tan
-
-Tan returns the tangent of the radian argument.
-%%
-tanh
-
-Tanh returns the hyperbolic tangent of n.
 %%
 time
 

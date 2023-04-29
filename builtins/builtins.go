@@ -116,10 +116,7 @@ func PopulateEnvironment(env *env.Environment) {
 	registerBuiltin(env, "/=", &primitive.Procedure{F: inequalityFn, Help: helpMap["/="], Args: []primitive.Symbol{primitive.Symbol("N"), primitive.Symbol("arg1..argN")}})
 	registerBuiltin(env, "<", &primitive.Procedure{F: ltFn, Help: helpMap["<"], Args: []primitive.Symbol{primitive.Symbol("a"), primitive.Symbol("b")}})
 	registerBuiltin(env, "=", &primitive.Procedure{F: equalsFn, Help: helpMap["="], Args: []primitive.Symbol{primitive.Symbol("arg1"), primitive.Symbol("arg2 .. argN")}})
-	registerBuiltin(env, "acos", &primitive.Procedure{F: acosFn, Help: helpMap["acos"], Args: []primitive.Symbol{primitive.Symbol("n")}})
 	registerBuiltin(env, "arch", &primitive.Procedure{F: archFn, Help: helpMap["arch"]})
-	registerBuiltin(env, "asin", &primitive.Procedure{F: asinFn, Help: helpMap["asin"], Args: []primitive.Symbol{primitive.Symbol("n")}})
-	registerBuiltin(env, "atan", &primitive.Procedure{F: atanFn, Help: helpMap["atan"], Args: []primitive.Symbol{primitive.Symbol("n")}})
 	registerBuiltin(env, "base", &primitive.Procedure{F: baseFn, Help: helpMap["base"], Args: []primitive.Symbol{primitive.Symbol("number"), primitive.Symbol("base")}})
 	registerBuiltin(env, "body", &primitive.Procedure{F: bodyFn, Help: helpMap["body"], Args: []primitive.Symbol{primitive.Symbol("function")}})
 	registerBuiltin(env, "builtins", &primitive.Procedure{F: builtinsFn, Help: helpMap["builtins"], Args: []primitive.Symbol{}})
@@ -130,8 +127,6 @@ func PopulateEnvironment(env *env.Environment) {
 	registerBuiltin(env, "chr", &primitive.Procedure{F: chrFn, Help: helpMap["chr"], Args: []primitive.Symbol{primitive.Symbol("num")}})
 	registerBuiltin(env, "cons", &primitive.Procedure{F: consFn, Help: helpMap["cons"], Args: []primitive.Symbol{primitive.Symbol("a"), primitive.Symbol("b")}})
 	registerBuiltin(env, "contains?", &primitive.Procedure{F: containsFn, Help: helpMap["contains?"], Args: []primitive.Symbol{primitive.Symbol("hash"), primitive.Symbol("key")}})
-	registerBuiltin(env, "cos", &primitive.Procedure{F: cosFn, Help: helpMap["cos"], Args: []primitive.Symbol{primitive.Symbol("n")}})
-	registerBuiltin(env, "cosh", &primitive.Procedure{F: coshFn, Help: helpMap["cosh"], Args: []primitive.Symbol{primitive.Symbol("n")}})
 	registerBuiltin(env, "date", &primitive.Procedure{F: dateFn, Help: helpMap["date"]})
 	registerBuiltin(env, "directory:entries", &primitive.Procedure{F: directoryEntriesFn, Help: helpMap["directory:entries"]})
 	registerBuiltin(env, "directory?", &primitive.Procedure{F: directoryFn, Help: helpMap["directory?"], Args: []primitive.Symbol{primitive.Symbol("path")}})
@@ -168,8 +163,6 @@ func PopulateEnvironment(env *env.Environment) {
 	registerBuiltin(env, "sha1", &primitive.Procedure{F: sha1Fn, Help: helpMap["sha1"], Args: []primitive.Symbol{primitive.Symbol("string")}})
 	registerBuiltin(env, "sha256", &primitive.Procedure{F: sha256Fn, Help: helpMap["sha256"], Args: []primitive.Symbol{primitive.Symbol("string")}})
 	registerBuiltin(env, "shell", &primitive.Procedure{F: shellFn, Help: helpMap["shell"], Args: []primitive.Symbol{primitive.Symbol("list")}})
-	registerBuiltin(env, "sin", &primitive.Procedure{F: sinFn, Help: helpMap["sin"], Args: []primitive.Symbol{primitive.Symbol("n")}})
-	registerBuiltin(env, "sinh", &primitive.Procedure{F: sinhFn, Help: helpMap["sinh"], Args: []primitive.Symbol{primitive.Symbol("n")}})
 	registerBuiltin(env, "sort", &primitive.Procedure{F: sortFn, Help: helpMap["sort"], Args: []primitive.Symbol{primitive.Symbol("list")}})
 	registerBuiltin(env, "source", &primitive.Procedure{F: sourceFn, Help: helpMap["source"], Args: []primitive.Symbol{primitive.Symbol("symbol")}})
 	registerBuiltin(env, "split", &primitive.Procedure{F: splitFn, Help: helpMap["split"], Args: []primitive.Symbol{primitive.Symbol("str"), primitive.Symbol("by")}})
@@ -177,8 +170,6 @@ func PopulateEnvironment(env *env.Environment) {
 	registerBuiltin(env, "str", &primitive.Procedure{F: strFn, Help: helpMap["str"], Args: []primitive.Symbol{primitive.Symbol("object")}})
 	registerBuiltin(env, "string<", &primitive.Procedure{F: stringLtFn, Help: helpMap["string<"], Args: []primitive.Symbol{primitive.Symbol("a"), primitive.Symbol("b")}})
 	registerBuiltin(env, "string=", &primitive.Procedure{F: stringEqualsFn, Help: helpMap["string="], Args: []primitive.Symbol{primitive.Symbol("a"), primitive.Symbol("b")}})
-	registerBuiltin(env, "tan", &primitive.Procedure{F: tanFn, Help: helpMap["tan"], Args: []primitive.Symbol{primitive.Symbol("n")}})
-	registerBuiltin(env, "tanh", &primitive.Procedure{F: tanhFn, Help: helpMap["tanh"], Args: []primitive.Symbol{primitive.Symbol("n")}})
 	registerBuiltin(env, "time", &primitive.Procedure{F: timeFn, Help: helpMap["time"]})
 	registerBuiltin(env, "type", &primitive.Procedure{F: typeFn, Help: helpMap["type"], Args: []primitive.Symbol{primitive.Symbol("object")}})
 	registerBuiltin(env, "vals", &primitive.Procedure{F: valsFn, Help: helpMap["vals"], Args: []primitive.Symbol{primitive.Symbol("hash")}})
@@ -187,61 +178,11 @@ func PopulateEnvironment(env *env.Environment) {
 
 // Built in functions
 
-// acos implements acos
-func acosFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
-
-	// We only need a single argument
-	if len(args) != 1 {
-		return primitive.ArityError()
-	}
-
-	// Which is a number
-	n, ok := args[0].(primitive.Number)
-	if !ok {
-		return primitive.Error("argument not a number")
-	}
-
-	return primitive.Number(math.Acos(float64(n)))
-}
-
 // archFn implements (os)
 func archFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 	return primitive.String(runtime.GOARCH)
 }
 
-// asin implements asin
-func asinFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
-
-	// We only need a single argument
-	if len(args) != 1 {
-		return primitive.ArityError()
-	}
-
-	// Which is a number
-	n, ok := args[0].(primitive.Number)
-	if !ok {
-		return primitive.Error("argument not a number")
-	}
-
-	return primitive.Number(math.Asin(float64(n)))
-}
-
-// atan implements atan
-func atanFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
-
-	// We only need a single argument
-	if len(args) != 1 {
-		return primitive.ArityError()
-	}
-
-	// Which is a number
-	n, ok := args[0].(primitive.Number)
-	if !ok {
-		return primitive.Error("argument not a number")
-	}
-
-	return primitive.Number(math.Atan(float64(n)))
-}
 
 // baseFn implements (base)
 func baseFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
@@ -463,40 +404,6 @@ func containsFn(env *env.Environment, args []primitive.Primitive) primitive.Prim
 
 	return primitive.Bool(false)
 
-}
-
-// cosFn implements cos
-func cosFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
-
-	// We only need a single argument
-	if len(args) != 1 {
-		return primitive.ArityError()
-	}
-
-	// Which is a number
-	n, ok := args[0].(primitive.Number)
-	if !ok {
-		return primitive.Error("argument not a number")
-	}
-
-	return primitive.Number(math.Cos(float64(n)))
-}
-
-// coshFn implements cosh
-func coshFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
-
-	// We only need a single argument
-	if len(args) != 1 {
-		return primitive.ArityError()
-	}
-
-	// Which is a number
-	n, ok := args[0].(primitive.Number)
-	if !ok {
-		return primitive.Error("argument not a number")
-	}
-
-	return primitive.Number(math.Cosh(float64(n)))
 }
 
 // dateFn returns the current (Weekday, DD, MM, YYYY) as a list.
@@ -1744,40 +1651,6 @@ func shellFn(env *env.Environment, args []primitive.Primitive) primitive.Primiti
 	return ret
 }
 
-// sinFn implements sin
-func sinFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
-
-	// We only need a single argument
-	if len(args) != 1 {
-		return primitive.ArityError()
-	}
-
-	// Which is a number
-	n, ok := args[0].(primitive.Number)
-	if !ok {
-		return primitive.Error("argument not a number")
-	}
-
-	return primitive.Number(math.Sin(float64(n)))
-}
-
-// sinhFn implements sinh
-func sinhFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
-
-	// We only need a single argument
-	if len(args) != 1 {
-		return primitive.ArityError()
-	}
-
-	// Which is a number
-	n, ok := args[0].(primitive.Number)
-	if !ok {
-		return primitive.Error("argument not a number")
-	}
-
-	return primitive.Number(math.Sinh(float64(n)))
-}
-
 // sortFn implements (sort)
 func sortFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
 	// If we have only a single argument
@@ -1944,39 +1817,6 @@ func stringLtFn(env *env.Environment, args []primitive.Primitive) primitive.Prim
 	return primitive.Bool(a < b)
 }
 
-// tanFn implements tan
-func tanFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
-
-	// We only need a single argument
-	if len(args) != 1 {
-		return primitive.ArityError()
-	}
-
-	// Which is a number
-	n, ok := args[0].(primitive.Number)
-	if !ok {
-		return primitive.Error("argument not a number")
-	}
-
-	return primitive.Number(math.Tan(float64(n)))
-}
-
-// tanhFn implements tanh
-func tanhFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
-
-	// We only need a single argument
-	if len(args) != 1 {
-		return primitive.ArityError()
-	}
-
-	// Which is a number
-	n, ok := args[0].(primitive.Number)
-	if !ok {
-		return primitive.Error("argument not a number")
-	}
-
-	return primitive.Number(math.Tanh(float64(n)))
-}
 
 // timeFn returns the current (HH, MM, SS) as a list.
 func timeFn(env *env.Environment, args []primitive.Primitive) primitive.Primitive {
