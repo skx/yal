@@ -14,13 +14,15 @@ import (
 
 	"github.com/skx/yal/primitive"
 	"github.com/tliron/glsp"
+
 	protocol "github.com/tliron/glsp/protocol_3_16"
 	"github.com/tliron/glsp/server"
-	"github.com/tliron/kutil/logging"
 	"go.lsp.dev/uri"
 
-	// Must include a backend implementation. See kutil's logging/ for other options.
-	_ "github.com/tliron/kutil/logging/simple"
+	// Must include a backend implementation
+	// See CommonLog for other options: https://github.com/tliron/commonlog
+	"github.com/tliron/commonlog"
+	_ "github.com/tliron/commonlog/simple"
 )
 
 // lsName contains the name of our LSP handler
@@ -51,7 +53,7 @@ func initialize(context *glsp.Context, params *protocol.InitializeParams) (any, 
 
 // lspStart launches our LSP server in the foreground, and doesn't return.
 func lspStart() {
-	logging.Configure(1, nil)
+	commonlog.Configure(1, nil)
 
 	handler = protocol.Handler{
 		// generic
