@@ -1,5 +1,9 @@
 #!/bin/bash
 
+# I don't even ..
+go env -w GOFLAGS="-buildvcs=false"
+
+
 # Install the tools we use to test our code-quality.
 #
 # Here we setup the tools to install only if the "CI" environmental variable
@@ -36,9 +40,6 @@ echo "Completed linter .."
 echo "Launching shadowed-variable check .."
 go vet -vettool=$(which shadow) ./...
 echo "Completed shadowed-variable check .."
-
-# I don't even ..
-go env -w GOFLAGS="-buildvcs=false"
 
 # Run golang tests
 go test ./...
