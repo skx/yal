@@ -599,6 +599,57 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 			}
 		}
 
+		// Sneaky type-conversion.
+		//
+		// What we're trying to do here is coerce arguments a little:
+		//
+		// - If a function is defined in lisp
+		//   - That takes ONE argument
+		//   - But more are provided
+		// - THEN
+		//   - Convert those arguments into a list and pass as a single arg
+		// - UNLESS
+		//   - The argument to the function is meant for variadic usage
+		//   - OR
+		//   - The argument is typed as not taking a list
+		//
+		if len(proc.Args) == 1 && len(args) > 1 {
+
+			// Get the argument name
+			// If this is typed it will have ":blah" suffix
+			// If this is variadic it will have "&" prefix
+			//
+			arg := proc.Args[0].ToString()
+
+			//
+			// Ignore variadic argument
+			//
+			if len(arg) > 0 && arg[0] != '&' {
+
+				//
+				// Is there a type-suffix?  Split by ":" to find out
+				//
+				parts := strings.Split(arg, ":")
+
+				//
+				// If there is NOT a type-suffix, or there is one that specifies a list
+				//
+				if len(parts) == 0 || (len(parts) == 2 && parts[1] == "list") {
+
+					// Convert the argument supplied into a list
+					var tmp primitive.List
+					for _, x := range args {
+						tmp = append(tmp, x)
+					}
+
+					// And replace the arguments
+					args = []primitive.Primitive{
+						tmp,
+					}
+				}
+			}
+		}
+
 		//
 		// Check that the arguments supplied match those that are expected.
 		//
