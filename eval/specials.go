@@ -120,6 +120,13 @@ func (ev *Eval) evalSpecialForm(name string, args []primitive.Primitive, e *env.
 		symb, ok := args[0].(primitive.Symbol)
 		if ok {
 			val := ev.eval(args[1], e, expandMacro)
+
+			// Was that an error?
+			er, eok := val.(primitive.Error)
+			if eok {
+				return er, true
+			}
+
 			e.Set(string(symb), val)
 			return primitive.Nil{}, true
 		}
@@ -360,6 +367,12 @@ func (ev *Eval) evalSpecialForm(name string, args []primitive.Primitive, e *env.
 			// evaluate the value - use the new environment.
 			eVal := ev.eval(val, newEnv, expandMacro)
 
+			// Was that an error?
+			er, eok := eVal.(primitive.Error)
+			if eok {
+				return er, true
+			}
+
 			// The thing to set
 			eKey, ok := key.(primitive.Symbol)
 			if !ok {
@@ -463,6 +476,12 @@ func (ev *Eval) evalSpecialForm(name string, args []primitive.Primitive, e *env.
 
 		// Get the value.
 		val := ev.eval(args[1], e, expandMacro)
+
+		// Was that an error?
+		er, eok := val.(primitive.Error)
+		if eok {
+			return er, true
+		}
 
 		// If we're loading our standard library save the function
 		if ev.loadingStdlib {
