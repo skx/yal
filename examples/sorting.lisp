@@ -118,6 +118,6 @@
                       (print "List element %d differs!" x))
                   (if (! (eq b c))
                       (print "List element %d differs!" x))
-                  (print "%d,%d,%d,%d" x a b c))))
+                  (print "offset %d had identical values: %d,%d,%d" x a b c))))
   (print "All done!")
   )
