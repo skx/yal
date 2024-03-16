@@ -258,13 +258,41 @@ func (ev *Eval) evalSpecialForm(name string, args []primitive.Primitive, e *env.
 			return er, true
 		}
 
-		// if the test was false then we return
-		// the else-section
+		// if the test was false then we return the else-section
+		//
+		// NOTE: There can be multiple false sections:
+		//
+		//   (if false false
+		//      (print "else1")
+		//      (print "else2..")
+		//      (print "elseN"))
+		//
 		if b, ok := test.(primitive.Bool); (ok && !bool(b)) || primitive.IsNil(test) {
+
+			// default return value
+			var ret primitive.Primitive
+
+			// default return value is nil
+			ret = primitive.Nil{}
+
+			// No else clause(s) ?  Return the nil
 			if len(args) < 3 {
-				return primitive.Nil{}, true
+				return ret, true
 			}
-			return ev.eval(args[2], e, expandMacro), true
+
+			// Otherwise execute all the false statements.
+			for _, x := range args[2:] {
+				ret = ev.eval(x, e, expandMacro)
+
+				// error?
+				er, eok := ret.(primitive.Error)
+				if eok {
+					return er, true
+				}
+			}
+
+			// all done
+			return ret, true
 		}
 
 		// otherwise we handle the true-section.

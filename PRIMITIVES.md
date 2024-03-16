@@ -1,4 +1,3 @@
-
 * [Primitives](#primitives)
   * [Symbols](#symbols)
   * [Special Forms](#special-forms)
@@ -10,6 +9,8 @@
 * [See Also](#see-also)
 
 
+
+
 # Primitives
 
 Here is a list of all the primitives which are available to yal users.
@@ -17,6 +18,7 @@ Here is a list of all the primitives which are available to yal users.
 Note that you might need to consult the source of the standard-library, or
 the help file, to see further details.  This document is primarily intended
 as a quick summary, and might lapse behind reality at times.
+
 
 
 ## Symbols
@@ -39,7 +41,6 @@ Characters are specified via the `#\X` syntax, for escaped characters you just n
 * `#\X` -> "X"
 * `#\\n` -> newline
 * `#\\t` -> tab
-
 
 
 
@@ -74,6 +75,7 @@ You can receive a full-list of special forms via `(specials)`, this list will in
   * Run the supplied list of statements forever, never terminating, without recursion.
 * `if`
   * Our conditional operation.
+  * Note that we support multiple "else" statements, if the condition is not true.
 * `let*`
   * Create a new scope, with locally bound variables.
 * `macroexpand`
@@ -97,6 +99,7 @@ You can receive a full-list of special forms via `(specials)`, this list will in
   * Create a new symbol from the given string.
 * `try`
   * Error-catching warpper, demonstrated in [examples/try.lisp](examples/try.lisp).
+
 
 
 ## Core Primitives
@@ -505,6 +508,8 @@ Functions here include:
   * Is the given number zero?
 
 
+
+
 # Type Checking
 
 Type checking is optional, but supported for function parameters via a `:type` suffix.  Here's an example of type-checking on a parameter value, in this case a list is required, via the `:list` suffix:
@@ -537,6 +542,7 @@ If multiple types are permitted then just keep appending things, for example:
 
 
 
+
 # Testing
 
 There is a simple set of tests written in Lisp, using a macro to define them easily, which can be viewed:
@@ -544,6 +550,7 @@ There is a simple set of tests written in Lisp, using a macro to define them eas
 * [examples/lisp-tests.lisp](examples/lisp-tests.lisp)
 
 Adding new tests is easy enough that this file should be updated over time with new test-cases.
+
 
 
 
