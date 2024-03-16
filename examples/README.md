@@ -3,6 +3,8 @@
 This directory contains some simple lisp examples, which can be executed via `yal`.
 
 
+* [adder.lisp](adder.lisp)
+  * Demonstrate creating an adder with closures.
 * [dynamic.lisp](dynamic.lisp)
   * Execute code by name, via introspection.
 * [fibonacci.lisp](fibonacci.lisp)
