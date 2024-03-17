@@ -1,11 +1,13 @@
-
 * [Brief Yal Introduction](#brief-yal-introduction)
 * [See Also](#see-also)
+
+
 
 
 # Brief Yal Introduction
 
 Yal is a typical toy lisp with support for numbers, strings, characters, hashes and structures.
+
 
 
 ## Primitive Types
@@ -24,6 +26,7 @@ Primitive types work as you would expect:
   * `(print #\*)`
 * Lists are written using parenthesis to group them:
   * `(print (list 1 2 3))`
+
 
 
 ## Other Types
@@ -70,6 +73,31 @@ The structure's fields can be accessed, and updated via generated methods, named
 ```
 
 
+
+## IF
+
+`if` is a standard of lisp, and we support it.  We also implement `cond` - as a macro - and other functions for looping, ranging, and calling functions against lists.
+
+The handling of `if` has been enhanced to allow **multiple** expressions to be executed in the "else" branch.  A standard `if` would look like this:
+
+    (if true
+      (print "This is executed")
+     (print "This is not"))
+
+We also allow:
+
+    (if false
+      (print "This is not executed")
+     (print "This is executed")
+     (print "This is executed too")
+     (print "This is also executed")
+     (print "This is executed as well ..")
+     )
+
+Here you see _multiple_ else-expressions are executed.  Only one expression is executed if the test succeeds, but the alternates have no limit - the return value of the expression is the return value of the last executed expression.
+
+
+
 ## Variables
 
 To set the contents of a variable use `set!` which we saw above:
@@ -94,6 +122,7 @@ form of `set!`:
       (set! global "updated" true)
       ;..
     )
+
 
 
 ## Functions
@@ -130,7 +159,6 @@ That would operate like so:
 
 
 
-
 ## Macros
 To define a macro use `defmacro!`:
 
@@ -142,6 +170,7 @@ You might use this macro like so:
     (debug foo)
 
 That concludes the brief overview, note that `lambda` can be used as a synonym for `fn*`, and other synonyms exist.  In the interests of simplicity they're not covered here.
+
 
 
 ## See Also
