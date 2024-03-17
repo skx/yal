@@ -9,6 +9,16 @@
 (set! make-adder (fn* (n)
    (fn* (m) (+ n m))))
 
+;;
+;; Here's a function which uses a closure to keep
+;; returning an incremented value each time it is called
+;;
+(set! counter (fn* (m)
+                 (fn* ()
+                      (do
+                          (set! m (+ m 1) true)
+                          m))))
+
 
 ;; Now create two adders.
 ;;
@@ -26,3 +36,15 @@
 ;;
 (print "(+ 10 5) => %d" (addFive 10))
 (print "(+ 10 3) => %d" (addTen   3))
+
+
+;; We can create a counter using the counter function
+;; we defined above too:
+(set! count (counter 0))
+
+;; Now call that ten times
+(repeat 10 (lambda (n)
+             (print "Counter shows: %d" (count))))
+
+;; And a final run
+(print "Last counter returned: %d" (count))
