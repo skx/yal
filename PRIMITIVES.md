@@ -398,6 +398,8 @@ Functions here include:
 * `first`
   * Return the first element of the given list.
   * This is the same as `car`.
+* `flatten`
+  * Convert a list of nested lists to a single list, flattening it.
 * `function?`
   * Is the given thing a function?
 * `hash?`
@@ -427,6 +429,8 @@ Functions here include:
 * `mean`
   * Return the average of the numbers in the specified list.
 * `member`
+  * Return true if the specified item is contained within the given list.
+* `member?`
   * Return true if the specified item is contained within the given list.
 * `min`
   * Return the maximum value in the specified list.
@@ -460,6 +464,8 @@ Functions here include:
   * Run the given body N times.
 * `repeated`
   * Return a list of length N whose elements are all X.
+* `replace`
+  * Replace any item of a list matching BEFORE with AFTER.
 * `require`
   * Allow loading a file, by name.
 * `rest`

@@ -22,6 +22,12 @@ See-also: intersection, member, occurrences, union."
                         (if (= 0 (length res)) nil res ))))
 
 
+(set! member? (fn* (item lst:list)
+                   "Return true if the item is a member of the list"
+                   (if (find item lst)
+                       true
+                     false)))
+
 (set! flatten (fn* (L)
                    "Converts a list of nested lists to a single list, flattening it."
                    (if (nil? L)
@@ -75,3 +81,12 @@ See-also: find, intersection, member, occurrences."
        (member (car x) y) (union (cdr x) y)
        true (cons (car x) (union (cdr x) y))
        )))
+
+
+(set! replace (fn* (lst:list before after)
+                   "Given a list replace any item matching before with after."
+                   (if (nil? lst)
+                       ()
+                     (if (eq (car lst) before)
+                         (cons after (replace (cdr lst) before after))
+                       (cons (car lst) (replace (cdr lst) before after))))))
