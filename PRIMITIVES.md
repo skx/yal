@@ -159,7 +159,7 @@ You can receive a full-list of these via `(builtins)`, this list will include:
 * `chr`
   * Return the ASCII character of the given number.
 * `cons`
-  * Add the element to the start of the given (potentialy empty) list.
+  * Add the element to the start of the given (potentially empty) list.
 * `contains?`
   * Does the specified hash contain the given key?
 * `cos`

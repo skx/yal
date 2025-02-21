@@ -9,6 +9,9 @@
 (set! make-adder (fn* (n)
    (fn* (m) (+ n m))))
 
+(set! doubler (fn* (f) (lambda (x) (f x x))))
+(print ((doubler *) 4))
+
 ;;
 ;; Here's a function which uses a closure to keep
 ;; returning an incremented value each time it is called

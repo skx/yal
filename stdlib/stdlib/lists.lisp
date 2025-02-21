@@ -11,7 +11,7 @@
 
 
 (set! find (fn* (item lst)
-                "Return the offsets of any occurence of the item in the given list, nil on failure.
+                "Return the offsets of any occurrence of the item in the given list, nil on failure.
 
 See-also: intersection, member, occurrences, union."
                      (let* (len (length lst)

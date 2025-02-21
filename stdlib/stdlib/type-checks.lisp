@@ -1,4 +1,4 @@
-;;; type-checks.lisp - Type-comparisions for given objects
+;;; type-checks.lisp - Type-comparisons for given objects
 
 ;; There is a built in `type` function which returns the type of an object.
 ;;

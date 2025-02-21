@@ -1,10 +1,11 @@
-;;; mal.lisp - Compatability with MAL, implemented in lisp.
+;;; mal.lisp - Compatibility with MAL, implemented in lisp.
 
 
 ;; Traditionally we use `car` and `cdr` for accessing the first and rest
 ;; elements of a list.  For readability it might be nice to vary that
 (alias first car)
 (alias rest  cdr)
+
 
 
 ;; Run an arbitrary series of statements, if the given condition is true.

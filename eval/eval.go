@@ -398,7 +398,7 @@ func (ev *Eval) eval(exp primitive.Primitive, e *env.Environment, expandMacro bo
 		//
 		// So we need to work out what it is:
 		//
-		//  1. A syntethic method, relate to struct.
+		//  1. A synthetic method, relate to struct.
 		//
 		//  2. A golang-implemented primitive.
 		//

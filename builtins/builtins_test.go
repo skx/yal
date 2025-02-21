@@ -791,7 +791,7 @@ func TestDirectory(t *testing.T) {
 	// Create a temporary directory
 	path, err := os.MkdirTemp("", "directory_")
 	if err != nil {
-		t.Fatalf("failed to create a temporary direcotry")
+		t.Fatalf("failed to create a temporary directory")
 	}
 
 	// directory? should return true
@@ -1805,7 +1805,7 @@ func TestFileWrite(t *testing.T) {
 	// path beneath the temporary directory
 	target := filepath.Join(path, "foo.txt")
 
-	// remove the direcotry
+	// remove the directory
 	os.RemoveAll(path)
 
 	failure := fileWriteFn(ENV, []primitive.Primitive{
@@ -2105,7 +2105,7 @@ func TestHelp(t *testing.T) {
 		}
 	}
 
-	// Two argument form of help is acceptible - if both args are string
+	// Two argument form of help is acceptable - if both args are string
 	out = helpFn(ENV, []primitive.Primitive{
 		primitive.String("OK"),
 		primitive.Number(3),
@@ -2119,7 +2119,7 @@ func TestHelp(t *testing.T) {
 		t.Fatalf("got error, but wrong one")
 	}
 
-	// Two argument form of help is acceptible - if both args are string
+	// Two argument form of help is acceptable - if both args are string
 	out = helpFn(ENV, []primitive.Primitive{
 		primitive.Number(3),
 		primitive.String("OK"),
