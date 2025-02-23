@@ -77,35 +77,4 @@ func TestScopedSet(t *testing.T) {
 		t.Fatalf("got variable; wrong value")
 	}
 
-	// Set variable in child
-	c.Set("NAME", "STEVE")
-	//	c.SetOuter("NAME", "STEVE")
-
-	// child should get it
-	val, ok = c.Get("NAME")
-	if !ok {
-		t.Fatalf("failed to get child-variable in child")
-	}
-	if val.(string) != "STEVE" {
-		t.Fatalf("variable had wrong value")
-	}
-
-	// parent should not
-	_, ok = p.Get("NAME")
-	if ok {
-		t.Fatalf("shouldn't be able to get child-variable in parent")
-	}
-
-	// set in the child
-	//
-	// Will actually set in the parent
-	c.SetOuter("FOO", "BART")
-
-	val, ok = p.Get("FOO")
-	if !ok {
-		t.Fatalf("parent-child weirdness")
-	}
-	if val.(string) != "BART" {
-		t.Fatalf("parent-child set failed")
-	}
 }

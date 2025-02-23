@@ -9,7 +9,9 @@
 // or call-frames, you can create a nested environment via NewEnvironment.
 package env
 
-import "github.com/skx/yal/config"
+import (
+	"github.com/skx/yal/config"
+)
 
 // Environment holds our state
 type Environment struct {
@@ -85,15 +87,23 @@ func (env *Environment) Set(key string, value any) {
 	env.values[key] = value
 }
 
-// SetOuter sets the variable in the parent scope, if not present in this one.
-func (env *Environment) SetOuter(key string, value any) {
+// SetInDefinition sets the variable where it is defined, and returns true.
+// If the value is not defined anywhere then we return false.
+func (env *Environment) SetInDefinition(key string, value any) bool {
+
+	// Is it set in this scope?
 	if _, ok := env.values[key]; ok {
+
+		// Then update and return success
 		env.values[key] = value
-		return
+		return true
 	}
 	if env.parent != nil {
-		env.parent.SetOuter(key, value)
+		if env.parent.SetInDefinition(key, value) {
+			return true
+		}
 	}
+	return false
 }
 
 // SetIOConfig updates the configuration object which is stored

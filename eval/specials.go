@@ -523,12 +523,22 @@ func (ev *Eval) evalSpecialForm(name string, args []primitive.Primitive, e *env.
 			}
 		}
 
-		// Now set, either locally or in the parent scope.
-		if len(args) == 3 {
-			e.SetOuter(string(sym), val)
-		} else {
-			e.Set(string(sym), val)
+		//
+		// Okay what we do here will be a little wierd and non-standard
+		//
+		// We want to see if the variable exists in the current scope,
+		// if not we want to search upwards.
+		//
+		// We ONLY set the value in the scope in which it is defined.
+		//
+		v := e.SetInDefinition(string(sym), val)
+		if v {
+			// we set it
+			return primitive.Nil{}, true
 		}
+
+		// We didn't set it, create the variable in the current scope.
+		e.Set(string(sym), val)
 		return primitive.Nil{}, true
 
 	case "stdlib":
