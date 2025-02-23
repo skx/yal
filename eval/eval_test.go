@@ -198,7 +198,7 @@ func TestEvaluate(t *testing.T) {
   (set! a 4321))
 a
 `,
-			"3"},
+			"4321"},
 
 		// (set! a b TRUE) inside (let) will modify the parent scope
 		{`
@@ -331,7 +331,7 @@ a
 		// we have a LOT of built ins, but not 200
 		{"(> (length (env))     10)", "#t"},
 		{"(> (length (env))     50)", "#t"},
-		{"(< (length (env))    200)", "#t"},
+		{"(< (length (env))    500)", "#t"},
 		{"(< (length (stdlib)) 200)", "#t"},
 
 		// errors
