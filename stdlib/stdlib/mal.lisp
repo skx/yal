@@ -23,6 +23,34 @@
 It is similar to an if-statement, however there is no provision for an 'else' clause, and the body specified may contain more than once expression to be evaluated."
                      `(if ~pred (do ~@rest))))
 
+
+
+;; A simple looping primitive, allowing the value of a named
+;; variable to be set to every member of the given list in turn,
+;; and then running the body.
+;;
+;; We define an anonymous function which we then invoke to
+;; setup our scoping, and avoid leaking the variable which
+;; should be used for only the body.
+;;
+;; Sample usage:
+;;
+;;   (loop n '(2 4 6 8)
+;;     (do
+;;       (print "I got %d" n)
+;;       (foo n)))
+;;
+(defmacro! loop (fn* (vr xs bdy)
+                    (let* (inner-sym (gensym))
+                    `(list
+                       (let* (~inner-sym (fn* (~vr) (~@bdy)))
+                         (if (> (length ~xs) 0)
+                           (do
+                             (~inner-sym (car ~xs))
+                             (loop ~vr (cdr ~xs) ~bdy )
+                             )))))))
+
+
 ;;
 ;; If the specified predicate is true, then run the body.
 ;;
