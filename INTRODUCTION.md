@@ -113,16 +113,6 @@ To start a new scope, with local variables, use `let*`:
       ;...
     )
 
-Inside a `let*` block, or a function, you'll only set the values of _local_
-variables.  If you wish to affect something globally use the three-argument
-form of `set!`:
-
-    (let* (foo "bar"
-           baz  "bart")
-      (set! global "updated" true)
-      ;..
-    )
-
 
 
 ## Functions

@@ -78,6 +78,8 @@ You can receive a full-list of special forms via `(specials)`, this list will in
   * Note that we support multiple "else" statements, if the condition is not true.
 * `let*`
   * Create a new scope, with locally bound variables.
+* `loop`
+  * Execute a block with each item of a list.  Similar to apply, but we bind a variable.
 * `macroexpand`
   * Expand the given macro.
 * `quote`
