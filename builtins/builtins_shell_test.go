@@ -102,7 +102,7 @@ func TestShell(t *testing.T) {
 	}
 
 	// with zero entries
-	if len(lst) != 0 {
+	if len(lst) > 0 {
 		t.Fatalf("expected (shell) result to have zero entries, got %v", lst)
 	}
 

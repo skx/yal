@@ -22,7 +22,7 @@ func TestStdlibExcludeAll(t *testing.T) {
 
 	x = Contents()
 	fmt.Printf("%s\n", x)
-	if len(x) != 0 {
+	if len(x) > 0 {
 		t.Fatalf("We expected no content, but got something, despite $YAL_STDLIB_EXCLUDE_ALL")
 	}
 

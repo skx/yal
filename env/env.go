@@ -9,9 +9,7 @@
 // or call-frames, you can create a nested environment via NewEnvironment.
 package env
 
-import (
-	"github.com/skx/yal/config"
-)
+import "github.com/skx/yal/config"
 
 // Environment holds our state
 type Environment struct {
@@ -67,7 +65,7 @@ func (env *Environment) Items() map[string]any {
 // New creates a new environment, with no parent.
 func New() *Environment {
 	return &Environment{
-		values:   map[string]any{},
+		values:   make(map[string]any),
 		ioconfig: config.New(),
 	}
 }
@@ -77,7 +75,7 @@ func New() *Environment {
 func NewEnvironment(parent *Environment) *Environment {
 	return &Environment{
 		parent:   parent,
-		values:   map[string]any{},
+		values:   make(map[string]any),
 		ioconfig: parent.ioconfig,
 	}
 }

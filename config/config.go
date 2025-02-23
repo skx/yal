@@ -35,7 +35,7 @@ type Config struct {
 // New returns a new configuration object
 func New() *Config {
 
-	e := &Config{}
+	e := new(Config)
 	return e
 }
 

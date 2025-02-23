@@ -917,7 +917,7 @@ func TestDirectoryEntries(t *testing.T) {
 	}
 
 	// but empty
-	if len(lst) != 0 {
+	if len(lst) > 0 {
 		t.Fatalf("failed to find expected file-count, got %v", lst)
 	}
 

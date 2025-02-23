@@ -1,8 +1,6 @@
 package primitive
 
-import (
-	"fmt"
-)
+import "fmt"
 
 // Number type holds numbers.
 type Number float64
