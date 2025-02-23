@@ -41,6 +41,7 @@ It is similar to an if-statement, however there is no provision for an 'else' cl
 ;;       (foo n)))
 ;;
 (defmacro! loop (fn* (vr xs bdy)
+                     "loop allows executing a block of code with a single variable bound to an item from the supplied list."
                     (let* (inner-sym (gensym))
                     `(list
                        (let* (~inner-sym (fn* (~vr) (~@bdy)))
